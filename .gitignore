@@ -1,3 +1,9 @@
+.vscode/
+
+# Outputs
+*.log
+*.txt
+
 # Prerequisites
 *.d
 
