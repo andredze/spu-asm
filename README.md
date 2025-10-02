@@ -27,7 +27,7 @@ Build programm
 
 ## Compiling
 ```powershell
-  compile
+  compile.exe
 ```
 
 ## Usage
