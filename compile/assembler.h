@@ -20,7 +20,8 @@ typedef enum AsmCommand {
     ASM_CMD_ADD = 2,
     ASM_CMD_SUB = 3,
     ASM_CMD_MUL = 4,
-    ASM_CMD_DIV = 5
+    ASM_CMD_DIV = 5,
+    ASM_CMD_SQRT = 6
 } AsmCommand_t;
 
 typedef struct AsmCommCase {

@@ -1,6 +1,6 @@
 CXX = g++
 
-CXXFLAGS =  -Iinclude \
+CXXFLAGS =  -Iinclude -Icompile \
 			-Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef \
 			-Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations \
 			-Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ \
@@ -15,8 +15,7 @@ SOURCES = source/main.cpp \
 		  source/stack.cpp \
 		  source/maths.cpp \
 		  source/input.cpp \
-		  source/calculator.cpp \
-		  source/assembler.cpp
+		  source/calculator.cpp
 
 EXECUTABLE = run.exe
 
@@ -25,14 +24,14 @@ OUTPUTS = stack.log
 all:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)
 
+compile_asm:
+	$(CXX) $(CXXFLAGS) compile/main.cpp compile/assembler.cpp compile/input.cpp -o compile.exe
+
 release:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)
 
 debug:
 	$(CXX) -DDEBUG $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)
-
-canary:
-	$(CXX) -DCANARY $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)
 
 clean:
 	rm $(OUTPUTS) $(EXECUTABLE)

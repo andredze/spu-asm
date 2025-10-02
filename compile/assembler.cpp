@@ -77,6 +77,7 @@ int GetAsmCommand(char* line, AsmCommand_t* command, int* value)
                                {"SUB",  ASM_CMD_SUB},
                                {"MUL",  ASM_CMD_MUL},
                                {"DIV",  ASM_CMD_DIV},
+                               {"SQRT", ASM_CMD_SQRT},
                                {"OUT",  ASM_CMD_OUT},
                                {"HLT",  ASM_CMD_HLT}};
 
@@ -99,7 +100,7 @@ int SetBiteCodeCommand(AsmCommand_t command, int value, FILE* output_stream)
 {
     assert(output_stream != NULL);
 
-    if (command < -1 || command > 5)
+    if (command < -1 || command > 6)
     {
         DPRINTF("<ERROR: Unknown command code in SetBiteCodeCommand()>\n");
         return 1;
