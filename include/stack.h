@@ -7,22 +7,47 @@
 #include <string.h>
 #include <assert.h>
 
-#ifdef DEBUG
-#define STACK_OK(stack, reason) \
-        do { \
-            StackErr_t error = STACK_SUCCESS; \
-            if ((error = StackIsOk(stack, __FILE__, __func__, __LINE__, reason)) \
-                       != STACK_SUCCESS) \
-            { \
-                return error; \
-            } \
-        } while (0);
+#ifdef CANARY
+#define CHECK_CANARY(stack) \
+    do { \
+        StackErr_t error = STACK_SUCCESS; \
+        if ((error = StackCheckCanaries(stack)) != STACK_SUCCESS) \
+        { \
+            return error; \
+        } \
+    } while (0)
 #else
-#define STACK_OK(stack, reason) if (StackCheckHash(stack) != STACK_SUCCESS) \
-                                { \
-                                    return STACK_HASH_CHANGED; \
-                                }
+#define CHECK_CANARY(stack) ;
 #endif
+
+#ifdef HASH
+#define CHECK_HASH(stack) \
+    if (StackCheckHash(stack) != STACK_SUCCESS) \
+    { \
+        return STACK_HASH_CHANGED; \
+    }
+#else
+#define CHECK_HASH(stack) ;
+#endif
+
+#ifdef DEBUG
+#define DEBUG_STACK_OK(stack, reason) \
+    do { \
+        StackErr_t error = STACK_SUCCESS; \
+        if ((error = StackIsOk(stack, __FILE__, __func__, __LINE__, reason)) \
+                    != STACK_SUCCESS) \
+        { \
+            return error; \
+        } \
+    } while (0)
+#else
+#define DEBUG_STACK_OK(stack, reason) ;
+#endif
+
+#define STACK_OK(stack, reason) \
+    DEBUG_STACK_OK(stack, reason); \
+    CHECK_CANARY(stack); \
+    CHECK_HASH(stack);
 
 #ifdef DEBUG
     #define INIT_STACK(name) Stack_t name = {.var_info = {#name, __FILE__, __func__, __LINE__}}
@@ -38,13 +63,16 @@
 
 const size_t STACK_SIZE_LIMIT = SIZE_MAX / 32 * 30;
 
-const int CANARY_VALUE_INT = 0xABEBADED;
 const int POISON_INT = 0xDEAFBABA;
 
 typedef int item_t;
-const item_t CANARY_VALUE = CANARY_VALUE_INT;
 const item_t POISON = POISON_INT;
 #define SPEC "%d"
+
+#ifdef CANARY
+const int CANARY_VALUE_INT = 0xABEBADED;
+const item_t CANARY_VALUE = CANARY_VALUE_INT;
+#endif
 
 const char* const reason_start = "Stack didn't pass verifier at the start of function";
 const char* const reason_end = "Stack didn't pass verifier at the end of function";
@@ -76,7 +104,9 @@ typedef struct Stack {
     item_t* data;
     size_t size;
     size_t capacity;
+#ifdef HASH
     size_t hash;
+#endif
 #ifdef DEBUG
     VarInfo_t var_info;
 #endif

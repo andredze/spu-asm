@@ -2,8 +2,9 @@
 
 int main()
 {
-    Context_t asm_commands_data = {.input_file_info =  {.filepath = "commands.txt"},
-                                   .output_file_info = {.filepath = "bitecode.txt"}};
+    Context_t asm_commands_data =
+        {.input_file_info =  {.filepath = "commands.txt"},
+         .output_file_info = {.filepath = "bitecode.txt"}};
 
     if (CompileCalculatorProgramm(&asm_commands_data) != ASM_SUCCESS)
     {

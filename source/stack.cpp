@@ -14,23 +14,37 @@ StackErr_t StackCtor(Stack_t* stack, size_t capacity)
         return STACK_CAPACITY_EXCEEDS_LIMIT;
     }
 
-    item_t* data = (item_t*) calloc(capacity + 2, sizeof(item_t));
+#ifdef CANARY
+    capacity += 2;
+#endif
+
+    item_t* data = (item_t*) calloc(capacity, sizeof(item_t));
     if (data == NULL)
     {
         DPRINTF("Memory allocation failed");
         return STACK_CALLOC_ERROR;
     }
-    data[0] = CANARY_VALUE;
-    data[capacity + 1] = CANARY_VALUE;
+    stack->data = data;
     stack->size = 0;
 
-    for (size_t i = 1; i < capacity + 1; i++)
+    size_t start_poison = 0;
+    size_t end_poison = capacity;
+
+#ifdef CANARY
+    data[0] = CANARY_VALUE;
+    data[capacity - 1] = CANARY_VALUE;
+    start_poison++;
+    end_poison--;
+#endif
+
+    for (size_t i = start_poison; i < end_poison; i++)
     {
         data[i] = POISON;
     }
 
-    stack->data = data;
+#ifdef HASH
     stack->hash = StackHash(stack);
+#endif
 
     STACK_OK(stack, reason_end);
 
@@ -42,10 +56,15 @@ StackErr_t StackReallocUp(Stack_t* stack)
     STACK_OK(stack, reason_start);
 
     size_t old_capacity = stack->capacity;
-    stack->capacity = old_capacity * 2;
+    size_t capacity = old_capacity * 2;
+    stack->capacity = capacity;
+
+#ifdef CANARY
+    capacity += 2;
+#endif
 
     item_t* data = (item_t*) realloc(stack->data,
-                                     (stack->capacity + 2) * sizeof(item_t));
+                                     (capacity) * sizeof(item_t));
     if (data == NULL)
     {
         DPRINTF("Memory reallocation up failed");
@@ -53,15 +72,25 @@ StackErr_t StackReallocUp(Stack_t* stack)
     }
     stack->data = data;
 
-    stack->data[0] = CANARY_VALUE;
-    stack->data[stack->capacity + 1] = CANARY_VALUE;
+    size_t start_poison = old_capacity;
+    size_t end_poison = capacity;
 
-    for (size_t i = old_capacity + 1; i < stack->capacity + 1; i++)
+#ifdef CANARY
+    stack->data[0] = CANARY_VALUE;
+    stack->data[capacity - 1] = CANARY_VALUE;
+    start_poison++;
+    end_poison--;
+#endif
+
+    for (size_t i = start_poison; i < end_poison; i++)
     {
         stack->data[i] = POISON;
     }
 
+#ifdef HASH
     stack->hash = StackHash(stack);
+#endif
+
     STACK_OK(stack, reason_end);
 
     return STACK_SUCCESS;
@@ -71,19 +100,29 @@ StackErr_t StackReallocDown(Stack_t* stack)
 {
     STACK_OK(stack, reason_start);
 
-    stack->capacity = stack->capacity / 2;
+    size_t capacity = stack->capacity / 2;
+    stack->capacity = capacity;
+
+#ifdef CANARY
+    capacity += 2;
+#endif
 
     stack->data = (item_t*) realloc(stack->data,
-                                    (stack->capacity + 2) * sizeof(item_t));
+                                    (capacity) * sizeof(item_t));
     if (stack->data == NULL)
     {
         DPRINTF("Memory reallocation down failed");
         return STACK_REALLOC_ERROR;
     }
 
-    stack->data[stack->capacity + 1] = CANARY_VALUE;
+#ifdef CANARY
+    stack->data[capacity - 1] = CANARY_VALUE;
+#endif
 
+#ifdef HASH
     stack->hash = StackHash(stack);
+#endif
+
     STACK_OK(stack, reason_end);
 
     return STACK_SUCCESS;
@@ -100,11 +139,19 @@ StackErr_t StackPush(Stack_t* stack, item_t item)
             return STACK_REALLOC_ERROR;
         }
     }
+
+#ifdef CANARY
     stack->data[1 + stack->size++] = item;
+#else
+    stack->data[stack->size++] = item;
+#endif
 
     // DPRINTF("pushed = " SPEC "\n", item);
 
+#ifdef HASH
     stack->hash = StackHash(stack);
+#endif
+
     STACK_OK(stack, reason_end);
 
     return STACK_SUCCESS;
@@ -119,10 +166,18 @@ StackErr_t StackPop(Stack_t* stack, item_t* item)
         DPRINTF("<Pop is impossible with zero size>\n");
         return STACK_SIZE_IS_ZERO;
     }
+
+#ifdef CANARY
     *item = stack->data[--stack->size + 1];
     stack->data[stack->size + 1] = POISON;
+#else
+    *item = stack->data[--stack->size];
+    stack->data[stack->size] = POISON;
+#endif
 
+#ifdef HASH
     stack->hash = StackHash(stack);
+#endif
 
     if (stack->size < stack->capacity / 4)
     {
@@ -263,6 +318,9 @@ StackErr_t StackDump(Stack_t* stack, StackErr_t error,
                     "stack: %s [%p]\n{\n"
                     "\tsize = %zu;\n"
                     "\tcapacity = %zu;\n"
+#ifdef HASH
+                    "\thash = %zu;\n"
+#endif
                     "\tdata [%p];\n\t{\n",
                     reason_of_calling,
                     stack->var_info.function,
@@ -272,6 +330,9 @@ StackErr_t StackDump(Stack_t* stack, StackErr_t error,
                     stack->var_info.struct_name, stack,
                     stack->size,
                     stack->capacity,
+#ifdef HASH
+                    stack->hash,
+#endif
                     stack->data);
 
     if (error == STACK_DATA_IS_NULL)
@@ -302,8 +363,16 @@ StackErr_t StackDump(Stack_t* stack, StackErr_t error,
         size = capacity - 1;
     }
 
+    size_t start_index = 0;
+    size_t end_index = capacity;
+
+#ifdef CANARY
     fprintf(stream, "\t\t [0] = " SPEC " (CANARY);\n", data[0]);
-    for (size_t i = 1; i < size + 1; i++)
+    start_index++;
+    end_index++;
+#endif /* CANARY */
+
+    for (size_t i = start_index; i < size + 1; i++)
     {
         if (data[i] == POISON)
         {
@@ -312,16 +381,20 @@ StackErr_t StackDump(Stack_t* stack, StackErr_t error,
         }
         fprintf(stream, "\t\t*[%zu] = " SPEC ";\n", i, data[i]);
     }
-    for (size_t j = size + 1; j < capacity + 1; j++)
+    for (size_t j = size + 1; j < end_index; j++)
     {
         fprintf(stream, "\t\t [%zu] = " SPEC " (POISON);\n",
                         j, stack->data[j]);
     }
+
+#ifdef CANARY
     if (error != STACK_CAPACITY_EXCEEDS_LIMIT)
     {
         fprintf(stream, "\t\t [%zu] = " SPEC " (CANARY);\n",
                         capacity + 1, stack->data[capacity + 1]);
     }
+#endif /* CANARY */
+
     fprintf(stream, "\t}\n"
                     "}");
 
@@ -351,6 +424,8 @@ StackErr_t StackVerify(Stack_t* stack)
     {
         return STACK_SIZE_EXCEEDS_CAPACITY;
     }
+
+#ifdef CANARY
     if (stack->data[0] != CANARY_VALUE)
     {
         return STACK_START_CANARY_RUINED;
@@ -359,19 +434,22 @@ StackErr_t StackVerify(Stack_t* stack)
     {
         return STACK_END_CANARY_RUINED;
     }
+#endif /* CANARY */
+
+#ifdef HASH
     if (StackHash(stack) != stack->hash)
     {
         return STACK_HASH_CHANGED;
     }
+#endif /* HASH */
+
     return STACK_SUCCESS;
 }
-#endif
+#endif /* DEBUG */
 
+#ifdef CANARY
 StackErr_t StackCheckCanaries(Stack_t* stack)
 {
-    assert(stack != NULL);
-    assert(stack->data != NULL);
-
     if (stack->data[0] != CANARY_VALUE)
     {
         fprintf(stderr, "Start canary has changed, stack is now ruined\n");
@@ -385,7 +463,9 @@ StackErr_t StackCheckCanaries(Stack_t* stack)
 
     return STACK_SUCCESS;
 }
+#endif /* CANARY */
 
+#ifdef HASH
 StackErr_t StackCheckHash(Stack_t* stack)
 {
     assert(stack != NULL);
@@ -399,7 +479,9 @@ StackErr_t StackCheckHash(Stack_t* stack)
 
     return STACK_SUCCESS;
 }
+#endif /* HASH */
 
+#ifdef HASH
 // djb2
 size_t StackHash(Stack_t* stack)
 {
@@ -421,17 +503,32 @@ size_t StackHash(Stack_t* stack)
 
     return hash;
 }
+#endif /* HASH */
 
 StackErr_t StackPrint(Stack_t* stack)
 {
     STACK_OK(stack, reason_start);
 
+    size_t end_index = stack->capacity - 1;
+
+#ifdef CANARY
     if (stack->data[0] == CANARY_VALUE)
         printf("[cnry, ");
     else
         printf("[%d, ", stack->data[0]);
+    end_index += 2;
+#else
+    if (stack->data[0] == POISON)
+    {
+        printf("[*, ");
+    }
+    else
+    {
+        printf("[%d, ", stack->data[0]);
+    }
+#endif /* CANARY */
 
-    for (size_t i = 1; i < stack->capacity + 1; i++)
+    for (size_t i = 1; i < end_index; i++)
     {
         if (stack->data[i] == POISON)
             printf("*, ");
@@ -439,10 +536,25 @@ StackErr_t StackPrint(Stack_t* stack)
             printf("%d, ", stack->data[i]);
     }
 
+#ifdef CANARY
     if (stack->data[stack->capacity + 1] == CANARY_VALUE)
         printf("cnry]\n");
     else
-        printf("%d]\n", stack->data[stack->capacity + 1]);
+        printf("%d]\n", stack->data[end_index]);
+#else
+    if (stack->data[end_index] == POISON)
+    {
+        printf("*]\n");
+    }
+    else
+    {
+        printf("%d]\n", stack->data[end_index]);
+    }
+#endif /* CANARY */
+
+#ifdef HASH
+    printf("hash = %zu\n", stack->hash);
+#endif
 
     return STACK_SUCCESS;
 }

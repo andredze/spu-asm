@@ -73,13 +73,13 @@ int GetAsmCommand(char* line, AsmCommand_t* command, int* value)
     }
 
     AsmCommCase_t comm_cases[] = {{"PUSH", ASM_CMD_PUSH},
-                               {"ADD",  ASM_CMD_ADD},
-                               {"SUB",  ASM_CMD_SUB},
-                               {"MUL",  ASM_CMD_MUL},
-                               {"DIV",  ASM_CMD_DIV},
-                               {"SQRT", ASM_CMD_SQRT},
-                               {"OUT",  ASM_CMD_OUT},
-                               {"HLT",  ASM_CMD_HLT}};
+                                  {"ADD",  ASM_CMD_ADD},
+                                  {"SUB",  ASM_CMD_SUB},
+                                  {"MUL",  ASM_CMD_MUL},
+                                  {"DIV",  ASM_CMD_DIV},
+                                  {"SQRT", ASM_CMD_SQRT},
+                                  {"OUT",  ASM_CMD_OUT},
+                                  {"HLT",  ASM_CMD_HLT}};
 
     size_t comm_cases_size = sizeof(comm_cases) / sizeof(comm_cases[0]);
 

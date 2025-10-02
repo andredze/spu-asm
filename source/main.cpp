@@ -5,8 +5,9 @@
 
 int main()
 {
-    Context_t commands_data = {.input_file_info =  {.filepath = "bitecode.txt"},
-                               .output_file_info = {.filepath = "answers.txt"}};
+    Context_t commands_data =
+        {.input_file_info =  {.filepath = "bitecode.txt"},
+         .output_file_info = {.filepath = "answers.txt"}};
 
     if (ExecuteCalculatorProgramm(&commands_data) != CALC_SUCCESS)
     {
