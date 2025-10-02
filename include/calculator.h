@@ -24,7 +24,8 @@ typedef enum Command {
     CMD_ADD = 2,
     CMD_SUB = 3,
     CMD_MUL = 4,
-    CMD_DIV = 5
+    CMD_DIV = 5,
+    CMD_SQRT = 6
 } Command_t;
 
 typedef struct CommCase {

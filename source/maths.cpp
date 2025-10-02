@@ -32,6 +32,25 @@ MathErr_t ApplyMathOperation(Stack_t* stack,
     return MATH_SUCCESS;
 }
 
+MathErr_t Sqrt(Stack_t* stack)
+{
+    assert(stack != NULL);
+
+    int number = 0;
+    if (StackPop(stack, &number) != STACK_SUCCESS)
+    {
+        return MATH_STACK_ERROR;
+    }
+
+    int value = (int) sqrt((double) number);
+    if (StackPush(stack, value) != STACK_SUCCESS)
+    {
+        return MATH_STACK_ERROR;
+    }
+
+    return MATH_SUCCESS;
+}
+
 MathErr_t Add(CalcData_t* calc_data)
 {
     assert(calc_data != NULL);
@@ -47,7 +66,7 @@ MathErr_t Sub(CalcData_t* calc_data)
     assert(calc_data != NULL);
     assert(calc_data->result == 0);
 
-    calc_data->result = calc_data->number1 - calc_data->number2;
+    calc_data->result = calc_data->number2 - calc_data->number1;
 
     return MATH_SUCCESS;
 }
@@ -72,7 +91,7 @@ MathErr_t Div(CalcData_t* calc_data)
         printf("Can not divide by zero\n");
         return MATH_DIVISION_BY_ZERO;
     }
-    calc_data->result = calc_data->number1 / calc_data->number2;
+    calc_data->result = calc_data->number2 / calc_data->number1;
 
     return MATH_SUCCESS;
 }

@@ -3,6 +3,7 @@
 
 #include "stack.h"
 #include "input.h"
+#include <math.h>
 
 typedef enum MathErr {
     MATH_SUCCESS,
@@ -26,6 +27,8 @@ MathErr_t Sub(CalcData_t* calc_data);
 MathErr_t Mul(CalcData_t* calc_data);
 
 MathErr_t Div(CalcData_t* calc_data);
+
+MathErr_t Sqrt(Stack_t* stack);
 
 MathErr_t Out(Stack_t* stack);
 

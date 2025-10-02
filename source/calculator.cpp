@@ -75,7 +75,7 @@ int GetCommand(char* line, Command_t* command, int* value)
     int cmd_code = 0;
     int arg_count = sscanf(line, "%d %d", &cmd_code, value);
 
-    if (!(cmd_code >= -1 && cmd_code <= 5))
+    if (!(cmd_code >= -1 && cmd_code <= 6))
     {
         DPRINTF("Command code %d doesn't exist\n", cmd_code);
         return 1;
@@ -122,6 +122,8 @@ int RunCommand(Stack_t* calc_stack, Command_t command,
             return ApplyMathOperation(calc_stack, Mul) == MATH_SUCCESS ? 0 : 1;
         case CMD_DIV:
             return ApplyMathOperation(calc_stack, Div) == MATH_SUCCESS ? 0 : 1;
+        case CMD_SQRT:
+            return Sqrt(calc_stack) == MATH_SUCCESS ? 0 : 1;
         case CMD_OUT:
             return HandleOut(calc_stack, output_stream);
         case CMD_HLT:
