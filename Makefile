@@ -1,7 +1,6 @@
 CXX = g++
 
-CXXFLAGS =  -Iinclude -Icompile \
-			-Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef \
+CXXFLAGS =  -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef \
 			-Wfloat-equal -Winline -Wunreachable-code -Wmissing-declarations \
 			-Wmissing-include-dirs -Wswitch-enum -Wswitch-default -Weffc++ \
 			-Wmain -Wextra -Wall -g -pipe -fexceptions -Wcast-qual -Wconversion \
@@ -11,30 +10,42 @@ CXXFLAGS =  -Iinclude -Icompile \
 			-Wstrict-null-sentinel -Wtype-limits -Wwrite-strings -Werror=vla -D_DEBUG \
 			-D_EJUDGE_CLIENT_SIDE
 
-SOURCES = source/main.cpp \
-		  source/stack.cpp \
-		  source/maths.cpp \
-		  source/input.cpp \
-		  source/calculator.cpp
+CALCFLAGS = $(CXXFLAGS) -Iinclude
 
-EXECUTABLE = run.exe
+CALCSOURCES = source/main.cpp \
+			  source/stack.cpp \
+			  source/maths.cpp \
+			  source/input.cpp \
+		  	  source/calculator.cpp
 
-OUTPUTS = stack.log
+CALCEXECUTABLE = run.exe
+
+CALCOUTPUTS = answers.txt \
+			  stack.log
+
+ASMSOURCES = compile/main.cpp \
+			 compile/assembler.cpp \
+			 compile/input.cpp
+
+ASMEXECUTABLE = compile.exe
+
+ASMFLAGS = $(CXXFLAGS) -Icompile
+
+ASMOUTPUTS = bitecode.txt
+
+ifdef DEBUG
+ASMFLAGS += -DDEBUG
+CALCFLAGS += -DDEBUG
+endif
 
 all:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)
 
-compile_asm:
-	$(CXX) $(CXXFLAGS) compile/main.cpp compile/assembler.cpp compile/input.cpp -o compile.exe
+compiler:
+	$(CXX) $(ASMFLAGS) $(ASMSOURCES) -o $(ASMEXECUTABLE)
 
-release:
-	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)
-
-debug:
-	$(CXX) -DDEBUG $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)
+calculator:
+	$(CXX) $(CALCFLAGS) $(CALCSOURCES) -o $(CALCEXECUTABLE)
 
 clean:
-	rm $(OUTPUTS) $(EXECUTABLE)
-
-cleanlogs:
-	rm $(OUTPUTS)
+	rm $(CALCOUTPUTS) $(ASMOUTPUTS) $(CALCEXECUTABLE) $(ASMEXECUTABLE)
