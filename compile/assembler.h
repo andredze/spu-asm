@@ -2,6 +2,7 @@
 #define ASSEMBLER_H
 
 #include "input.h"
+#include "commands.h"
 
 const int ASM_MAX_COMMAND_LEN = 200;
 
@@ -20,30 +21,19 @@ typedef enum AsmErr {
     ASM_PRINT_CODE_ERROR
 } AsmErr_t;
 
-typedef enum AsmCommand {
-    ASM_CMD_HLT = -1,
-    ASM_CMD_OUT = 0,
-    ASM_CMD_PUSH = 1,
-    ASM_CMD_ADD = 2,
-    ASM_CMD_SUB = 3,
-    ASM_CMD_MUL = 4,
-    ASM_CMD_DIV = 5,
-    ASM_CMD_SQRT = 6
-} AsmCommand_t;
-
 typedef struct AsmCommCase {
     const char* str_command;
-    AsmCommand_t command;
+    Command_t command;
 } AsmCommCase_t;
 
-const AsmCommCase_t COMM_CASES[] = {{"PUSH", ASM_CMD_PUSH},
-                                    {"ADD",  ASM_CMD_ADD},
-                                    {"SUB",  ASM_CMD_SUB},
-                                    {"MUL",  ASM_CMD_MUL},
-                                    {"DIV",  ASM_CMD_DIV},
-                                    {"SQRT", ASM_CMD_SQRT},
-                                    {"OUT",  ASM_CMD_OUT},
-                                    {"HLT",  ASM_CMD_HLT}};
+const AsmCommCase_t COMM_CASES[] = {{"PUSH", CMD_PUSH},
+                                    {"ADD",  CMD_ADD},
+                                    {"SUB",  CMD_SUB},
+                                    {"MUL",  CMD_MUL},
+                                    {"DIV",  CMD_DIV},
+                                    {"SQRT", CMD_SQRT},
+                                    {"OUT",  CMD_OUT},
+                                    {"HLT",  CMD_HLT}};
 
 const size_t COMM_CASES_SIZE = sizeof(COMM_CASES) / sizeof(COMM_CASES[0]);
 
@@ -52,9 +42,9 @@ AsmErr_t CompileCalculatorProgramm(Context_t* commands_data);
 AsmErr_t CompileCommands(Context_t* commands_data,
                          CodeData_t* code_data);
 
-int GetAsmCommand(char* line, AsmCommand_t* command, int* value);
+int GetAsmCommand(char* line, Command_t* command, int* value);
 
-int SetBiteCodeCommand(AsmCommand_t command, int value,
+int SetBiteCodeCommand(Command_t command, int value,
                        CodeData_t* code_data);
 
 int CodeDataCtor(Context_t* commands_data, CodeData_t* code_data);

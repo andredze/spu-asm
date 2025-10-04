@@ -51,7 +51,7 @@ AsmErr_t CompileCommands(Context_t* commands_data,
     assert(code_data != NULL);
 
     int value = 0;
-    AsmCommand_t command = ASM_CMD_HLT;
+    Command_t command = CMD_HLT;
 
     for (int i = 0; i < commands_data->ptrdata_params.lines_count; i++)
     {
@@ -73,7 +73,7 @@ AsmErr_t CompileCommands(Context_t* commands_data,
     return ASM_SUCCESS;
 }
 
-int GetAsmCommand(char* line, AsmCommand_t* command, int* value)
+int GetAsmCommand(char* line, Command_t* command, int* value)
 {
     assert(line != NULL);
     assert(command != NULL);
@@ -101,7 +101,7 @@ int GetAsmCommand(char* line, AsmCommand_t* command, int* value)
     return 1;
 }
 
-int SetBiteCodeCommand(AsmCommand_t command, int value,
+int SetBiteCodeCommand(Command_t command, int value,
                        CodeData_t* code_data)
 {
     assert(code_data != NULL);
@@ -111,7 +111,7 @@ int SetBiteCodeCommand(AsmCommand_t command, int value,
         DPRINTF("<ERROR: Unknown command code in SetBiteCodeCommand()>\n");
         return 1;
     }
-    if (command == ASM_CMD_PUSH)
+    if (command == CMD_PUSH)
     {
         code_data->buffer[code_data->cur_cmd++] = command;
         code_data->buffer[code_data->cur_cmd++] = value;
@@ -173,7 +173,7 @@ int CreateBiteCodePretty(CodeData_t* code_data, const char* filepath)
     size_t i = 0;
     while (i < code_data->cur_cmd)
     {
-        if (code_data->buffer[i] == ASM_CMD_PUSH)
+        if (code_data->buffer[i] == CMD_PUSH)
         {
             fprintf(pretty_output_info.stream,
                     "%d %d\n",

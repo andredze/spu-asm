@@ -4,6 +4,7 @@
 #include "maths.h"
 #include "input.h"
 #include "stack.h"
+#include "commands.h"
 
 const int CALC_MAX_COMMAND_LEN = 200;
 const size_t CALC_MIN_STACK_CAPACITY = 32;
@@ -16,17 +17,6 @@ typedef enum CalcErr {
     CALC_UNKNOWN_COMMAND,
     CALC_MATH_ERROR
 } CalcErr_t;
-
-typedef enum Command {
-    CMD_HLT = -1,
-    CMD_OUT = 0,
-    CMD_PUSH = 1,
-    CMD_ADD = 2,
-    CMD_SUB = 3,
-    CMD_MUL = 4,
-    CMD_DIV = 5,
-    CMD_SQRT = 6
-} Command_t;
 
 typedef struct CommCase {
     const char* str_command;
