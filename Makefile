@@ -25,11 +25,11 @@ CALCOUTPUTS = answers.txt \
 
 ASMSOURCES = compile/main.cpp \
 			 compile/assembler.cpp \
-			 compile/input.cpp
+			 source/input.cpp
 
 ASMEXECUTABLE = compile.exe
 
-ASMFLAGS = $(CXXFLAGS) -Icompile
+ASMFLAGS = $(CXXFLAGS) -Icompile -Iinclude
 
 ASMOUTPUTS = bitecode.txt
 
