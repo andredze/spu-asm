@@ -5,6 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef DEBUG
+#define NDEBUG
+#endif
+
 #include <assert.h>
 
 #ifdef CANARY
@@ -30,7 +35,7 @@
 #define CHECK_HASH(stack) ;
 #endif
 
-#ifdef DEBUG
+#ifdef DEBUG // stack_debug
 #define DEBUG_STACK_OK(stack, reason) \
     do { \
         StackErr_t error = STACK_SUCCESS; \
@@ -70,7 +75,7 @@ const item_t POISON = POISON_INT;
 #define SPEC "%d"
 
 #ifdef CANARY
-const int CANARY_VALUE_INT = 0xABEBADED;
+const int CANARY_VALUE_INT = 0xAB0BADED;
 const item_t CANARY_VALUE = CANARY_VALUE_INT;
 #endif
 

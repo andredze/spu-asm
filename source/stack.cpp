@@ -108,7 +108,7 @@ StackErr_t StackReallocDown(Stack_t* stack)
 #endif
 
     stack->data = (item_t*) realloc(stack->data,
-                                    (capacity) * sizeof(item_t));
+                                    capacity * sizeof(item_t));
     if (stack->data == NULL)
     {
         DPRINTF("Memory reallocation down failed");
@@ -450,6 +450,9 @@ StackErr_t StackVerify(Stack_t* stack)
 #ifdef CANARY
 StackErr_t StackCheckCanaries(Stack_t* stack)
 {
+    assert(stack != NULL);
+    assert(stack->data != NULL);
+
     if (stack->data[0] != CANARY_VALUE)
     {
         fprintf(stderr, "Start canary has changed, stack is now ruined\n");
