@@ -29,6 +29,17 @@ typedef struct AsmCommCase {
     AsmCommand_t command;
 } AsmCommCase_t;
 
+const AsmCommCase_t COMM_CASES[] = {{"PUSH", ASM_CMD_PUSH},
+                                    {"ADD",  ASM_CMD_ADD},
+                                    {"SUB",  ASM_CMD_SUB},
+                                    {"MUL",  ASM_CMD_MUL},
+                                    {"DIV",  ASM_CMD_DIV},
+                                    {"SQRT", ASM_CMD_SQRT},
+                                    {"OUT",  ASM_CMD_OUT},
+                                    {"HLT",  ASM_CMD_HLT}};
+
+const size_t COMM_CASES_SIZE = sizeof(COMM_CASES) / sizeof(COMM_CASES[0]);
+
 AsmErr_t CompileCalculatorProgramm(Context_t* commands_data);
 
 AsmErr_t CompileCommands(Context_t* commands_data);

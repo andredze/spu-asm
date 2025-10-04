@@ -40,7 +40,7 @@ CalcErr_t ExecuteCommands(Context_t* commands_data);
 int GetCommand(char* line, Command_t* command, int* value);
 
 int RunCommand(Stack_t* calc_stack, Command_t command,
-                int value, FILE* output_stream);
+               int value, FILE* output_stream);
 
 int HandleOut(Stack_t* calc_stack, FILE* output_stream);
 

@@ -72,22 +72,11 @@ int GetAsmCommand(char* line, AsmCommand_t* command, int* value)
         return 1;
     }
 
-    AsmCommCase_t comm_cases[] = {{"PUSH", ASM_CMD_PUSH},
-                                  {"ADD",  ASM_CMD_ADD},
-                                  {"SUB",  ASM_CMD_SUB},
-                                  {"MUL",  ASM_CMD_MUL},
-                                  {"DIV",  ASM_CMD_DIV},
-                                  {"SQRT", ASM_CMD_SQRT},
-                                  {"OUT",  ASM_CMD_OUT},
-                                  {"HLT",  ASM_CMD_HLT}};
-
-    size_t comm_cases_size = sizeof(comm_cases) / sizeof(comm_cases[0]);
-
-    for (size_t i = 0; i < comm_cases_size; i++)
+    for (size_t i = 0; i < COMM_CASES_SIZE; i++)
     {
-        if (strcmp(operation, comm_cases[i].str_command) == 0)
+        if (strcmp(operation, COMM_CASES[i].str_command) == 0)
         {
-            *command = comm_cases[i].command;
+            *command = COMM_CASES[i].command;
             return 0;
         }
     }
