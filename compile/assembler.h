@@ -57,8 +57,12 @@ int GetAsmCommand(char* line, AsmCommand_t* command, int* value);
 int SetBiteCodeCommand(AsmCommand_t command, int value,
                        CodeData_t* code_data);
 
+int CodeDataCtor(Context_t* commands_data, CodeData_t* code_data);
+
 int CreateBiteCode(CodeData_t* code_data, Context_t* commands_data);
 
 int CreateBiteCodePretty(CodeData_t* code_data, const char* filepath);
+
+void AsmDestroy(Context_t* commands_data, CodeData_t* code_data);
 
 #endif /* ASSEMBLER_H */

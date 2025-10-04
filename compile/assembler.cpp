@@ -10,16 +10,12 @@ AsmErr_t CompileCalculatorProgramm(Context_t* commands_data)
     }
     DPRINTF("lines_count = %d\n", commands_data->buffer_data.lines_count);
 
-    int lines_count = commands_data->buffer_data.lines_count;
-    int* buffer = (int*) calloc(lines_count * 2, sizeof(int));
-    if (buffer == NULL)
+    CodeData_t code_data = {};
+
+    if (CodeDataCtor(commands_data, &code_data))
     {
-        DPRINTF("Calloc failed\n");
         return ASM_CALLOC_ERROR;
     }
-
-    CodeData_t code_data = {.buffer = buffer,
-                            .cur_cmd = 0};
 
     AsmErr_t error = ASM_SUCCESS;
     if ((error = CompileCommands(commands_data, &code_data)) != ASM_SUCCESS)
@@ -29,7 +25,7 @@ AsmErr_t CompileCalculatorProgramm(Context_t* commands_data)
 
     for (size_t i = 0; i < code_data.cur_cmd; i++)
     {
-        printf("data[%zu] = %d\n", i, code_data.buffer[i]);
+        DPRINTF("data[%zu] = %d\n", i, code_data.buffer[i]);
     }
 
     if (CreateBiteCode(&code_data, commands_data))
@@ -41,9 +37,8 @@ AsmErr_t CompileCalculatorProgramm(Context_t* commands_data)
         return ASM_PRINT_CODE_ERROR;
     }
 
-    free(code_data.buffer);
-    free(commands_data->buffer_data.buffer);
-    free(commands_data->ptrdata_params.ptrdata);
+    AsmDestroy(commands_data, &code_data);
+
     DPRINTF("\n<End of the compilator>");
 
     return ASM_SUCCESS;
@@ -129,6 +124,22 @@ int SetBiteCodeCommand(AsmCommand_t command, int value,
     return 0;
 }
 
+int CodeDataCtor(Context_t* commands_data, CodeData_t* code_data)
+{
+    int lines_count = commands_data->buffer_data.lines_count;
+
+    int* buffer = (int*) calloc(lines_count * 2, sizeof(int));
+    if (buffer == NULL)
+    {
+        DPRINTF("Calloc failed\n");
+        return 1;
+    }
+    code_data->buffer = buffer;
+    code_data->cur_cmd = 0;
+
+    return 0;
+}
+
 int CreateBiteCode(CodeData_t* code_data, Context_t* commands_data)
 {
     if (OpenFile(&commands_data->output_file_info, "wb"))
@@ -181,4 +192,11 @@ int CreateBiteCodePretty(CodeData_t* code_data, const char* filepath)
     fclose(pretty_output_info.stream);
 
     return 0;
+}
+
+void AsmDestroy(Context_t* commands_data, CodeData_t* code_data)
+{
+    free(code_data->buffer);
+    free(commands_data->buffer_data.buffer);
+    free(commands_data->ptrdata_params.ptrdata);
 }

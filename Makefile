@@ -31,7 +31,7 @@ ASMEXECUTABLE = compile.exe
 
 ASMFLAGS = $(CXXFLAGS) -Icompile -Iinclude
 
-ASMOUTPUTS = bitecode.txt
+ASMOUTPUTS = bitecode.bin pretty_bc.txt
 
 ifdef DEBUG
 ASMFLAGS += -DDEBUG
