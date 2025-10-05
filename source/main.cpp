@@ -42,7 +42,20 @@ int main()
 
     ProcDump(&proc_data, PROC_SUCCESS);
 
-    if (ProcDtor(&proc_data) != PROC_SUCCESS)
+    FILE* stream = fopen("answers.txt", "w");
+    if (stream == NULL)
+    {
+        printf("Error opening output file\n");
+        return EXIT_FAILURE;
+    }
+
+    if (ProcExecuteCommands(&proc_data, stream) != PROC_SUCCESS)
+    {
+        fclose(stream);
+        return EXIT_FAILURE;
+    }
+
+    if (ProcDtor(&proc_data, stream) != PROC_SUCCESS)
     {
         return EXIT_FAILURE;
     }

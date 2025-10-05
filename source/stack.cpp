@@ -235,6 +235,7 @@ StackErr_t StackIsOk(Stack_t* stack,
             return dump_return;
         }
     }
+
     return error;
 }
 
@@ -316,13 +317,13 @@ StackErr_t StackDump(Stack_t* stack, StackErr_t error,
     fprintf(stream, "reason: %s\n"
                     "from %s at %s:%d\n"
                     "ERROR %d: %s\n"
-                    "stack: %s [%p]\n{\n"
+                    "stack: %s [%p]:\n{\n"
                     "\tsize = %zu;\n"
                     "\tcapacity = %zu;\n"
 #ifdef HASH
                     "\thash = %zu;\n"
 #endif
-                    "\tdata [%p];\n\t{\n",
+                    "\tdata [%p]:\n\t{\n",
                     reason_of_calling,
                     stack->var_info.function,
                     stack->var_info.file_name,

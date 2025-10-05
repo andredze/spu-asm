@@ -1,5 +1,7 @@
 #include "assembler.h"
 
+// TODO: disasm
+
 AsmErr_t CompileCalculatorProgramm(Context_t* commands_data)
 {
     assert(commands_data != NULL);
