@@ -211,7 +211,7 @@ StackErr_t StackDtor(Stack_t* stack)
     return STACK_SUCCESS;
 }
 
-#ifdef DEBUG
+#ifdef STACK_DEBUG
 StackErr_t StackIsOk(Stack_t* stack,
                      const char* file_name,
                      const char* function,
@@ -445,7 +445,7 @@ StackErr_t StackVerify(Stack_t* stack)
 
     return STACK_SUCCESS;
 }
-#endif /* DEBUG */
+#endif /* STACK_DEBUG */
 
 #ifdef CANARY
 StackErr_t StackCheckCanaries(Stack_t* stack)

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef DEBUG
+#ifndef STACK_DEBUG
 #define NDEBUG
 #endif
 
@@ -35,8 +35,8 @@
 #define CHECK_HASH(stack) ;
 #endif
 
-#ifdef DEBUG // stack_debug
-#define DEBUG_STACK_OK(stack, reason) \
+#ifdef STACK_DEBUG
+#define STACK_OK_DEBUG(stack, reason) \
     do { \
         StackErr_t error = STACK_SUCCESS; \
         if ((error = StackIsOk(stack, __FILE__, __func__, __LINE__, reason)) \
@@ -46,21 +46,21 @@
         } \
     } while (0)
 #else
-#define DEBUG_STACK_OK(stack, reason) ;
+#define STACK_OK_DEBUG(stack, reason) ;
 #endif
 
 #define STACK_OK(stack, reason) \
-    DEBUG_STACK_OK(stack, reason); \
+    STACK_OK_DEBUG(stack, reason); \
     CHECK_CANARY(stack); \
     CHECK_HASH(stack);
 
-#ifdef DEBUG
-    #define INIT_STACK(name) Stack_t name = {.var_info = {#name, __FILE__, __func__, __LINE__}}
+#ifdef STACK_DEBUG
+    #define STACK_INIT(name) Stack_t name = {.var_info = {#name, __FILE__, __func__, __LINE__}}
 #else
-    #define INIT_STACK(name) Stack_t name = {}
+    #define STACK_INIT(name) Stack_t name = {}
 #endif
 
-#ifdef DEBUG
+#ifdef STACK_DEBUG
     #define DPRINTF(...) fprintf(stderr, __VA_ARGS__);
 #else
     #define DPRINTF(...) ;
@@ -112,7 +112,7 @@ typedef struct Stack {
 #ifdef HASH
     size_t hash;
 #endif
-#ifdef DEBUG
+#ifdef STACK_DEBUG
     VarInfo_t var_info;
 #endif
 } Stack_t;
