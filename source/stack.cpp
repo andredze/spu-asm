@@ -11,7 +11,6 @@ StackErr_t StackCtor(Stack_t* stack, size_t capacity)
 
     if (stack->capacity > STACK_SIZE_LIMIT)
     {
-        DPRINTF("<Capacity exceeds limit>\n");
         return STACK_CAPACITY_EXCEEDS_LIMIT;
     }
 
@@ -245,47 +244,48 @@ int StackErrToStr(StackErr_t error, const char** line)
     {
         case STACK_SUCCESS:
             *line = "No errors occurred";
-            break;
+            return 0;
         case STACK_IS_NULL:
             *line = "Pointer to the stack structure is NULL";
-            break;
+            return 0;
         case STACK_DATA_IS_NULL:
             *line = "Pointer to the stack data is NULL";
-            break;
+            return 0;
         case STACK_SIZE_EXCEEDS_LIMIT:
             *line = "Size exceeded limit (possibly set to the negative value)";
-            break;
+            return 0;
         case STACK_CAPACITY_EXCEEDS_LIMIT:
             *line = "Capacity exceeded limit (possibly set to the negative value)";
-            break;
+            return 0;
         case STACK_SIZE_EXCEEDS_CAPACITY:
             *line = "Size exceeded capacity";
-            break;
+            return 0;
         case STACK_CALLOC_ERROR:
             *line = "Memory allocation with calloc failed";
-            break;
+            return 0;
         case STACK_REALLOC_ERROR:
             *line = "Memory reallocation failed";
-            break;
+            return 0;
         case STACK_START_CANARY_RUINED:
             *line = "Start boundary value was changed";
-            break;
+            return 0;
         case STACK_END_CANARY_RUINED:
             *line = "End boundary value was changed";
-            break;
+            return 0;
         case STACK_FILE_OPENNING_ERROR:
             *line = "Opening the log file failed";
-            break;
+            return 0;
         case STACK_SIZE_IS_ZERO:
             *line = "Size equals zero";
-            break;
+            return 0;
         case STACK_HASH_CHANGED:
             *line = "Hash changed it's value";
-            break;
+            return 0;
         default:
             return 1;
     }
-    return 0;
+
+    return 1;
 }
 
 StackErr_t StackDump(Stack_t* stack, StackErr_t error,
@@ -377,7 +377,7 @@ StackErr_t StackDump(Stack_t* stack, StackErr_t error,
     {
         if (data[i] == POISON)
         {
-            size = i;
+            size = i - 1;
             break;
         }
         fprintf(stream, "\t\t*[%zu] = " SPEC ";\n", i, data[i]);
