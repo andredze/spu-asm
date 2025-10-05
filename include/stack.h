@@ -61,9 +61,13 @@
 #endif
 
 #ifdef STACK_DEBUG
-    #define DPRINTF(...) fprintf(stderr, __VA_ARGS__);
+    #ifndef DPRINTF
+        #define DPRINTF(...) fprintf(stderr, __VA_ARGS__);
+    #endif
 #else
-    #define DPRINTF(...) ;
+    #ifndef DPRINTF
+        #define DPRINTF(...) ;
+    #endif
 #endif
 
 const size_t STACK_SIZE_LIMIT = SIZE_MAX / 32 * 30;

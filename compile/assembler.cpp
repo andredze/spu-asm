@@ -147,6 +147,11 @@ int CreateBiteCode(CodeData_t* code_data, Context_t* commands_data)
         return 1;
     }
 
+    fwrite(&code_data->cur_cmd,
+           sizeof(code_data->cur_cmd),
+           1,
+           commands_data->output_file_info.stream);
+
     if (fwrite(code_data->buffer,
                sizeof(code_data->buffer[0]),
                code_data->cur_cmd,

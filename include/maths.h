@@ -17,8 +17,8 @@ typedef struct CalcData {
     int result;
 } CalcData_t;
 
-MathErr_t ApplyMathOperation(Stack_t* stack,
-                             MathErr_t (* calculate) (CalcData_t* calc_data));
+MathErr_t ApplyBinaryOperation(Stack_t* stack,
+                               MathErr_t (* calculate) (CalcData_t* calc_data));
 
 MathErr_t Add(CalcData_t* calc_data);
 

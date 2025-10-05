@@ -1,6 +1,6 @@
 #include "calculator.h"
 
-CalcErr_t ExecuteCalculatorProgramm(Context_t* commands_data)
+CalcErr_t ExecutePrettyBCProgramm(Context_t* commands_data)
 {
     assert(commands_data != NULL);
 
@@ -34,7 +34,7 @@ CalcErr_t ExecuteCommands(Context_t* commands_data)
     Command_t command = CMD_HLT;
     int value = 0;
 
-    INIT_STACK(calc_stack);
+    STACK_INIT(calc_stack);
 
     if (StackCtor(&calc_stack, CALC_MIN_STACK_CAPACITY) != STACK_SUCCESS)
     {
@@ -115,13 +115,13 @@ int RunCommand(Stack_t* calc_stack, Command_t command,
         case CMD_PUSH:
             return StackPush(calc_stack, value) == STACK_SUCCESS ? 0 : 1;
         case CMD_ADD:
-            return ApplyMathOperation(calc_stack, Add) == MATH_SUCCESS ? 0 : 1;
+            return ApplyBinaryOperation(calc_stack, Add) == MATH_SUCCESS ? 0 : 1;
         case CMD_SUB:
-            return ApplyMathOperation(calc_stack, Sub) == MATH_SUCCESS ? 0 : 1;
+            return ApplyBinaryOperation(calc_stack, Sub) == MATH_SUCCESS ? 0 : 1;
         case CMD_MUL:
-            return ApplyMathOperation(calc_stack, Mul) == MATH_SUCCESS ? 0 : 1;
+            return ApplyBinaryOperation(calc_stack, Mul) == MATH_SUCCESS ? 0 : 1;
         case CMD_DIV:
-            return ApplyMathOperation(calc_stack, Div) == MATH_SUCCESS ? 0 : 1;
+            return ApplyBinaryOperation(calc_stack, Div) == MATH_SUCCESS ? 0 : 1;
         case CMD_SQRT:
             return Sqrt(calc_stack) == MATH_SUCCESS ? 0 : 1;
         case CMD_OUT:

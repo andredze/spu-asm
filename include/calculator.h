@@ -23,7 +23,7 @@ typedef struct CommCase {
     Command_t command;
 } CommCase_t;
 
-CalcErr_t ExecuteCalculatorProgramm(Context_t* commands_data);
+CalcErr_t ExecutePrettyBCProgramm(Context_t* commands_data);
 
 CalcErr_t ExecuteCommands(Context_t* commands_data);
 

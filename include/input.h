@@ -9,9 +9,13 @@
 #include <sys\stat.h>
 
 #ifdef DEBUG
-    #define DPRINTF(...) fprintf(stderr, __VA_ARGS__);
+    #ifndef DPRINTF
+        #define DPRINTF(...) fprintf(stderr, __VA_ARGS__);
+    #endif
 #else
-    #define DPRINTF(...) ;
+    #ifndef DPRINTF
+        #define DPRINTF(...) ;
+    #endif
 #endif
 
 typedef struct BufferData {

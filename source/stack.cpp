@@ -11,6 +11,7 @@ StackErr_t StackCtor(Stack_t* stack, size_t capacity)
 
     if (stack->capacity > STACK_SIZE_LIMIT)
     {
+        DPRINTF("<Capacity exceeds limit>\n");
         return STACK_CAPACITY_EXCEEDS_LIMIT;
     }
 

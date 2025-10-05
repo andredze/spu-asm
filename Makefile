@@ -16,7 +16,8 @@ CALCSOURCES = source/main.cpp \
 			  source/stack.cpp \
 			  source/maths.cpp \
 			  source/input.cpp \
-		  	  source/calculator.cpp
+		  	  source/calculator.cpp \
+			  source/processor.cpp
 
 CALCEXECUTABLE = run.exe
 
@@ -35,7 +36,7 @@ ASMOUTPUTS = bitecode.bin pretty_bc.txt
 
 ifdef DEBUG
 ASMFLAGS += -DDEBUG
-CALCFLAGS += -DDEBUG
+CALCFLAGS += -DPROC_DEBUG -DSTACK_DEBUG -DDEBUG
 endif
 
 all:

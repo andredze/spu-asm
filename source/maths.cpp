@@ -1,7 +1,7 @@
 #include "maths.h"
 
-MathErr_t ApplyMathOperation(Stack_t* stack,
-                             MathErr_t (* calculate) (CalcData_t* calc_data))
+MathErr_t ApplyBinaryOperation(Stack_t* stack,
+                               MathErr_t (* calculate) (CalcData_t* calc_data))
 {
     assert(stack != NULL);
     assert(stack->data != NULL);
