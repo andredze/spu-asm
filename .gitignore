@@ -1,8 +1,10 @@
+# Directories
 .vscode/
 
 # Outputs
 *.log
 *.txt
+*.bin
 
 # Prerequisites
 *.d
