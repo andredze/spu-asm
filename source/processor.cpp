@@ -318,7 +318,6 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
     Command_t command = CMD_HLT;
     int value = 0;
 
-    // TODO: cmd_count in size_t
     while (proc_data->cmd_count < proc_data->code_size)
     {
         DPRINTF("\nEntering %zu instruction\n", proc_data->cmd_count);

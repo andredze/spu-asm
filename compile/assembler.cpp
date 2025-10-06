@@ -98,36 +98,41 @@ int GetAsmCommand(char* line, Command_t* command, int* value)
         }
     }
 
-    // TODO: покрасивее сделать (прототип)
     if (CmdArgsCount(*command) == 1)
     {
-        if (*command == CMD_PUSH)
+        if (GetValue(*command, line, value))
         {
-            if (sscanf(line, "%s %d", operation, value) != 2)
-            {
-                DPRINTF("sscanf failed\n");
-                return 1;
-            }
-            return 0;
+            return 1;
         }
-        else
+    }
+
+    return 0;
+}
+
+int GetValue(Command_t command, const char* line, int* value)
+{
+    char operation[CMD_MAX_LEN] = {};
+    if (command == CMD_PUSH)
+    {
+        if (sscanf(line, "%s %d", operation, value) != 2)
         {
-            char reg[CMD_MAX_LEN] = {};
-            if (sscanf(line, "%s %s", operation, reg) != 2)
-            {
-                DPRINTF("sscanf failed\n");
-                return 1;
-            }
-            *value = reg[1] - 'A';
-            return 0;
+            DPRINTF("sscanf failed\n");
+            return 1;
         }
+        return 0;
     }
     else
     {
+        char reg[CMD_MAX_LEN] = {};
+        if (sscanf(line, "%s %s", operation, reg) != 2)
+        {
+            DPRINTF("sscanf failed\n");
+            return 1;
+        }
+        *value = reg[1] - 'A';
         return 0;
     }
 
-    DPRINTF("Unknown processor command\n");
     return 1;
 }
 

@@ -26,6 +26,8 @@ AsmErr_t CompileCommands(Context_t* commands_data,
 
 int GetAsmCommand(char* line, Command_t* command, int* value);
 
+int GetValue(Command_t command, const char* line, int* value);
+
 int SetBiteCodeCommands(Command_t command, int value,
                         CodeData_t* code_data);
 
