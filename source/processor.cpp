@@ -1,6 +1,5 @@
 #include "processor.h"
 
-// TODO: regs
 // TODO: rename codmmands_data and proc_data
 // TODO: in load pretty check if args are valid
 
@@ -154,9 +153,9 @@ ProcErr_t ProcVerify(Proc_t* proc_data)
     {
         return PROC_CODE_IS_NULL;
     }
-    if (proc_data->cmd_count < 0)
+    if (proc_data->cmd_count > PROC_CODE_SIZE_LIMIT)
     {
-        return PROC_CMD_COUNT_NEGATIVE;
+        return PROC_CMD_COUNT_EXCEEDS_LIMIT;
     }
     if (proc_data->code_size > PROC_CODE_SIZE_LIMIT)
     {
@@ -211,8 +210,8 @@ int ProcErrToStr(ProcErr_t error, const char** error_str)
         case PROC_STACK_ERROR:
             *error_str = "Error with proc_data.stack, check stack logs";
             return 0;
-        case PROC_CMD_COUNT_NEGATIVE:
-            *error_str = "Proc_data.cmd_count has negative value";
+        case PROC_CMD_COUNT_EXCEEDS_LIMIT:
+            *error_str = "Proc_data.cmd_count is bigger than limit (probably was set to negative)";
             return 0;
         case PROC_CODE_SIZE_EXCEEDS_LIMIT:
             *error_str = "Proc_data.code_size is bigger than limit (probably was set to negative)";
@@ -227,7 +226,6 @@ int ProcErrToStr(ProcErr_t error, const char** error_str)
     }
 }
 
-// TODO: pretty dump for stack
 ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
 {
     DPRINTF("Dumping...\n");
@@ -258,7 +256,7 @@ ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
     fprintf(stream, "from %s at %s:%d\n"
                     "ERROR %d: %s\n"
                     "proc_data: %s [%p]:\n{\n"
-                    "\tcmd_count = %d;\n"
+                    "\tcmd_count = %zu;\n"
                     "\tcode_size = %zu;\n",
                     proc_data->var_info.function,
                     proc_data->var_info.file_name,
@@ -268,6 +266,7 @@ ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
                     proc_data->cmd_count,
                     proc_data->code_size);
     // stack
+    proc_data->stack.var_info = {"proc_data->stack.var_info", __FILE__, __func__, __LINE__};
     if (StackDump(&proc_data->stack, STACK_SUCCESS, "Proc dump") != STACK_SUCCESS)
     {
         return PROC_STACK_ERROR;
@@ -322,7 +321,7 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
     // TODO: cmd_count in size_t
     while (proc_data->cmd_count < proc_data->code_size)
     {
-        DPRINTF("\nEntering %d instruction\n", proc_data->cmd_count);
+        DPRINTF("\nEntering %zu instruction\n", proc_data->cmd_count);
 
         if (ProcGetCommand(proc_data, &command, &value))
         {

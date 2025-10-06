@@ -15,7 +15,7 @@ typedef enum ProcErr {
     PROC_DATA_IS_NULL,
     PROC_CODE_IS_NULL,
     PROC_STACK_ERROR,
-    PROC_CMD_COUNT_NEGATIVE,
+    PROC_CMD_COUNT_EXCEEDS_LIMIT,
     PROC_CODE_SIZE_EXCEEDS_LIMIT,
     PROC_CMD_COUNT_BIGGER_CODE_SIZE
 } ProcErr_t;
@@ -31,7 +31,7 @@ typedef struct Proc {
     Stack_t stack;
     int* code;
     size_t code_size;
-    int cmd_count;
+    size_t cmd_count;
     int regs[REGS_COUNT];
 #ifdef PROC_DEBUG
     VarInfo_t var_info;
