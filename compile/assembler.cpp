@@ -1,6 +1,7 @@
 #include "assembler.h"
 
 // TODO: disasm
+// TODO: identifier before code
 
 AsmErr_t CompileCalculatorProgramm(Context_t* commands_data)
 {
@@ -66,7 +67,7 @@ AsmErr_t CompileCommands(Context_t* commands_data,
         }
         DPRINTF("Command = %d\n", command);
 
-        if (SetBiteCodeCommand(command, value, code_data))
+        if (SetBiteCodeCommands(command, value, code_data))
         {
             return ASM_SET_COMMAND_ERROR;
         }
@@ -80,13 +81,11 @@ int GetAsmCommand(char* line, Command_t* command, int* value)
     assert(line != NULL);
     assert(command != NULL);
 
-    char operation[ASM_MAX_COMMAND_LEN] = {};
+    char operation[CMD_MAX_LEN] = {};
 
-    int arg_count = sscanf(line, "%s %d", operation, value);
-    if (arg_count < 1 || arg_count > 2)
+    if (sscanf(line, "%s", operation) != 1)
     {
-        DPRINTF("Invalid number of arguments for command\n"
-                        "arg_count = %d; expected = 2", arg_count);
+        DPRINTF("sscanf failed\n");
         return 1;
     }
 
@@ -95,33 +94,80 @@ int GetAsmCommand(char* line, Command_t* command, int* value)
         if (strcmp(operation, COMM_CASES[i].str_command) == 0)
         {
             *command = COMM_CASES[i].command;
+            break;
+        }
+    }
+
+    // TODO: покрасивее сделать (прототип)
+    if (CmdArgsCount(*command) == 1)
+    {
+        if (*command == CMD_PUSH)
+        {
+            if (sscanf(line, "%s %d", operation, value) != 2)
+            {
+                DPRINTF("sscanf failed\n");
+                return 1;
+            }
             return 0;
         }
+        else
+        {
+            char reg[CMD_MAX_LEN] = {};
+            if (sscanf(line, "%s %s", operation, reg) != 2)
+            {
+                DPRINTF("sscanf failed\n");
+                return 1;
+            }
+            *value = reg[1] - 'A';
+            return 0;
+        }
+    }
+    else
+    {
+        return 0;
     }
 
     DPRINTF("Unknown calc command\n");
     return 1;
 }
 
-int SetBiteCodeCommand(Command_t command, int value,
-                       CodeData_t* code_data)
+int SetBiteCodeCommands(Command_t command, int value,
+                        CodeData_t* code_data)
 {
     assert(code_data != NULL);
 
-    if (command < -1 || command > 6)
+    // TODO: check if number is in enum
+    if (command < -1 || command > 33)
     {
-        DPRINTF("<ERROR: Unknown command code in SetBiteCodeCommand()>\n");
+        DPRINTF("<ERROR: Unknown command code in SetBiteCodeCommands()>\n");
         return 1;
     }
+
+    code_data->buffer[code_data->cur_cmd++] = command;
+
+    if (CmdArgsCount(command) == 1)
+    {
+        if (command == CMD_PUSH)
+        {
+            code_data->buffer[code_data->cur_cmd++] = value;
+        }
+        if (command == CMD_TOTR || command == CMD_PUSHR)
+        {
+            code_data->buffer[code_data->cur_cmd++] = value;
+        }
+    }
+
+    return 0;
+}
+
+int CmdArgsCount(Command_t command)
+{
     if (command == CMD_PUSH)
-    {
-        code_data->buffer[code_data->cur_cmd++] = command;
-        code_data->buffer[code_data->cur_cmd++] = value;
-    }
-    else
-    {
-        code_data->buffer[code_data->cur_cmd++] = command;
-    }
+        return 1;
+    if (command == CMD_TOTR)
+        return 1;
+    if (command == CMD_PUSHR)
+        return 1;
 
     return 0;
 }
