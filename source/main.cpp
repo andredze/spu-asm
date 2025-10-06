@@ -13,7 +13,7 @@ int main()
 //     if (ExecuteCalculatorProgramm(&commands_data) != CALC_SUCCESS)
 //     {
 //         return EXIT_FAILURE;
-    // }
+//     }
 
     DPRINTF("Programm start\n");
     PROC_INIT(proc_data);
@@ -22,10 +22,14 @@ int main()
     {
         return EXIT_FAILURE;
     }
-    if (ProcLoadCode(&proc_data, "bitecode.bin") != PROC_SUCCESS)
+    if (ProcLoadPrettyBC(&proc_data, "pretty_bc.txt") != PROC_SUCCESS)
     {
         return EXIT_FAILURE;
     }
+    // if (ProcLoadCode(&proc_data, "bitecode.bin") != PROC_SUCCESS)
+    // {
+    //     return EXIT_FAILURE;
+    // }
 
     DPRINTF("proc_data.code:\n");
     for (size_t i = 0; i < proc_data.code_size; i++)

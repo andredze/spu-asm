@@ -31,7 +31,6 @@
 #endif
 
 const size_t PROC_CODE_SIZE_LIMIT = SIZE_MAX / 32 * 30;
-const int PROC_MAX_COMMAND_LEN = 200;
 const size_t PROC_MIN_STACK_CAPACITY = 32;
 const int REGS_COUNT = 8;
 
@@ -70,6 +69,8 @@ typedef struct Proc {
 ProcErr_t ProcCtor(Proc_t* proc_data);
 
 ProcErr_t ProcLoadCode(Proc_t* proc_data, const char* codepath);
+
+ProcErr_t ProcLoadPrettyBC(Proc_t* proc_data, const char* codepath);
 
 ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream);
 

@@ -1,6 +1,8 @@
 #include "processor.h"
 
 // TODO: regs
+// TODO: rename codmmands_data and proc_data
+// TODO: in load pretty check if args are valid
 
 ProcErr_t ProcCtor(Proc_t* proc_data)
 {
@@ -18,8 +20,68 @@ ProcErr_t ProcCtor(Proc_t* proc_data)
     return PROC_SUCCESS;
 }
 
+ProcErr_t ProcLoadPrettyBC(Proc_t* proc_data, const char* codepath)
+{
+    assert(proc_data != NULL);
+    assert(codepath != NULL);
+    DPRINTF("Loading pretty_bitecode...\n");
+
+    Context_t commands_data = {.input_file_info =  {.filepath = codepath}};
+
+    if (ReadAndParseFile(&commands_data))
+    {
+        return PROC_READING_FILE_ERROR;
+    }
+    DPRINTF("Read and parsed file\n");
+    DPRINTF("lines_count = %d\n", commands_data.buffer_data.lines_count);
+
+    proc_data->code_size = commands_data.buffer_data.lines_count * 2;
+    proc_data->code = (int*) calloc(proc_data->code_size, sizeof(int));
+    if (proc_data->code == NULL)
+    {
+        printf("Calloc failed\n");
+        return PROC_CALLOC_ERROR;
+    }
+
+    int args_count = 0;
+
+    for (int i = 0; i < commands_data.buffer_data.lines_count; i++)
+    {
+        args_count = sscanf(commands_data.ptrdata_params.ptrdata[i],
+                            "%d %d",
+                            &proc_data->code[proc_data->cmd_count],
+                            &proc_data->code[proc_data->cmd_count + 1]);
+        DPRINTF("str = %s\n", commands_data.ptrdata_params.ptrdata[i]);
+        if (args_count == 2)
+        {
+            DPRINTF("got: %d %d\n", proc_data->code[proc_data->cmd_count],
+                                    proc_data->code[proc_data->cmd_count + 1]);
+            proc_data->cmd_count += 2;
+        }
+        else if (args_count == 1)
+        {
+            DPRINTF("got: %d\n", proc_data->code[proc_data->cmd_count]);
+            proc_data->cmd_count++;
+        }
+        else
+        {
+            DPRINTF("Error with reading commands from ptrdata\n");
+            DPRINTF("args_count = %d\n", args_count);
+            return PROC_UNKNOWN_COMMAND;
+        }
+    }
+    proc_data->cmd_count = 0;
+
+    free(commands_data.buffer_data.buffer);
+    free(commands_data.ptrdata_params.ptrdata);
+    DPRINTF("Pretty bitecode loaded\n");
+
+    return PROC_SUCCESS;
+}
+
 ProcErr_t ProcLoadCode(Proc_t* proc_data, const char* codepath)
 {
+    assert(proc_data != NULL);
     assert(codepath != NULL);
 
     FILE* code_stream = fopen(codepath, "rb");
@@ -165,6 +227,7 @@ int ProcErrToStr(ProcErr_t error, const char** error_str)
     }
 }
 
+// TODO: pretty dump for stack
 ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
 {
     DPRINTF("Dumping...\n");
