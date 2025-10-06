@@ -226,7 +226,7 @@ int CreateBiteCodePretty(CodeData_t* code_data, const char* filepath)
     size_t i = 0;
     while (i < code_data->cur_cmd)
     {
-        if (code_data->buffer[i] == CMD_PUSH)
+        if (CmdArgsCount((Command_t) code_data->buffer[i]) == 1)
         {
             fprintf(pretty_output_info.stream,
                     "%d %d\n",
