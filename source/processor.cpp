@@ -354,7 +354,7 @@ ProcErr_t ProcGetCommand(Proc_t* proc_data,
     // TODO: check if command is valid + number of args given
     *command = (Command_t) proc_data->code[proc_data->cmd_count++];
 
-    if (*command == CMD_PUSH)
+    if (CmdArgsCount(*command) == 1)
     {
         *value = proc_data->code[proc_data->cmd_count++];
     }
@@ -372,37 +372,19 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
 
     switch (command)
     {
-        case CMD_PUSH: return StackPush(stk_ptr, value) == STACK_SUCCESS ? 0 : 1;
-        case CMD_ADD:  return ApplyBinaryOperation(stk_ptr, Add) == MATH_SUCCESS ? 0 : 1;
-        case CMD_SUB:  return ApplyBinaryOperation(stk_ptr, Sub) == MATH_SUCCESS ? 0 : 1;
-        case CMD_MUL:  return ApplyBinaryOperation(stk_ptr, Mul) == MATH_SUCCESS ? 0 : 1;
-        case CMD_DIV:  return ApplyBinaryOperation(stk_ptr, Div) == MATH_SUCCESS ? 0 : 1;
-        case CMD_SQRT: return Sqrt(stk_ptr) == MATH_SUCCESS ? 0 : 1;
-        case CMD_OUT:  return ProcHandleOut(stk_ptr, output_stream);
-        case CMD_HLT:  return 1;
-        default:       return 1;
+        case CMD_PUSH:  return StackPush(stk_ptr, value) == STACK_SUCCESS ? 0 : 1;
+        case CMD_ADD:   return ApplyBinaryOperation(stk_ptr, Add) == MATH_SUCCESS ? 0 : 1;
+        case CMD_SUB:   return ApplyBinaryOperation(stk_ptr, Sub) == MATH_SUCCESS ? 0 : 1;
+        case CMD_MUL:   return ApplyBinaryOperation(stk_ptr, Mul) == MATH_SUCCESS ? 0 : 1;
+        case CMD_DIV:   return ApplyBinaryOperation(stk_ptr, Div) == MATH_SUCCESS ? 0 : 1;
+        case CMD_SQRT:  return Sqrt(stk_ptr) == MATH_SUCCESS ? 0 : 1;
+        case CMD_OUT:   return HandleOut(stk_ptr, output_stream);
+        case CMD_TOTR:  return HandleTotr(stk_ptr, proc_data, value);
+        case CMD_PUSHR: return HandlePushr(stk_ptr, proc_data, value);
+        case CMD_IN:    return HandleIn(stk_ptr);
+        case CMD_HLT:   return 1;
+        default:        return 1;
     }
 
-    return 0;
-}
-
-int ProcHandleOut(Stack_t* stack, FILE* output_stream)
-{
-    assert(stack != NULL);
-    assert(output_stream != NULL);
-
-    int result = 0;
-    StackErr_t pop_return = StackPop(stack, &result);
-
-    if (pop_return == STACK_SIZE_IS_ZERO)
-    {
-        return 0;
-    }
-    if (pop_return != STACK_SUCCESS)
-    {
-        return 1;
-    }
-
-    fprintf(output_stream, "ANSWER = %d\n", result);
     return 0;
 }

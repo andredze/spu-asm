@@ -1,6 +1,8 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
+#include <stdio.h>
+
 typedef enum Command {
     CMD_HLT = -1,
     CMD_OUT = 0,
@@ -35,5 +37,7 @@ const CommCase_t COMM_CASES[] = {{"PUSH",  CMD_PUSH},
 const size_t COMM_CASES_SIZE = sizeof(COMM_CASES) / sizeof(COMM_CASES[0]);
 
 const int CMD_MAX_LEN = 50;
+
+int CmdArgsCount(Command_t command);
 
 #endif /* COMMANDS_H */

@@ -3,6 +3,7 @@
 
 #include "stack.h"
 #include "input.h"
+#include "proc_types.h"
 #include <math.h>
 
 typedef enum MathErr {
@@ -30,6 +31,12 @@ MathErr_t Div(CalcData_t* calc_data);
 
 MathErr_t Sqrt(Stack_t* stack);
 
-MathErr_t Out(Stack_t* stack);
+int HandleOut(Stack_t* stack, FILE* output_stream);
+
+int HandleTotr(Stack_t* stack, Proc_t* proc_data, int index);
+
+int HandlePushr(Stack_t* stack, Proc_t* proc_data, int index);
+
+int HandleIn(Stack_t* stack);
 
 #endif /* MATHS_H */

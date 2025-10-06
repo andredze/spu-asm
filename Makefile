@@ -16,6 +16,7 @@ PROCSOURCES = source/main.cpp \
 			  source/stack.cpp \
 			  source/maths.cpp \
 			  source/input.cpp \
+			  source/commands.cpp \
 			  source/processor.cpp
 
 PROCEXECUTABLE = run.exe
@@ -26,7 +27,8 @@ PROCOUTPUTS = answers.txt \
 
 ASMSOURCES = compile/main.cpp \
 			 compile/assembler.cpp \
-			 source/input.cpp
+			 source/input.cpp \
+			 source/commands.cpp
 
 ASMEXECUTABLE = compile.exe
 

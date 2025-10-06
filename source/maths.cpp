@@ -1,5 +1,6 @@
 #include "maths.h"
 
+// TODO: rename to commands (?) and connect w commands.h
 MathErr_t ApplyBinaryOperation(Stack_t* stack,
                                MathErr_t (* calculate) (CalcData_t* calc_data))
 {
@@ -96,15 +97,87 @@ MathErr_t Div(CalcData_t* calc_data)
     return MATH_SUCCESS;
 }
 
-MathErr_t Out(Stack_t* calc_stack)
+int HandleOut(Stack_t* stack, FILE* output_stream)
 {
-    int answer = 0;
+    assert(stack != NULL);
+    assert(output_stream != NULL);
 
-    if (StackPop(calc_stack, &answer) != STACK_SUCCESS)
+    int result = 0;
+    StackErr_t pop_return = StackPop(stack, &result);
+
+    if (pop_return == STACK_SIZE_IS_ZERO)
     {
-        return MATH_STACK_ERROR;
+        return 0;
     }
-    printf("ANSWER = %d", answer);
+    if (pop_return != STACK_SUCCESS)
+    {
+        return 1;
+    }
+    fprintf(output_stream, "ANSWER = %d\n", result);
 
-    return MATH_SUCCESS;
+    return 0;
+}
+
+int HandleTotr(Stack_t* stack, Proc_t* proc_data, int index)
+{
+    assert(stack != NULL);
+    assert(proc_data != NULL);
+
+    int value = 0;
+    StackErr_t pop_return = StackPop(stack, &value);
+
+    if (pop_return == STACK_SIZE_IS_ZERO)
+    {
+        return 0;
+    }
+    if (pop_return != STACK_SUCCESS)
+    {
+        return 1;
+    }
+
+    if (index < 0 || index > 7)
+    {
+        DPRINTF("Invalid register index given\n");
+        return 1;
+    }
+    proc_data->regs[index] = value;
+
+    return 0;
+}
+
+int HandlePushr(Stack_t* stack, Proc_t* proc_data, int index)
+{
+    assert(stack != NULL);
+    assert(proc_data != NULL);
+
+    if (index < 0 || index > 7)
+    {
+        DPRINTF("Invalid register index given\n");
+        return 1;
+    }
+    if (StackPush(stack, proc_data->regs[index]) != STACK_SUCCESS)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+int HandleIn(Stack_t* stack)
+{
+    assert(stack != NULL);
+
+    int value = 0;
+    printf("Enter int value: ");
+    if (scanf("%d", &value) != 1)
+    {
+        printf("Input is wrong, try better :)\n");
+        return 1;
+    }
+    if (StackPush(stack, value) != STACK_SUCCESS)
+    {
+        return 1;
+    }
+
+    return 0;
 }

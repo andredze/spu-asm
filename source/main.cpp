@@ -49,6 +49,8 @@ int main()
         return EXIT_FAILURE;
     }
 
+    ProcDump(&proc_data, PROC_SUCCESS);
+
     if (ProcDtor(&proc_data, stream) != PROC_SUCCESS)
     {
         return EXIT_FAILURE;

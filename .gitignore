@@ -2,9 +2,9 @@
 .vscode/
 
 # Outputs
+*.bin
 *.log
 *.txt
-*.bin
 
 # Prerequisites
 *.d

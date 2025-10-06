@@ -29,8 +29,6 @@ int GetAsmCommand(char* line, Command_t* command, int* value);
 int SetBiteCodeCommands(Command_t command, int value,
                         CodeData_t* code_data);
 
-int CmdArgsCount(Command_t command);
-
 int CodeDataCtor(Context_t* commands_data, CodeData_t* code_data);
 
 int CreateBiteCode(CodeData_t* code_data, Context_t* commands_data);

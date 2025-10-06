@@ -160,18 +160,6 @@ int SetBiteCodeCommands(Command_t command, int value,
     return 0;
 }
 
-int CmdArgsCount(Command_t command)
-{
-    if (command == CMD_PUSH)
-        return 1;
-    if (command == CMD_TOTR)
-        return 1;
-    if (command == CMD_PUSHR)
-        return 1;
-
-    return 0;
-}
-
 int CodeDataCtor(Context_t* commands_data, CodeData_t* code_data)
 {
     int lines_count = commands_data->buffer_data.lines_count;
