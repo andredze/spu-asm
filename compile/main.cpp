@@ -6,7 +6,7 @@ int main()
         {.input_file_info =  {.filepath = "commands.txt"},
          .output_file_info = {.filepath = "bitecode.bin"}};
 
-    if (CompileCalculatorProgramm(&asm_commands_data) != ASM_SUCCESS)
+    if (CompileProgramm(&asm_commands_data) != ASM_SUCCESS)
     {
         return EXIT_FAILURE;
     }

@@ -10,18 +10,18 @@ CXXFLAGS =  -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef \
 			-Wstrict-null-sentinel -Wtype-limits -Wwrite-strings -Werror=vla -D_DEBUG \
 			-D_EJUDGE_CLIENT_SIDE
 
-CALCFLAGS = $(CXXFLAGS) -Iinclude
+PROCFLAGS = $(CXXFLAGS) -Iinclude
 
-CALCSOURCES = source/main.cpp \
+PROCSOURCES = source/main.cpp \
 			  source/stack.cpp \
 			  source/maths.cpp \
 			  source/input.cpp \
-		  	  source/calculator.cpp \
 			  source/processor.cpp
 
-CALCEXECUTABLE = run.exe
+PROCEXECUTABLE = run.exe
 
-CALCOUTPUTS = answers.txt \
+PROCOUTPUTS = answers.txt \
+			  processor.log \
 			  stack.log
 
 ASMSOURCES = compile/main.cpp \
@@ -32,11 +32,12 @@ ASMEXECUTABLE = compile.exe
 
 ASMFLAGS = $(CXXFLAGS) -Icompile -Iinclude
 
-ASMOUTPUTS = bitecode.bin pretty_bc.txt
+ASMOUTPUTS = bitecode.bin \
+			 pretty_bc.txt
 
 ifdef DEBUG
 ASMFLAGS += -DDEBUG
-CALCFLAGS += -DPROC_DEBUG -DSTACK_DEBUG -DDEBUG
+PROCFLAGS += -DPROC_DEBUG -DSTACK_DEBUG -DDEBUG
 endif
 
 all:
@@ -45,8 +46,8 @@ all:
 compiler:
 	$(CXX) $(ASMFLAGS) $(ASMSOURCES) -o $(ASMEXECUTABLE)
 
-calculator:
-	$(CXX) $(CALCFLAGS) $(CALCSOURCES) -o $(CALCEXECUTABLE)
+processor:
+	$(CXX) $(PROCFLAGS) $(PROCSOURCES) -o $(PROCEXECUTABLE)
 
 clean:
-	rm $(CALCOUTPUTS) $(ASMOUTPUTS) $(CALCEXECUTABLE) $(ASMEXECUTABLE)
+	rm $(PROCOUTPUTS) $(ASMOUTPUTS) $(PROCEXECUTABLE) $(ASMEXECUTABLE)

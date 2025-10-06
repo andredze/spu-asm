@@ -3,7 +3,7 @@
 // TODO: disasm
 // TODO: identifier before code
 
-AsmErr_t CompileCalculatorProgramm(Context_t* commands_data)
+AsmErr_t CompileProgramm(Context_t* commands_data)
 {
     assert(commands_data != NULL);
 
@@ -127,7 +127,7 @@ int GetAsmCommand(char* line, Command_t* command, int* value)
         return 0;
     }
 
-    DPRINTF("Unknown calc command\n");
+    DPRINTF("Unknown processor command\n");
     return 1;
 }
 

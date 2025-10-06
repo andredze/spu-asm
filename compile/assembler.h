@@ -19,7 +19,7 @@ typedef enum AsmErr {
     ASM_PRINT_CODE_ERROR
 } AsmErr_t;
 
-AsmErr_t CompileCalculatorProgramm(Context_t* commands_data);
+AsmErr_t CompileProgramm(Context_t* commands_data);
 
 AsmErr_t CompileCommands(Context_t* commands_data,
                          CodeData_t* code_data);

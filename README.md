@@ -10,7 +10,7 @@ Calculator using reverse Polish notation
 ## Build programm
 
 ```powershell
-  make calculator
+  make processor
 ```
 
 ### Build with debug mode
@@ -22,7 +22,7 @@ Build compiler
 
 Build programm
 ```powershell
-  make calculator DEBUG=1
+  make processor DEBUG=1
 ```
 
 ## Compiling
