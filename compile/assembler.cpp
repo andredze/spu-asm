@@ -111,12 +111,13 @@ int GetAsmCommand(char* line, Command_t* command, int* value)
 
 int GetValue(Command_t command, const char* line, int* value)
 {
+    DPRINTF("cmd = %d\n", command);
     char operation[CMD_MAX_LEN] = {};
     if (command == CMD_PUSH)
     {
         if (sscanf(line, "%s %d", operation, value) != 2)
         {
-            DPRINTF("sscanf failed\n");
+            DPRINTF("Wrong number of args for push\n");
             return 1;
         }
         return 0;
@@ -126,7 +127,7 @@ int GetValue(Command_t command, const char* line, int* value)
         char reg[CMD_MAX_LEN] = {};
         if (sscanf(line, "%s %s", operation, reg) != 2)
         {
-            DPRINTF("sscanf failed\n");
+            DPRINTF("Wrong number of args for reg cmd\n");
             return 1;
         }
         *value = reg[1] - 'A';
@@ -156,7 +157,7 @@ int SetBiteCodeCommands(Command_t command, int value,
         {
             code_data->buffer[code_data->cur_cmd++] = value;
         }
-        if (command == CMD_TOTR || command == CMD_PUSHR)
+        if (command == CMD_POPR || command == CMD_PUSHR)
         {
             code_data->buffer[code_data->cur_cmd++] = value;
         }
@@ -187,6 +188,10 @@ int CreateBiteCode(CodeData_t* code_data, Context_t* commands_data)
     {
         return 1;
     }
+    // fwrite(VERSION,
+    //        sizeof(code_data->cur_cmd),
+    //        1,
+    //        commands_data->output_file_info.stream);
 
     fwrite(&code_data->cur_cmd,
            sizeof(code_data->cur_cmd),

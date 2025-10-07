@@ -118,7 +118,7 @@ int HandleOut(Stack_t* stack, FILE* output_stream)
     return 0;
 }
 
-int HandleTotr(Stack_t* stack, Proc_t* proc_data, int index)
+int HandlePopr(Stack_t* stack, Proc_t* proc_data, int index)
 {
     assert(stack != NULL);
     assert(proc_data != NULL);

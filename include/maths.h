@@ -33,7 +33,7 @@ MathErr_t Sqrt(Stack_t* stack);
 
 int HandleOut(Stack_t* stack, FILE* output_stream);
 
-int HandleTotr(Stack_t* stack, Proc_t* proc_data, int index);
+int HandlePopr(Stack_t* stack, Proc_t* proc_data, int index);
 
 int HandlePushr(Stack_t* stack, Proc_t* proc_data, int index);
 

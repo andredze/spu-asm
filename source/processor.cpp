@@ -1,6 +1,6 @@
 #include "processor.h"
 
-// TODO: rename codmmands_data and proc_data
+// TODO: rename commands_data and proc_data
 // TODO: in load pretty check if args are valid
 
 ProcErr_t ProcCtor(Proc_t* proc_data)
@@ -377,7 +377,7 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
         case CMD_DIV:   return ApplyBinaryOperation(stk_ptr, Div) == MATH_SUCCESS ? 0 : 1;
         case CMD_SQRT:  return Sqrt(stk_ptr) == MATH_SUCCESS ? 0 : 1;
         case CMD_OUT:   return HandleOut(stk_ptr, output_stream);
-        case CMD_TOTR:  return HandleTotr(stk_ptr, proc_data, value);
+        case CMD_POPR:  return HandlePopr(stk_ptr, proc_data, value);
         case CMD_PUSHR: return HandlePushr(stk_ptr, proc_data, value);
         case CMD_IN:    return HandleIn(stk_ptr);
         case CMD_HLT:   return 1;
