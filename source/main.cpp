@@ -1,6 +1,6 @@
 #include "stack.h"
 #include "input.h"
-#include "maths.h"
+#include "operations.h"
 #include "processor.h"
 
 int main()

@@ -13,6 +13,13 @@ typedef enum Command {
     CMD_DIV = 5,
     CMD_SQRT = 6,
     CMD_IN = 7,
+    CMD_JMP = 10,
+    CMD_JB = 11,
+    CMD_JBE = 12,
+    CMD_JA = 13,
+    CMD_JAE = 14,
+    CMD_JE = 15,
+    CMD_JNE = 16,
     CMD_POPR = 32,
     CMD_PUSHR = 33
 } Command_t;
@@ -32,7 +39,14 @@ const CommCase_t COMM_CASES[] = {{"PUSH",  CMD_PUSH},
                                  {"HLT",   CMD_HLT},
                                  {"IN",    CMD_IN},
                                  {"POPR",  CMD_POPR},
-                                 {"PUSHR", CMD_PUSHR}};
+                                 {"PUSHR", CMD_PUSHR},
+                                 {"JMP",   CMD_JMP},
+                                 {"JB",    CMD_JB},
+                                 {"JBE",   CMD_JBE},
+                                 {"JA",    CMD_JA},
+                                 {"JAE",   CMD_JAE},
+                                 {"JE",    CMD_JE},
+                                 {"JNE",   CMD_JNE},};
 
 const size_t COMM_CASES_SIZE = sizeof(COMM_CASES) / sizeof(COMM_CASES[0]);
 

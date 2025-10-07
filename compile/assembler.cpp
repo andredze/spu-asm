@@ -110,16 +110,7 @@ int GetValue(Command_t command, const char* line, int* value)
 {
     DPRINTF("cmd = %d\n", command);
     char operation[CMD_MAX_LEN] = {};
-    if (command == CMD_PUSH)
-    {
-        if (sscanf(line, "%s %d", operation, value) != 2)
-        {
-            DPRINTF("Wrong number of args for push\n");
-            return 1;
-        }
-        return 0;
-    }
-    else
+    if (command == CMD_PUSHR || command == CMD_POPR)
     {
         char reg[CMD_MAX_LEN] = {};
         if (sscanf(line, "%s %s", operation, reg) != 2)
@@ -128,6 +119,15 @@ int GetValue(Command_t command, const char* line, int* value)
             return 1;
         }
         *value = reg[1] - 'A';
+        return 0;
+    }
+    else
+    {
+        if (sscanf(line, "%s %d", operation, value) != 2)
+        {
+            DPRINTF("Wrong number of args for push\n");
+            return 1;
+        }
         return 0;
     }
 
@@ -150,11 +150,11 @@ int SetBiteCodeCommands(Command_t command, int value,
 
     if (CmdArgsCount(command) == 1)
     {
-        if (command == CMD_PUSH)
+        if (command == CMD_POPR || command == CMD_PUSHR)
         {
             code_data->buffer[code_data->cur_cmd++] = value;
         }
-        if (command == CMD_POPR || command == CMD_PUSHR)
+        else
         {
             code_data->buffer[code_data->cur_cmd++] = value;
         }

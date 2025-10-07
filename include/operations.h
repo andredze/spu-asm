@@ -1,5 +1,5 @@
-#ifndef MATHS_H
-#define MATHS_H
+#ifndef OPERATIONS_H
+#define OPERATIONS_H
 
 #include "stack.h"
 #include "input.h"
@@ -39,4 +39,11 @@ int HandlePushr(Stack_t* stack, Proc_t* proc_data, int index);
 
 int HandleIn(Stack_t* stack);
 
-#endif /* MATHS_H */
+int HandleJmp(Proc_t* proc_data, size_t new_cmd_count);
+
+int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
+                 size_t new_cmd_count, Command_t command);
+
+int Compare(int number1, int number2, Command_t command);
+
+#endif /* OPERATIONS_H */

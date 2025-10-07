@@ -140,7 +140,7 @@ ProcErr_t ProcDtor(Proc_t* proc_data, FILE* stream)
 
 ProcErr_t ProcVerify(Proc_t* proc_data)
 {
-    DPRINTF("Verifying proc...\n");
+    // DPRINTF("Verifying proc...\n");
 
     if (proc_data == NULL)
     {
@@ -167,7 +167,7 @@ ProcErr_t ProcVerify(Proc_t* proc_data)
         return PROC_STACK_ERROR;
     }
 
-    DPRINTF("Success in verify\n");
+    // DPRINTF("Success in verify\n");
     return PROC_SUCCESS;
 }
 
@@ -225,7 +225,7 @@ int ProcErrToStr(ProcErr_t error, const char** error_str)
 
 ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
 {
-    DPRINTF("Dumping...\n");
+    // DPRINTF("Dumping...\n");
 
     FILE* stream = fopen("processor.log", "w");
     if (stream == NULL)
@@ -324,7 +324,6 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
             return PROC_UNKNOWN_COMMAND;
         }
         DPRINTF("Command = %d\n", command);
-
         if (command == CMD_HLT)
         {
             break;
@@ -333,6 +332,8 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
         {
             return PROC_MATH_ERROR;
         }
+        DPRINTF("To continue press enter: ");
+        getchar();
     }
     DPRINTF("Executed commands\n");
 
@@ -343,7 +344,7 @@ ProcErr_t ProcGetCommand(Proc_t* proc_data,
                          Command_t* command,
                          int* value)
 {
-    DPRINTF("Getting command...\n");
+    // DPRINTF("Getting command...\n");
     PROC_OK_DEBUG(proc_data);
 
     *command = (Command_t) proc_data->code[proc_data->cmd_count++];
@@ -360,7 +361,7 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
                    int value, FILE* output_stream)
 {
     assert(output_stream != NULL);
-    DPRINTF("Running command...\n");
+    // DPRINTF("Running command...\n");
     PROC_OK_DEBUG(proc_data);
     Stack_t* stk_ptr = &proc_data->stack;
 
@@ -376,6 +377,13 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
         case CMD_POPR:  return HandlePopr(stk_ptr, proc_data, value);
         case CMD_PUSHR: return HandlePushr(stk_ptr, proc_data, value);
         case CMD_IN:    return HandleIn(stk_ptr);
+        case CMD_JMP:   return HandleJmp(proc_data, value);
+        case CMD_JB:    return HandleJumpIf(stk_ptr, proc_data, value, CMD_JB);
+        case CMD_JBE:   return HandleJumpIf(stk_ptr, proc_data, value, CMD_JBE);
+        case CMD_JA:    return HandleJumpIf(stk_ptr, proc_data, value, CMD_JA);
+        case CMD_JAE:   return HandleJumpIf(stk_ptr, proc_data, value, CMD_JAE);
+        case CMD_JE:    return HandleJumpIf(stk_ptr, proc_data, value, CMD_JE);
+        case CMD_JNE:   return HandleJumpIf(stk_ptr, proc_data, value, CMD_JNE);
         case CMD_HLT:   return 1;
         default:        return 1;
     }

@@ -14,7 +14,7 @@ PROCFLAGS = $(CXXFLAGS) -Iinclude
 
 PROCSOURCES = source/main.cpp \
 			  source/stack.cpp \
-			  source/maths.cpp \
+			  source/operations.cpp \
 			  source/input.cpp \
 			  source/commands.cpp \
 			  source/processor.cpp

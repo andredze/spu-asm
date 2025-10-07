@@ -1,7 +1,7 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 
-#include "maths.h"
+#include "operations.h"
 #include "input.h"
 #include "stack.h"
 #include "commands.h"
