@@ -1,6 +1,5 @@
 #include "maths.h"
 
-// TODO: rename to commands (?) and connect w commands.h
 MathErr_t ApplyBinaryOperation(Stack_t* stack,
                                MathErr_t (* calculate) (CalcData_t* calc_data))
 {

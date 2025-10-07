@@ -1,8 +1,5 @@
 #include "processor.h"
 
-// TODO: rename commands_data and proc_data
-// TODO: in load pretty check if args are valid
-
 ProcErr_t ProcCtor(Proc_t* proc_data)
 {
     if (proc_data == NULL)
@@ -349,7 +346,6 @@ ProcErr_t ProcGetCommand(Proc_t* proc_data,
     DPRINTF("Getting command...\n");
     PROC_OK_DEBUG(proc_data);
 
-    // TODO: check if command is valid + number of args given
     *command = (Command_t) proc_data->code[proc_data->cmd_count++];
 
     if (CmdArgsCount(*command) == 1)

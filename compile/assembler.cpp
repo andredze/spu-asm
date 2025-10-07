@@ -1,8 +1,5 @@
 #include "assembler.h"
 
-// TODO: disasm
-// TODO: identifier before code
-
 AsmErr_t CompileProgramm(Context_t* commands_data)
 {
     assert(commands_data != NULL);
