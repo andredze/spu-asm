@@ -212,23 +212,22 @@ int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
     {
         return 1;
     }
-    // if compare returns 1 than jump
-    if (!(Compare(number1, number2, command)))
+    // if compare returns 0 than don't jump
+    if (!(CompareForJump(number1, number2, command)))
     {
         DPRINTF("-Jump rejected\n");
         return 0;
     }
-    if (new_cmd_count > proc_data->code_size)
+    // else jump
+    if (HandleJmp(proc_data, new_cmd_count))
     {
-        DPRINTF("Invalid argument in JMP\n");
         return 1;
     }
-    proc_data->cmd_count = new_cmd_count;
 
     return 0;
 }
 
-int Compare(int number1, int number2, Command_t command)
+int CompareForJump(int number1, int number2, Command_t command)
 {
     switch (command)
     {

@@ -29,24 +29,25 @@ typedef struct CommCase {
     Command_t command;
 } CommCase_t;
 
-const CommCase_t COMM_CASES[] = {{"PUSH",  CMD_PUSH},
-                                 {"ADD",   CMD_ADD},
-                                 {"SUB",   CMD_SUB},
-                                 {"MUL",   CMD_MUL},
-                                 {"DIV",   CMD_DIV},
-                                 {"SQRT",  CMD_SQRT},
-                                 {"OUT",   CMD_OUT},
-                                 {"HLT",   CMD_HLT},
-                                 {"IN",    CMD_IN},
-                                 {"POPR",  CMD_POPR},
-                                 {"PUSHR", CMD_PUSHR},
-                                 {"JMP",   CMD_JMP},
-                                 {"JB",    CMD_JB},
-                                 {"JBE",   CMD_JBE},
-                                 {"JA",    CMD_JA},
-                                 {"JAE",   CMD_JAE},
-                                 {"JE",    CMD_JE},
-                                 {"JNE",   CMD_JNE},};
+const CommCase_t COMM_CASES[] =
+    {{"PUSH",  CMD_PUSH},
+     {"ADD",   CMD_ADD},
+     {"SUB",   CMD_SUB},
+     {"MUL",   CMD_MUL},
+     {"DIV",   CMD_DIV},
+     {"SQRT",  CMD_SQRT},
+     {"OUT",   CMD_OUT},
+     {"HLT",   CMD_HLT},
+     {"IN",    CMD_IN},
+     {"POPR",  CMD_POPR},
+     {"PUSHR", CMD_PUSHR},
+     {"JMP",   CMD_JMP},
+     {"JB",    CMD_JB},
+     {"JBE",   CMD_JBE},
+     {"JA",    CMD_JA},
+     {"JAE",   CMD_JAE},
+     {"JE",    CMD_JE},
+     {"JNE",   CMD_JNE}};
 
 const size_t COMM_CASES_SIZE = sizeof(COMM_CASES) / sizeof(COMM_CASES[0]);
 

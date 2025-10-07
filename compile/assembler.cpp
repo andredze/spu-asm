@@ -1,4 +1,5 @@
 #include "assembler.h"
+#include "config.h"
 
 AsmErr_t CompileProgramm(Context_t* commands_data)
 {
@@ -32,7 +33,7 @@ AsmErr_t CompileProgramm(Context_t* commands_data)
     {
         return ASM_PRINT_CODE_ERROR;
     }
-    if (CreateBiteCodePretty(&code_data, "pretty_bc.txt"))
+    if (CreateBiteCodePretty(&code_data, READABLE_BITECODE_FILENAME))
     {
         return ASM_PRINT_CODE_ERROR;
     }

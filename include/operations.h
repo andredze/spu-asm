@@ -44,6 +44,6 @@ int HandleJmp(Proc_t* proc_data, size_t new_cmd_count);
 int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
                  size_t new_cmd_count, Command_t command);
 
-int Compare(int number1, int number2, Command_t command);
+int CompareForJump(int number1, int number2, Command_t command);
 
 #endif /* OPERATIONS_H */

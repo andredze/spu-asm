@@ -19,8 +19,6 @@ typedef enum AsmErr {
     ASM_PRINT_CODE_ERROR
 } AsmErr_t;
 
-const int VERSION = 1;
-
 AsmErr_t CompileProgramm(Context_t* commands_data);
 
 AsmErr_t CompileCommands(Context_t* commands_data,

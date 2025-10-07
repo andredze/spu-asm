@@ -2,6 +2,7 @@
 #include "input.h"
 #include "operations.h"
 #include "processor.h"
+#include "config.h"
 
 int main()
 {
@@ -12,11 +13,11 @@ int main()
     {
         return EXIT_FAILURE;
     }
-    if (ProcLoadPrettyBC(&proc_data, "pretty_bc.txt") != PROC_SUCCESS)
+    if (ProcLoadPrettyBC(&proc_data, READABLE_BITECODE_FILENAME) != PROC_SUCCESS)
     {
         return EXIT_FAILURE;
     }
-    // if (ProcLoadCode(&proc_data, "bitecode.bin") != PROC_SUCCESS)
+    // if (ProcLoadCode(&proc_data, BINARY_BITECODE_FILENAME) != PROC_SUCCESS)
     // {
     //     return EXIT_FAILURE;
     // }
@@ -36,7 +37,7 @@ int main()
 
     ProcDump(&proc_data, PROC_SUCCESS);
 
-    FILE* stream = fopen("answers.txt", "w");
+    FILE* stream = fopen(ANSWERS_OUTPUT_FILENAME, "w");
     if (stream == NULL)
     {
         printf("Error opening output file\n");
