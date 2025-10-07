@@ -86,7 +86,6 @@ int GetAsmCommand(char* line, Command_t* command, int* value)
         DPRINTF("sscanf failed\n");
         return 1;
     }
-
     for (size_t i = 0; i < COMM_CASES_SIZE; i++)
     {
         if (strcmp(operation, COMM_CASES[i].str_command) == 0)
@@ -95,7 +94,6 @@ int GetAsmCommand(char* line, Command_t* command, int* value)
             break;
         }
     }
-
     if (CmdArgsCount(*command) == 1)
     {
         if (GetValue(*command, line, value))
@@ -186,15 +184,17 @@ int CreateBiteCode(CodeData_t* code_data, Context_t* commands_data)
     {
         return 1;
     }
-    // fwrite(VERSION,
-    //        sizeof(code_data->cur_cmd),
-    //        1,
-    //        commands_data->output_file_info.stream);
 
-    fwrite(&code_data->cur_cmd,
-           sizeof(code_data->cur_cmd),
-           1,
-           commands_data->output_file_info.stream);
+    CodeParams_t code_params = {.version = CODE_VERSION,
+                                .code_size = code_data->cur_cmd};
+    if (fwrite(&code_params,
+               sizeof(code_params),
+               1,
+               commands_data->output_file_info.stream) != 1)
+    {
+        DPRINTF("Code_params writing in file error\n");
+        return 1;
+    }
 
     if (fwrite(code_data->buffer,
                sizeof(code_data->buffer[0]),

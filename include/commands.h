@@ -24,6 +24,11 @@ typedef enum Command {
     CMD_PUSHR = 33
 } Command_t;
 
+typedef struct CodeParams {
+    int version;
+    size_t code_size;
+} CodeParams_t;
+
 typedef struct CommCase {
     const char* str_command;
     Command_t command;

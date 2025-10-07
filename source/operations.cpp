@@ -237,7 +237,7 @@ int CompareForJump(int number1, int number2, Command_t command)
         case CMD_JAE: return number1 >= number2;
         case CMD_JE:  return number1 == number2;
         case CMD_JNE: return number1 != number2;
-        default:      return EOF; //
+        default:      return EOF;
     }
 
     return EOF;

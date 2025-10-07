@@ -33,12 +33,19 @@ Build programm
 ## Usage
 Input file example
 ```text
-  PUSH 10
-  PUSH 20
+  PUSH 1
+  POPR RAX
+  PUSHR RAX
+  PUSHR RAX
   MUL
-  PUSH 5
-  DIV
   OUT
+  PUSHR RAX
+  PUSH 1
+  ADD
+  POPR RAX
+  PUSHR RAX
+  PUSH 5
+  JB 4
   HLT
 ```
 
@@ -47,7 +54,10 @@ Execute programm
   run.exe
 ```
 
-Output file example
+Output of the example
 ```text
-  ANSWER = 40
+  ANSWER = 1
+  ANSWER = 4
+  ANSWER = 9
+  ANSWER = 16
 ```

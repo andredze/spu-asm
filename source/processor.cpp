@@ -1,4 +1,5 @@
 #include "processor.h"
+#include "config.h"
 
 ProcErr_t ProcCtor(Proc_t* proc_data)
 {
@@ -87,16 +88,26 @@ ProcErr_t ProcLoadCode(Proc_t* proc_data, const char* codepath)
         return PROC_CODE_FILE_OPENNING_ERROR;
     }
 
-    size_t code_size = 0;
-    if (fread(&code_size, sizeof(code_size), 1, code_stream) != 1)
+    CodeParams_t code_params = {};
+    if (fread(&code_params, sizeof(code_params), 1, code_stream) != 1)
     {
-        DPRINTF("Reading the size of code failed\n");
+        DPRINTF("Reading the code_params failed\n");
         return PROC_READING_FILE_ERROR;
     }
 
-    proc_data->code_size = code_size;
+    if (code_params.version != CODE_VERSION)
+    {
+        printf("Wrong version of code, this processor can only execute %d version\n", CODE_VERSION);
+        return PROC_READING_FILE_ERROR;
+    }
+    if (code_params.code_size > PROC_CODE_SIZE_LIMIT)
+    {
+        DPRINTF("Too large code\n");
+        return PROC_CODE_SIZE_EXCEEDS_LIMIT;
+    }
+    proc_data->code_size = code_params.code_size;
 
-    proc_data->code = (int*) calloc(code_size, sizeof(int));
+    proc_data->code = (int*) calloc(proc_data->code_size, sizeof(int));
     if (proc_data->code == NULL)
     {
         printf("Calloc failed\n");
@@ -104,8 +115,8 @@ ProcErr_t ProcLoadCode(Proc_t* proc_data, const char* codepath)
     }
 
     size_t fread_return = fread(proc_data->code, sizeof(proc_data->code[0]),
-                                code_size, code_stream);
-    if (fread_return != code_size)
+                                proc_data->code_size, code_stream);
+    if (fread_return != proc_data->code_size)
     {
         DPRINTF("Error with fread, return = %zu\n", fread_return);
         return PROC_READING_FILE_ERROR;

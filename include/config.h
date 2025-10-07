@@ -6,6 +6,6 @@ const char* const ANSWERS_OUTPUT_FILENAME = "answers.txt";
 const char* const READABLE_BITECODE_FILENAME = "pretty_bc.txt";
 const char* const BINARY_BITECODE_FILENAME = "bitecode.bin";
 
-const int VERSION = 1;
+const int CODE_VERSION = 1;
 
 #endif /* CONFIG_H */
