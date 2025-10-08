@@ -29,11 +29,11 @@ AsmErr_t CompileProgramm(Context_t* commands_data)
         DPRINTF("data[%zu] = %d\n", i, code_data.buffer[i]);
     }
 
-    if (CreateBiteCode(&code_data, commands_data))
+    if (WriteBiteCode(&code_data, commands_data))
     {
         return ASM_PRINT_CODE_ERROR;
     }
-    if (CreateBiteCodePretty(&code_data, READABLE_BITECODE_FILENAME))
+    if (WriteBiteCodePretty(&code_data, READABLE_BITECODE_FILENAME))
     {
         return ASM_PRINT_CODE_ERROR;
     }
@@ -65,7 +65,7 @@ AsmErr_t CompileCommands(Context_t* commands_data,
         }
         DPRINTF("Command = %d\n", command);
 
-        if (SetBiteCodeCommands(command, value, code_data))
+        if (AddCommandCode(command, value, code_data))
         {
             return ASM_SET_COMMAND_ERROR;
         }
@@ -133,15 +133,15 @@ int GetValue(Command_t command, const char* line, int* value)
     return 1;
 }
 
-int SetBiteCodeCommands(Command_t command, int value,
-                        CodeData_t* code_data)
+int AddCommandCode(Command_t command, int value,
+                   CodeData_t* code_data)
 {
     assert(code_data != NULL);
 
     // TODO: check if number is in enum
     if (command < -1 || command > 33)
     {
-        DPRINTF("<ERROR: Unknown command code in SetBiteCodeCommands()>\n");
+        DPRINTF("<ERROR: Unknown command code in AddCommandCode()>\n");
         return 1;
     }
 
@@ -178,7 +178,7 @@ int CodeDataCtor(Context_t* commands_data, CodeData_t* code_data)
     return 0;
 }
 
-int CreateBiteCode(CodeData_t* code_data, Context_t* commands_data)
+int WriteBiteCode(CodeData_t* code_data, Context_t* commands_data)
 {
     if (OpenFile(&commands_data->output_file_info, "wb"))
     {
@@ -209,7 +209,7 @@ int CreateBiteCode(CodeData_t* code_data, Context_t* commands_data)
     return 0;
 }
 
-int CreateBiteCodePretty(CodeData_t* code_data, const char* filepath)
+int WriteBiteCodePretty(CodeData_t* code_data, const char* filepath)
 {
     FileInfo_t pretty_output_info = {.filepath = filepath};
 

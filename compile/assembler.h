@@ -28,14 +28,14 @@ int GetAsmCommand(char* line, Command_t* command, int* value);
 
 int GetValue(Command_t command, const char* line, int* value);
 
-int SetBiteCodeCommands(Command_t command, int value,
-                        CodeData_t* code_data);
+int AddCommandCode(Command_t command, int value,
+                   CodeData_t* code_data);
 
 int CodeDataCtor(Context_t* commands_data, CodeData_t* code_data);
 
-int CreateBiteCode(CodeData_t* code_data, Context_t* commands_data);
+int WriteBiteCode(CodeData_t* code_data, Context_t* commands_data);
 
-int CreateBiteCodePretty(CodeData_t* code_data, const char* filepath);
+int WriteBiteCodePretty(CodeData_t* code_data, const char* filepath);
 
 void AsmDestroy(Context_t* commands_data, CodeData_t* code_data);
 
