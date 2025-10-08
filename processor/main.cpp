@@ -6,6 +6,11 @@
 
 int main()
 {
+    // int number1 = 15;
+    // int number2 = 10;
+    // int res = CompareForJumpMacr(number1, number2);
+    // printf("result = %d", res);
+
     DPRINTF("Programm start\n");
     PROC_INIT(proc_data);
     DPRINTF("Proc initialized\n");

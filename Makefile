@@ -12,12 +12,12 @@ CXXFLAGS =  -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef \
 
 PROCFLAGS = $(CXXFLAGS) -Iinclude
 
-PROCSOURCES = source/main.cpp \
-			  source/stack.cpp \
-			  source/operations.cpp \
-			  source/input.cpp \
-			  source/commands.cpp \
-			  source/processor.cpp
+PROCSOURCES = processor/main.cpp \
+			  processor/stack.cpp \
+			  processor/operations.cpp \
+			  processor/input.cpp \
+			  processor/commands.cpp \
+			  processor/processor.cpp
 
 PROCEXECUTABLE = run.exe
 
@@ -27,8 +27,8 @@ PROCOUTPUTS = answers.txt \
 
 ASMSOURCES = compile/main.cpp \
 			 compile/assembler.cpp \
-			 source/input.cpp \
-			 source/commands.cpp
+			 processor/input.cpp \
+			 processor/commands.cpp
 
 ASMEXECUTABLE = compile.exe
 
@@ -48,7 +48,7 @@ all:
 compiler:
 	$(CXX) $(ASMFLAGS) $(ASMSOURCES) -o $(ASMEXECUTABLE)
 
-processor:
+spu:
 	$(CXX) $(PROCFLAGS) $(PROCSOURCES) -o $(PROCEXECUTABLE)
 
 clean:

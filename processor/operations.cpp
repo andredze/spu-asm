@@ -1,5 +1,33 @@
 #include "operations.h"
 
+// DECLARE_HANDLE_JUMP(<, JB);
+// #define DECLARE_HANDLE_JUMP(comp_oper, cmd_name) \
+//     int Handle#cmd_name(Proc_t* proc_data, Stack_t* stack, int new_cmd_count) \
+//     { \
+//         assert(proc_data != NULL); \
+//         assert(stack != NULL); \
+//         \
+//         int number1 = 0; \
+//         int number2 = 0; \
+//         if (StackPop(stack, &number2)) \
+//         { \
+//             return 1; \
+//         } \
+//         if (StackPop(stack, &number1)) \
+//         { \
+//             return 1; \
+//         } \
+//         if (!(number1 comp_oper number2)) \
+//         { \
+//             DPRINTF("-Jump rejected\n"); \
+//             return 0; \
+//         } \
+//         if (HandleJmp(proc_data, new_cmd_count)) \
+//         { \
+//             return 1; \
+//         } \
+//     }
+
 MathErr_t ApplyBinaryOperation(Stack_t* stack,
                                MathErr_t (* calculate) (CalcData_t* calc_data))
 {
@@ -231,9 +259,9 @@ int CompareForJump(int number1, int number2, Command_t command)
 {
     switch (command)
     {
-        case CMD_JB:  return number1 < number2;
+        case CMD_JB:  return number1 <  number2;
         case CMD_JBE: return number1 <= number2;
-        case CMD_JA:  return number1 > number2;
+        case CMD_JA:  return number1 >  number2;
         case CMD_JAE: return number1 >= number2;
         case CMD_JE:  return number1 == number2;
         case CMD_JNE: return number1 != number2;
