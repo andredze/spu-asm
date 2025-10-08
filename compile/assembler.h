@@ -19,6 +19,12 @@ typedef enum AsmErr {
     ASM_PRINT_CODE_ERROR
 } AsmErr_t;
 
+const int ASM_MAX_ARGS_COUNT = 2;
+
+int SetFilenames(const char** commands_filename,
+                 const char** bitecode_filename,
+                 int argc, char* argv[]);
+
 AsmErr_t CompileProgramm(Context_t* commands_data);
 
 AsmErr_t CompileCommands(Context_t* commands_data,

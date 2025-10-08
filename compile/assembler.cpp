@@ -1,6 +1,34 @@
 #include "assembler.h"
 #include "config.h"
 
+int SetFilenames(const char** commands_filename,
+                 const char** bitecode_filename,
+                 int argc, char* argv[])
+{
+    if (argc == 3)
+    {
+        *commands_filename = argv[1];
+        *bitecode_filename = argv[2];
+    }
+    else if (argc == 2)
+    {
+        *commands_filename = argv[1];
+        *bitecode_filename = BINARY_BITECODE_FILENAME;
+    }
+    else if (argc == 1)
+    {
+        *commands_filename = COMMANDS_FILENAME;
+        *bitecode_filename = BINARY_BITECODE_FILENAME;
+    }
+    else
+    {
+        printf("Too much arguments given, maximum 2 (current arguments = %d)\n", argc);
+        return 1;
+    }
+
+    return 0;
+}
+
 AsmErr_t CompileProgramm(Context_t* commands_data)
 {
     assert(commands_data != NULL);
@@ -166,7 +194,7 @@ int CodeDataCtor(Context_t* commands_data, CodeData_t* code_data)
 {
     int lines_count = commands_data->buffer_data.lines_count;
 
-    int* buffer = (int*) calloc(lines_count * 2, sizeof(int));
+    int* buffer = (int*) calloc(lines_count * ASM_MAX_ARGS_COUNT, sizeof(int));
     if (buffer == NULL)
     {
         DPRINTF("Calloc failed\n");
