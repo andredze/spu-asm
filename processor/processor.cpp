@@ -379,11 +379,11 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
     switch (command)
     {
         case CMD_PUSH:  return StackPush(stk_ptr, value) == STACK_SUCCESS ? 0 : 1;
-        case CMD_ADD:   return ApplyBinaryOperation(stk_ptr, Add) == MATH_SUCCESS ? 0 : 1;
-        case CMD_SUB:   return ApplyBinaryOperation(stk_ptr, Sub) == MATH_SUCCESS ? 0 : 1;
-        case CMD_MUL:   return ApplyBinaryOperation(stk_ptr, Mul) == MATH_SUCCESS ? 0 : 1;
-        case CMD_DIV:   return ApplyBinaryOperation(stk_ptr, Div) == MATH_SUCCESS ? 0 : 1;
-        case CMD_SQRT:  return Sqrt(stk_ptr) == MATH_SUCCESS ? 0 : 1;
+        case CMD_ADD:   return ExecuteBinaryOperation(stk_ptr, Add) == MATH_SUCCESS ? 0 : 1;
+        case CMD_SUB:   return ExecuteBinaryOperation(stk_ptr, Sub) == MATH_SUCCESS ? 0 : 1;
+        case CMD_MUL:   return ExecuteBinaryOperation(stk_ptr, Mul) == MATH_SUCCESS ? 0 : 1;
+        case CMD_DIV:   return ExecuteBinaryOperation(stk_ptr, Div) == MATH_SUCCESS ? 0 : 1;
+        case CMD_SQRT:  return HandleSqrt(stk_ptr) == MATH_SUCCESS ? 0 : 1;
         case CMD_OUT:   return HandleOut(stk_ptr, output_stream);
         case CMD_POPR:  return HandlePopr(stk_ptr, proc_data, value);
         case CMD_PUSHR: return HandlePushr(stk_ptr, proc_data, value);

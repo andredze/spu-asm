@@ -18,7 +18,7 @@ typedef struct CalcData {
     int result;
 } CalcData_t;
 
-MathErr_t ApplyBinaryOperation(Stack_t* stack,
+MathErr_t ExecuteBinaryOperation(Stack_t* stack,
                                MathErr_t (* calculate) (CalcData_t* calc_data));
 
 MathErr_t Add(CalcData_t* calc_data);
@@ -29,7 +29,7 @@ MathErr_t Mul(CalcData_t* calc_data);
 
 MathErr_t Div(CalcData_t* calc_data);
 
-MathErr_t Sqrt(Stack_t* stack);
+MathErr_t HandleSqrt(Stack_t* stack);
 
 int HandleOut(Stack_t* stack, FILE* output_stream);
 

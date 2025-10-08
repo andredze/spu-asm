@@ -28,8 +28,8 @@
 //         } \
 //     }
 
-MathErr_t ApplyBinaryOperation(Stack_t* stack,
-                               MathErr_t (* calculate) (CalcData_t* calc_data))
+MathErr_t ExecuteBinaryOperation(Stack_t* stack,
+                                 MathErr_t (* calculate) (CalcData_t* calc_data))
 {
     assert(stack != NULL);
     assert(stack->data != NULL);
@@ -60,7 +60,7 @@ MathErr_t ApplyBinaryOperation(Stack_t* stack,
     return MATH_SUCCESS;
 }
 
-MathErr_t Sqrt(Stack_t* stack)
+MathErr_t HandleSqrt(Stack_t* stack)
 {
     assert(stack != NULL);
 
