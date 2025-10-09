@@ -343,8 +343,9 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
         {
             return PROC_MATH_ERROR;
         }
-        DPRINTF("To continue press enter: ");
-        getchar();
+        StackPrint(&proc_data->stack);
+        // DPRINTF("To continue press enter: ");
+        // getchar();
     }
     DPRINTF("Executed commands\n");
 

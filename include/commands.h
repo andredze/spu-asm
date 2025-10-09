@@ -22,6 +22,7 @@ typedef enum Command {
     CMD_JNE = 16,
     CMD_POPR = 32,
     CMD_PUSHR = 33,
+    CMD_LABEL = 17
 } Command_t;
 
 typedef struct CodeParams {

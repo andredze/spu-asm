@@ -28,9 +28,9 @@
         return 0; \
     }
 
-DECLARE_HANDLE_JUMP_IF(<, JB);
+DECLARE_HANDLE_JUMP_IF(<,  JB);
 DECLARE_HANDLE_JUMP_IF(<=, JBE);
-DECLARE_HANDLE_JUMP_IF(>, JA);
+DECLARE_HANDLE_JUMP_IF(>,  JA);
 DECLARE_HANDLE_JUMP_IF(>=, JAE);
 DECLARE_HANDLE_JUMP_IF(==, JE);
 DECLARE_HANDLE_JUMP_IF(!=, JNE);
@@ -121,7 +121,7 @@ MathErr_t Div(CalcData_t* calc_data)
     assert(calc_data != NULL);
     assert(calc_data->result == 0);
 
-    if (calc_data->number2 == 0)
+    if (calc_data->number1 == 0)
     {
         printf("Can not divide by zero\n");
         return MATH_DIVISION_BY_ZERO;
