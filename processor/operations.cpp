@@ -1,6 +1,6 @@
 #include "operations.h"
 
-#define DECLARE_HANDLE_JUMP(comp_oper, cmd_name) \
+#define DECLARE_HANDLE_JUMP_IF_IF(comp_oper, cmd_name) \
     int Handle##cmd_name(Proc_t* proc_data, Stack_t* stack, int new_cmd_count) \
     { \
         assert(proc_data != NULL); \
@@ -28,12 +28,12 @@
         return 0; \
     }
 
-DECLARE_HANDLE_JUMP(<, JB);
-DECLARE_HANDLE_JUMP(<=, JBE);
-DECLARE_HANDLE_JUMP(>, JA);
-DECLARE_HANDLE_JUMP(>=, JAE);
-DECLARE_HANDLE_JUMP(==, JE);
-DECLARE_HANDLE_JUMP(!=, JNE);
+DECLARE_HANDLE_JUMP_IF(<, JB);
+DECLARE_HANDLE_JUMP_IF(<=, JBE);
+DECLARE_HANDLE_JUMP_IF(>, JA);
+DECLARE_HANDLE_JUMP_IF(>=, JAE);
+DECLARE_HANDLE_JUMP_IF(==, JE);
+DECLARE_HANDLE_JUMP_IF(!=, JNE);
 
 MathErr_t ExecuteBinaryOperation(Stack_t* stack,
                                  MathErr_t (* calculate) (CalcData_t* calc_data))
