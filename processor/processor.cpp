@@ -389,12 +389,12 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
         case CMD_PUSHR: return HandlePushr(stk_ptr, proc_data, value);
         case CMD_IN:    return HandleIn(stk_ptr);
         case CMD_JMP:   return HandleJmp(proc_data, value);
-        case CMD_JB:    return HandleJumpIf(stk_ptr, proc_data, value, CMD_JB);
-        case CMD_JBE:   return HandleJumpIf(stk_ptr, proc_data, value, CMD_JBE);
-        case CMD_JA:    return HandleJumpIf(stk_ptr, proc_data, value, CMD_JA);
-        case CMD_JAE:   return HandleJumpIf(stk_ptr, proc_data, value, CMD_JAE);
-        case CMD_JE:    return HandleJumpIf(stk_ptr, proc_data, value, CMD_JE);
-        case CMD_JNE:   return HandleJumpIf(stk_ptr, proc_data, value, CMD_JNE);
+        case CMD_JB:    return HandleJB (proc_data, stk_ptr, value);
+        case CMD_JBE:   return HandleJBE(proc_data, stk_ptr, value);
+        case CMD_JA:    return HandleJA (proc_data, stk_ptr, value);
+        case CMD_JAE:   return HandleJAE(proc_data, stk_ptr, value);
+        case CMD_JE:    return HandleJE (proc_data, stk_ptr, value);
+        case CMD_JNE:   return HandleJNE(proc_data, stk_ptr, value);
         case CMD_HLT:   return 1;
         default:        return 1;
     }

@@ -1,32 +1,39 @@
 #include "operations.h"
 
-// DECLARE_HANDLE_JUMP(<, JB);
-// #define DECLARE_HANDLE_JUMP(comp_oper, cmd_name) \
-//     int Handle#cmd_name(Proc_t* proc_data, Stack_t* stack, int new_cmd_count) \
-//     { \
-//         assert(proc_data != NULL); \
-//         assert(stack != NULL); \
-//         \
-//         int number1 = 0; \
-//         int number2 = 0; \
-//         if (StackPop(stack, &number2)) \
-//         { \
-//             return 1; \
-//         } \
-//         if (StackPop(stack, &number1)) \
-//         { \
-//             return 1; \
-//         } \
-//         if (!(number1 comp_oper number2)) \
-//         { \
-//             DPRINTF("-Jump rejected\n"); \
-//             return 0; \
-//         } \
-//         if (HandleJmp(proc_data, new_cmd_count)) \
-//         { \
-//             return 1; \
-//         } \
-//     }
+#define DECLARE_HANDLE_JUMP(comp_oper, cmd_name) \
+    int Handle##cmd_name(Proc_t* proc_data, Stack_t* stack, int new_cmd_count) \
+    { \
+        assert(proc_data != NULL); \
+        assert(stack != NULL); \
+        \
+        int number1 = 0; \
+        int number2 = 0; \
+        if (StackPop(stack, &number2)) \
+        { \
+            return 1; \
+        } \
+        if (StackPop(stack, &number1)) \
+        { \
+            return 1; \
+        } \
+        if (!(number1 comp_oper number2)) \
+        { \
+            DPRINTF("-Jump rejected\n"); \
+            return 0; \
+        } \
+        if (HandleJmp(proc_data, new_cmd_count)) \
+        { \
+            return 1; \
+        } \
+        return 0; \
+    }
+
+DECLARE_HANDLE_JUMP(<, JB);
+DECLARE_HANDLE_JUMP(<=, JBE);
+DECLARE_HANDLE_JUMP(>, JA);
+DECLARE_HANDLE_JUMP(>=, JAE);
+DECLARE_HANDLE_JUMP(==, JE);
+DECLARE_HANDLE_JUMP(!=, JNE);
 
 MathErr_t ExecuteBinaryOperation(Stack_t* stack,
                                  MathErr_t (* calculate) (CalcData_t* calc_data))
@@ -224,6 +231,7 @@ int HandleJmp(Proc_t* proc_data, size_t new_cmd_count)
     return 0;
 }
 
+// realisation without macro
 int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
                  size_t new_cmd_count, Command_t command)
 {

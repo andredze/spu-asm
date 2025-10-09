@@ -18,6 +18,18 @@ typedef struct CalcData {
     int result;
 } CalcData_t;
 
+int HandleJB(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+
+int HandleJBE(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+
+int HandleJA(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+
+int HandleJAE(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+
+int HandleJE(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+
+int HandleJNE(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+
 MathErr_t ExecuteBinaryOperation(Stack_t* stack,
                                MathErr_t (* calculate) (CalcData_t* calc_data));
 
