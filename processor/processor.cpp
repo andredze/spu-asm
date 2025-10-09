@@ -23,7 +23,7 @@ ProcErr_t ProcLoadPrettyBC(Proc_t* proc_data, const char* codepath)
     assert(codepath != NULL);
     DPRINTF("Loading pretty_bitecode...\n");
 
-    Context_t commands_data = {.input_file_info =  {.filepath = codepath}};
+    InputCtx_t commands_data = {.input_file_info =  {.filepath = codepath}};
 
     if (ReadAndParseFile(&commands_data))
     {

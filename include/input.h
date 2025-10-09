@@ -34,32 +34,32 @@ typedef struct FileInfo {
     size_t size;
 } FileInfo_t;
 
-typedef struct Context {
+typedef struct InputCtx {
     FileInfo_t input_file_info;
     BufferData_t buffer_data;
     PtrDataParams_t ptrdata_params;
     FileInfo_t output_file_info;
-} Context_t;
+} InputCtx_t;
 
-int ReadAndParseFile(Context_t* context);
+int ReadAndParseFile(InputCtx_t* InputCtx);
 
 int OpenFile(FileInfo_t* file_info, const char* mode);
 
-int CountSize(Context_t* context);
+int CountSize(InputCtx_t* InputCtx);
 
-int ReadText(Context_t* context);
+int ReadText(InputCtx_t* InputCtx);
 
-int AllocateBuffer(Context_t* context);
+int AllocateBuffer(InputCtx_t* InputCtx);
 
-int FillBuffer(Context_t* context);
+int FillBuffer(InputCtx_t* InputCtx);
 
-int ParseText(Context_t* context);
+int ParseText(InputCtx_t* InputCtx);
 
-int CountLines(Context_t* context);
+int CountLines(InputCtx_t* InputCtx);
 
-int AllocatePtrdata(Context_t* context);
+int AllocatePtrdata(InputCtx_t* InputCtx);
 
-int FillPtrdata(Context_t* context);
+int FillPtrdata(InputCtx_t* InputCtx);
 
 void AddNullTerminators(char* ptr);
 

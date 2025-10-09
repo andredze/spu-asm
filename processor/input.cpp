@@ -1,19 +1,19 @@
 #include "input.h"
 
-int ReadAndParseFile(Context_t* context)
+int ReadAndParseFile(InputCtx_t* InputCtx)
 {
-    if (OpenFile(&context->input_file_info, "rb"))
+    if (OpenFile(&InputCtx->input_file_info, "rb"))
     {
         return 0;
     }
-    if (ReadText(context))
+    if (ReadText(InputCtx))
     {
         DPRINTF("<Error during parsing text>\n");
         return 0;
     }
-    fclose(context->input_file_info.stream);
+    fclose(InputCtx->input_file_info.stream);
 
-    if (ParseText(context))
+    if (ParseText(InputCtx))
     {
         DPRINTF("<ptr_data is a NULL pointer>\n");
         return 0;
@@ -37,37 +37,37 @@ int OpenFile(FileInfo_t* file_info, const char* mode)
     return 0;
 }
 
-int CountSize(Context_t* context)
+int CountSize(InputCtx_t* InputCtx)
 {
-    assert(context != NULL);
-    assert(context->input_file_info.filepath != NULL);
+    assert(InputCtx != NULL);
+    assert(InputCtx->input_file_info.filepath != NULL);
 
     struct stat file_stat_info = {};
 
-    if (stat(context->input_file_info.filepath, &file_stat_info) == -1)
+    if (stat(InputCtx->input_file_info.filepath, &file_stat_info) == -1)
     {
         DPRINTF("\n<Error occured with stat()>\n");
         return 1;
     }
-    context->input_file_info.size = file_stat_info.st_size;
-    DPRINTF("size = %zu\n", context->input_file_info.size);
+    InputCtx->input_file_info.size = file_stat_info.st_size;
+    DPRINTF("size = %zu\n", InputCtx->input_file_info.size);
 
     return 0;
 }
 
-int ReadText(Context_t* context)
+int ReadText(InputCtx_t* InputCtx)
 {
-    assert(context != NULL);
+    assert(InputCtx != NULL);
 
-    if (CountSize(context))
+    if (CountSize(InputCtx))
     {
         return 1;
     }
-    if (AllocateBuffer(context))
+    if (AllocateBuffer(InputCtx))
     {
         return 1;
     }
-    if (FillBuffer(context))
+    if (FillBuffer(InputCtx))
     {
         return 1;
     }
@@ -75,42 +75,42 @@ int ReadText(Context_t* context)
     return 0;
 }
 
-int AllocateBuffer(Context_t* context)
+int AllocateBuffer(InputCtx_t* InputCtx)
 {
-    assert(context != NULL);
+    assert(InputCtx != NULL);
 
-    char* buffer = (char*) calloc(context->input_file_info.size / sizeof(char) + 1,
+    char* buffer = (char*) calloc(InputCtx->input_file_info.size / sizeof(char) + 1,
                                   sizeof(char));
     if (buffer == NULL)
     {
         DPRINTF("<Memory allocation for buffer failed>");
         return 1;
     }
-    context->buffer_data.buffer = buffer;
+    InputCtx->buffer_data.buffer = buffer;
 
     return 0;
 }
 
-int FillBuffer(Context_t* context)
+int FillBuffer(InputCtx_t* InputCtx)
 {
-    assert(context != NULL);
-    assert(context->input_file_info.stream != NULL);
+    assert(InputCtx != NULL);
+    assert(InputCtx->input_file_info.stream != NULL);
 
-    size_t fread_return = fread(context->buffer_data.buffer,
+    size_t fread_return = fread(InputCtx->buffer_data.buffer,
                                 sizeof(char),
-                                context->input_file_info.size,
-                                context->input_file_info.stream);
+                                InputCtx->input_file_info.size,
+                                InputCtx->input_file_info.stream);
     DPRINTF("fread return = %llu\n", fread_return);
 
-    if (fread_return != context->input_file_info.size)
+    if (fread_return != InputCtx->input_file_info.size)
     {
-        if (ferror(context->input_file_info.stream))
+        if (ferror(InputCtx->input_file_info.stream))
         {
             DPRINTF("\n<Error with reading the file>\n");
             DPRINTF("<fread_return = %zu>\n", fread_return);
             return 1;
         }
-        if (feof(context->input_file_info.stream))
+        if (feof(InputCtx->input_file_info.stream))
         {
             DPRINTF("\n<EOF reached>\n");
             return 1;
@@ -119,28 +119,28 @@ int FillBuffer(Context_t* context)
 
     DPRINTF("BUFFER:\n");
 #ifdef DEBUG
-    puts(context->buffer_data.buffer);
+    puts(InputCtx->buffer_data.buffer);
 #endif
 
     // adding NULL-terminator
-    context->buffer_data.buffer[context->input_file_info.size] = '\0';
+    InputCtx->buffer_data.buffer[InputCtx->input_file_info.size] = '\0';
 
     return 0;
 }
 
-int ParseText(Context_t* context)
+int ParseText(InputCtx_t* InputCtx)
 {
-    assert(context != NULL);
+    assert(InputCtx != NULL);
 
-    if (CountLines(context))
+    if (CountLines(InputCtx))
     {
         return 1;
     }
-    if (AllocatePtrdata(context))
+    if (AllocatePtrdata(InputCtx))
     {
         return 1;
     }
-    if (FillPtrdata(context))
+    if (FillPtrdata(InputCtx))
     {
         return 1;
     }
@@ -148,11 +148,11 @@ int ParseText(Context_t* context)
     return 0;
 }
 
-int CountLines(Context_t* context)
+int CountLines(InputCtx_t* InputCtx)
 {
-    assert(context != NULL);
+    assert(InputCtx != NULL);
 
-    char* ptr = context->buffer_data.buffer;
+    char* ptr = InputCtx->buffer_data.buffer;
     char* endptr = strchr(ptr, '\0');
     int lines_count = 0;
 
@@ -168,19 +168,19 @@ int CountLines(Context_t* context)
         lines_count += 1;
     }
 
-    context->buffer_data.lines_count = lines_count;
-    context->ptrdata_params.lines_count = lines_count;
+    InputCtx->buffer_data.lines_count = lines_count;
+    InputCtx->ptrdata_params.lines_count = lines_count;
 
     return 0;
 }
 
-int AllocatePtrdata(Context_t* context)
+int AllocatePtrdata(InputCtx_t* InputCtx)
 {
-    assert(context != NULL);
+    assert(InputCtx != NULL);
 
-    context->ptrdata_params.ptrdata = (char**) calloc(context->buffer_data.lines_count,
+    InputCtx->ptrdata_params.ptrdata = (char**) calloc(InputCtx->buffer_data.lines_count,
                                                      sizeof(char*));
-    if (context->ptrdata_params.ptrdata == NULL)
+    if (InputCtx->ptrdata_params.ptrdata == NULL)
     {
         DPRINTF("\n<Memory allocation for ptrdata failed>\n");
         return 1;
@@ -189,16 +189,16 @@ int AllocatePtrdata(Context_t* context)
     return 0;
 }
 
-int FillPtrdata(Context_t* context)
+int FillPtrdata(InputCtx_t* InputCtx)
 {
-    assert(context != NULL);
+    assert(InputCtx != NULL);
 
     // fill ptrdata and switch \r and \n to \0
-    char* ptr = context->buffer_data.buffer;
+    char* ptr = InputCtx->buffer_data.buffer;
 
-    for (int i = 0; i < context->buffer_data.lines_count; i++)
+    for (int i = 0; i < InputCtx->buffer_data.lines_count; i++)
     {
-        context->ptrdata_params.ptrdata[i] = ptr;
+        InputCtx->ptrdata_params.ptrdata[i] = ptr;
 
         assert(ptr != NULL);
 

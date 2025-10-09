@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    Context_t asm_commands_data =
+    InputCtx_t asm_commands_data =
         {.input_file_info =  {.filepath = commands_filename},
          .output_file_info = {.filepath = bitecode_filename}};
 

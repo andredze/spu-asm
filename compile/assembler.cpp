@@ -29,7 +29,7 @@ int SetFilenames(const char** commands_filename,
     return 0;
 }
 
-AsmErr_t CompileProgramm(Context_t* commands_data)
+AsmErr_t CompileProgramm(InputCtx_t* commands_data)
 {
     assert(commands_data != NULL);
 
@@ -73,7 +73,7 @@ AsmErr_t CompileProgramm(Context_t* commands_data)
     return ASM_SUCCESS;
 }
 
-AsmErr_t CompileCommands(Context_t* commands_data,
+AsmErr_t CompileCommands(InputCtx_t* commands_data,
                          CodeData_t* code_data)
 {
     assert(commands_data != NULL);
@@ -190,7 +190,7 @@ int AddCommandCode(Command_t command, int value,
     return 0;
 }
 
-int CodeDataCtor(Context_t* commands_data, CodeData_t* code_data)
+int CodeDataCtor(InputCtx_t* commands_data, CodeData_t* code_data)
 {
     int lines_count = commands_data->buffer_data.lines_count;
 
@@ -206,7 +206,7 @@ int CodeDataCtor(Context_t* commands_data, CodeData_t* code_data)
     return 0;
 }
 
-int WriteBiteCode(CodeData_t* code_data, Context_t* commands_data)
+int WriteBiteCode(CodeData_t* code_data, InputCtx_t* commands_data)
 {
     if (OpenFile(&commands_data->output_file_info, "wb"))
     {
@@ -271,7 +271,7 @@ int WriteBiteCodePretty(CodeData_t* code_data, const char* filepath)
     return 0;
 }
 
-void AsmDestroy(Context_t* commands_data, CodeData_t* code_data)
+void AsmDestroy(InputCtx_t* commands_data, CodeData_t* code_data)
 {
     free(code_data->buffer);
     free(commands_data->buffer_data.buffer);

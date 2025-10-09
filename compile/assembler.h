@@ -25,9 +25,9 @@ int SetFilenames(const char** commands_filename,
                  const char** bitecode_filename,
                  int argc, char* argv[]);
 
-AsmErr_t CompileProgramm(Context_t* commands_data);
+AsmErr_t CompileProgramm(InputCtx_t* commands_data);
 
-AsmErr_t CompileCommands(Context_t* commands_data,
+AsmErr_t CompileCommands(InputCtx_t* commands_data,
                          CodeData_t* code_data);
 
 int GetAsmCommand(char* line, Command_t* command, int* value);
@@ -37,12 +37,12 @@ int GetValue(Command_t command, const char* line, int* value);
 int AddCommandCode(Command_t command, int value,
                    CodeData_t* code_data);
 
-int CodeDataCtor(Context_t* commands_data, CodeData_t* code_data);
+int CodeDataCtor(InputCtx_t* commands_data, CodeData_t* code_data);
 
-int WriteBiteCode(CodeData_t* code_data, Context_t* commands_data);
+int WriteBiteCode(CodeData_t* code_data, InputCtx_t* commands_data);
 
 int WriteBiteCodePretty(CodeData_t* code_data, const char* filepath);
 
-void AsmDestroy(Context_t* commands_data, CodeData_t* code_data);
+void AsmDestroy(InputCtx_t* commands_data, CodeData_t* code_data);
 
 #endif /* ASSEMBLER_H */
