@@ -1,6 +1,6 @@
 #include "operations.h"
 
-#define DECLARE_HANDLE_JUMP_IF_IF(comp_oper, cmd_name) \
+#define DECLARE_HANDLE_JUMP_IF(comp_oper, cmd_name) \
     int Handle##cmd_name(Proc_t* proc_data, Stack_t* stack, int new_cmd_count) \
     { \
         assert(proc_data != NULL); \
