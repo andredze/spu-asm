@@ -4,19 +4,19 @@ int ReadAndParseFile(InputCtx_t* InputCtx)
 {
     if (OpenFile(&InputCtx->input_file_info, "rb"))
     {
-        return 0;
+        return 1;
     }
     if (ReadText(InputCtx))
     {
         DPRINTF("<Error during parsing text>\n");
-        return 0;
+        return 1;
     }
     fclose(InputCtx->input_file_info.stream);
 
     if (ParseText(InputCtx))
     {
         DPRINTF("<ptr_data is a NULL pointer>\n");
-        return 0;
+        return 1;
     }
 
     return 0;
