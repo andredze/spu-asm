@@ -4,9 +4,12 @@
 #include "input.h"
 #include "commands.h"
 
+const int LABELS_COUNT = 10;
+
 typedef struct CodeData {
     int* buffer;
     size_t cur_cmd;
+    int labels[LABELS_COUNT];
 } CodeData_t;
 
 typedef enum AsmErr {
@@ -21,26 +24,23 @@ typedef enum AsmErr {
 
 const int ASM_MAX_ARGS_COUNT = 2;
 
-const int LABELS_COUNT = 10;
-
 int SetFilenames(const char** commands_filename,
                  const char** bitecode_filename,
                  int argc, char* argv[]);
 
-AsmErr_t CompileProgramm(InputCtx_t* commands_data, int labels[]);
+AsmErr_t CompileProgramm(InputCtx_t* commands_data);
 
-void DPrintAsmData(CodeData_t* code_data, int labels[]);
+void DPrintAsmData(CodeData_t* code_data);
 
 AsmErr_t CompileCommands(InputCtx_t* commands_data,
-                         CodeData_t* code_data,
-                         int labels[]);
+                         CodeData_t* code_data);
 
-int GetAsmCommand(char* line, Command_t* command, int* value, int labels[]);
+int GetAsmCommand(char* line, Command_t* command, int* value, CodeData_t* code_data);
 
-int GetValue(Command_t command, const char* line, int* value, int labels[]);
+int GetValue(Command_t command, const char* line, int* value, CodeData_t* code_data);
 
 int AddCommandCode(Command_t command, int value,
-                   CodeData_t* code_data, int labels[]);
+                   CodeData_t* code_data);
 
 int CodeDataCtor(InputCtx_t* commands_data, CodeData_t* code_data);
 

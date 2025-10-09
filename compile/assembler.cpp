@@ -29,7 +29,7 @@ int SetFilenames(const char** commands_filename,
     return 0;
 }
 
-void DPrintAsmData(CodeData_t* code_data, int labels[])
+void DPrintAsmData(CodeData_t* code_data)
 {
     DPRINTF("\n-----------------------------------\n");
     DPRINTF("code = ");
@@ -41,13 +41,13 @@ void DPrintAsmData(CodeData_t* code_data, int labels[])
     DPRINTF("labels = ");
     for (int i = 0; i < LABELS_COUNT; i++)
     {
-        DPRINTF("%d, ", labels[i]);
+        DPRINTF("%d, ", code_data->labels[i]);
     }
     DPRINTF("\n");
     DPRINTF("-----------------------------------\n");
 }
 
-AsmErr_t CompileProgramm(InputCtx_t* commands_data, int labels[])
+AsmErr_t CompileProgramm(InputCtx_t* commands_data)
 {
     assert(commands_data != NULL);
 
@@ -65,20 +65,20 @@ AsmErr_t CompileProgramm(InputCtx_t* commands_data, int labels[])
     }
 
     AsmErr_t error = ASM_SUCCESS;
-    if ((error = CompileCommands(commands_data, &code_data, labels)) != ASM_SUCCESS)
+    if ((error = CompileCommands(commands_data, &code_data)) != ASM_SUCCESS)
     {
         return error;
     }
 
-    DPrintAsmData(&code_data, labels);
+    DPrintAsmData(&code_data);
 
     code_data.cur_cmd = 0;
-    if ((error = CompileCommands(commands_data, &code_data, labels)) != ASM_SUCCESS)
+    if ((error = CompileCommands(commands_data, &code_data)) != ASM_SUCCESS)
     {
         return error;
     }
 
-    DPrintAsmData(&code_data, labels);
+    DPrintAsmData(&code_data);
 
     if (WriteBiteCode(&code_data, commands_data))
     {
@@ -97,8 +97,7 @@ AsmErr_t CompileProgramm(InputCtx_t* commands_data, int labels[])
 }
 
 AsmErr_t CompileCommands(InputCtx_t* commands_data,
-                         CodeData_t* code_data,
-                         int labels[])
+                         CodeData_t* code_data)
 {
     assert(commands_data != NULL);
     assert(code_data != NULL);
@@ -111,13 +110,13 @@ AsmErr_t CompileCommands(InputCtx_t* commands_data,
         DPRINTF("\nEntering %d iteration of ptrdata for\n", i);
 
         if (GetAsmCommand(commands_data->ptrdata_params.ptrdata[i],
-                          &command, &value, labels))
+                          &command, &value, code_data))
         {
             return ASM_GET_COMMAND_ERROR;
         }
         DPRINTF("Command = %d\n", command);
 
-        if (AddCommandCode(command, value, code_data, labels))
+        if (AddCommandCode(command, value, code_data))
         {
             return ASM_SET_COMMAND_ERROR;
         }
@@ -126,9 +125,10 @@ AsmErr_t CompileCommands(InputCtx_t* commands_data,
     return ASM_SUCCESS;
 }
 
-int GetAsmCommand(char* line, Command_t* command, int* value, int labels[])
+int GetAsmCommand(char* line, Command_t* command, int* value, CodeData_t* code_data)
 {
     assert(line != NULL);
+    assert(code_data != NULL);
     assert(command != NULL);
 
     char operation[CMD_MAX_LEN] = {};
@@ -153,7 +153,7 @@ int GetAsmCommand(char* line, Command_t* command, int* value, int labels[])
     }
     if (CmdArgsCount(*command) == 1)
     {
-        if (GetValue(*command, line, value, labels))
+        if (GetValue(*command, line, value, code_data))
         {
             return 1;
         }
@@ -162,8 +162,10 @@ int GetAsmCommand(char* line, Command_t* command, int* value, int labels[])
     return 0;
 }
 
-int GetValue(Command_t command, const char* line, int* value, int labels[])
+int GetValue(Command_t command, const char* line, int* value, CodeData_t* code_data)
 {
+    assert(code_data != NULL);
+
     DPRINTF("cmd = %d\n", command);
     char operation[CMD_MAX_LEN] = {};
     int label = 0;
@@ -171,7 +173,7 @@ int GetValue(Command_t command, const char* line, int* value, int labels[])
     if (sscanf(line, "%s :%d", operation, &label) == 2)
     {
         // TODO: check if label is valid
-        *value = labels[label];
+        *value = code_data->labels[label];
         // TODO: if command not jump - return error;
         return 0;
     }
@@ -200,7 +202,7 @@ int GetValue(Command_t command, const char* line, int* value, int labels[])
 }
 
 int AddCommandCode(Command_t command, int value,
-                   CodeData_t* code_data, int labels[])
+                   CodeData_t* code_data)
 {
     assert(code_data != NULL);
 
@@ -212,7 +214,8 @@ int AddCommandCode(Command_t command, int value,
     }
     if (command == CMD_LABEL)
     {
-        labels[value] = code_data->cur_cmd;
+        // labels in size_t
+        code_data->labels[value] = (int) code_data->cur_cmd;
         return 0;
     }
 
@@ -245,6 +248,11 @@ int CodeDataCtor(InputCtx_t* commands_data, CodeData_t* code_data)
     }
     code_data->buffer = buffer;
     code_data->cur_cmd = 0;
+
+    for (int i = 0; i < LABELS_COUNT; i++)
+    {
+        code_data->labels[i] = -1;
+    }
 
     return 0;
 }

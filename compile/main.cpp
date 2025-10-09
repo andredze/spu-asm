@@ -15,13 +15,7 @@ int main(int argc, char* argv[])
         {.input_file_info =  {.filepath = commands_filename},
          .output_file_info = {.filepath = bitecode_filename}};
 
-    int labels[LABELS_COUNT] = {};
-    for (int i = 0; i < LABELS_COUNT; i++)
-    {
-        labels[i] = -1;
-    }
-
-    if (CompileProgramm(&asm_commands_data, labels) != ASM_SUCCESS)
+    if (CompileProgramm(&asm_commands_data) != ASM_SUCCESS)
     {
         return EXIT_FAILURE;
     }
