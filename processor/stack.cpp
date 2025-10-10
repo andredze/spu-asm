@@ -296,7 +296,7 @@ StackErr_t StackDump(Stack_t* stack, StackErr_t error,
 
     DPRINTF("Dumping...\n");
 
-    FILE* stream = fopen("stack.log", "w");
+    FILE* stream = fopen(STACK_LOGFILENAME, "w");
     if (stream == NULL)
     {
         DPRINTF("Can not open stream: stack.log");

@@ -1,6 +1,7 @@
 #include "assembler.h"
 #include "config.h"
 
+// TODO: labels in dynamic
 int SetFilenames(const char** commands_filename,
                  const char** bitecode_filename,
                  int argc, char* argv[])
@@ -31,7 +32,7 @@ int SetFilenames(const char** commands_filename,
 
 void DPrintAsmData(CodeData_t* code_data)
 {
-    DPRINTF("\n-----------------------------------\n");
+    DPRINTF("\n-----------------------------------------------------------------\n");
     DPRINTF("code = ");
     for (size_t i = 0; i < code_data->cur_cmd; i++)
     {
@@ -44,7 +45,7 @@ void DPrintAsmData(CodeData_t* code_data)
         DPRINTF("%d, ", code_data->labels[i]);
     }
     DPRINTF("\n");
-    DPRINTF("-----------------------------------\n");
+    DPRINTF("-----------------------------------------------------------------\n");
 }
 
 AsmErr_t CompileProgramm(InputCtx_t* commands_data)
@@ -96,64 +97,133 @@ AsmErr_t CompileProgramm(InputCtx_t* commands_data)
     return ASM_SUCCESS;
 }
 
-AsmErr_t CompileCommands(InputCtx_t* commands_data,
-                         CodeData_t* code_data)
+AsmErr_t CreateListingFile(InputCtx_t* commands_data,
+                           FileInfo_t* listing_file_info)
 {
     assert(commands_data != NULL);
+    assert(listing_file_info != NULL);
+
+    char listing_filename[MAX_FILENAME_LEN] = {};
+    strcpy(listing_filename, "logs/");
+    strcat(listing_filename, strchr(commands_data->input_file_info.filepath, '/') + 1);
+    strcat(listing_filename, "_listing.txt");
+    DPRINTF("listing_filename = %s\n", listing_filename);
+    listing_file_info->filepath = listing_filename;
+
+    if (OpenFile(listing_file_info, "w"))
+    {
+        return ASM_CREATE_LISTING_ERROR;
+    }
+    fprintf(listing_file_info->stream, "address      \tcommand     cmd    \tvalue\tindex\n\n");
+    DPRINTF("FILE = %p\n", listing_file_info->stream);
+
+    return ASM_SUCCESS;
+}
+
+AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
+                            CodeData_t* code_data,
+                            FILE* listing_stream)
+{
+    assert(curr_cmd_data != NULL);
     assert(code_data != NULL);
 
-    int value = 0;
-    Command_t command = CMD_HLT;
-
-    for (int i = 0; i < commands_data->ptrdata_params.lines_count; i++)
+    if (CmdArgsCount(curr_cmd_data->command) == 1)
     {
-        DPRINTF("\nEntering %d iteration of ptrdata for\n", i);
-
-        if (GetAsmCommand(commands_data->ptrdata_params.ptrdata[i],
-                          &command, &value, code_data))
+        if (fprintf(listing_stream, "%-12p\t%-10s\t%-4d\t%-4d\t%-4zu\n",
+                    &code_data->buffer[code_data->cur_cmd],
+                    curr_cmd_data->line,
+                    curr_cmd_data->command,
+                    curr_cmd_data->value,
+                    code_data->cur_cmd) < 0)
         {
-            return ASM_GET_COMMAND_ERROR;
+            DPRINTF("Fprintf error in listing cmd with 1 arg\n");
+            return ASM_LISTING_ERROR;
         }
-        DPRINTF("Command = %d\n", command);
-
-        if (AddCommandCode(command, value, code_data))
+    }
+    else
+    {
+        if (fprintf(listing_stream, "%-12p\t%-10s\t%-4d\t\t\t%-4zu\n",
+                    &code_data->buffer[code_data->cur_cmd],
+                    curr_cmd_data->line,
+                    curr_cmd_data->command,
+                    code_data->cur_cmd) < 0)
         {
-            return ASM_SET_COMMAND_ERROR;
+            DPRINTF("Fprintf error in listing cmd with 0 arg\n");
+            return ASM_LISTING_ERROR;
         }
     }
 
     return ASM_SUCCESS;
 }
 
-int GetAsmCommand(char* line, Command_t* command, int* value, CodeData_t* code_data)
+AsmErr_t CompileCommands(InputCtx_t* commands_data,
+                         CodeData_t* code_data)
 {
-    assert(line != NULL);
+    assert(commands_data != NULL);
     assert(code_data != NULL);
-    assert(command != NULL);
+
+    FileInfo_t listing_file_info = {};
+    if (CreateListingFile(commands_data, &listing_file_info))
+    {
+        return ASM_CREATE_LISTING_ERROR;
+    }
+
+    for (int i = 0; i < commands_data->ptrdata_params.lines_count; i++)
+    {
+        DPRINTF("\nEntering %d iteration of ptrdata for\n", i);
+
+        CurrCmdData_t curr_cmd_data = {.line = commands_data->ptrdata_params.ptrdata[i],
+                                       .command = CMD_HLT,
+                                       .value = 0};
+
+        if (GetAsmCommand(&curr_cmd_data, code_data))
+        {
+            return ASM_GET_COMMAND_ERROR;
+        }
+        DPRINTF("Command = %d\n", curr_cmd_data.command);
+
+        if (AddStringToListing(&curr_cmd_data, code_data, listing_file_info.stream) != ASM_SUCCESS)
+        {
+            return ASM_LISTING_ERROR;
+        }
+        if (AddCommandCode(&curr_cmd_data, code_data))
+        {
+            return ASM_SET_COMMAND_ERROR;
+        }
+    }
+    fclose(listing_file_info.stream);
+
+    return ASM_SUCCESS;
+}
+
+int GetAsmCommand(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
+{
+    assert(code_data != NULL);
+    assert(curr_cmd_data != NULL);
 
     char operation[CMD_MAX_LEN] = {};
 
-    if (sscanf(line, "%s", operation) != 1)
+    if (sscanf(curr_cmd_data->line, "%s", operation) != 1)
     {
         DPRINTF("sscanf failed\n");
         return 1;
     }
-    if (sscanf(line, ":%d", value) == 1)
+    if (sscanf(curr_cmd_data->line, ":%d", &curr_cmd_data->value) == 1)
     {
-        *command = CMD_LABEL;
+        curr_cmd_data->command = CMD_LABEL;
         return 0;
     }
     for (size_t i = 0; i < COMM_CASES_SIZE; i++)
     {
         if (strcmp(operation, COMM_CASES[i].str_command) == 0)
         {
-            *command = COMM_CASES[i].command;
+            curr_cmd_data->command = COMM_CASES[i].command;
             break;
         }
     }
-    if (CmdArgsCount(*command) == 1)
+    if (CmdArgsCount(curr_cmd_data->command) == 1)
     {
-        if (GetValue(*command, line, value, code_data))
+        if (GetValue(curr_cmd_data, code_data))
         {
             return 1;
         }
@@ -162,35 +232,48 @@ int GetAsmCommand(char* line, Command_t* command, int* value, CodeData_t* code_d
     return 0;
 }
 
-int GetValue(Command_t command, const char* line, int* value, CodeData_t* code_data)
+int GetValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
 {
     assert(code_data != NULL);
+    assert(curr_cmd_data != NULL);
 
-    DPRINTF("cmd = %d\n", command);
+    DPRINTF("cmd = %d\n", curr_cmd_data->command);
     char operation[CMD_MAX_LEN] = {};
     int label = 0;
 
-    if (sscanf(line, "%s :%d", operation, &label) == 2)
+    if (sscanf(curr_cmd_data->line, "%s :%d", operation, &label) == 2)
     {
-        // TODO: check if label is valid
-        *value = code_data->labels[label];
-        // TODO: if command not jump - return error;
+        if (!(curr_cmd_data->command >= CMD_JMP &&
+              curr_cmd_data->command <= CMD_JNE))
+        {
+            printf("Syntax error\n");
+            return 1;
+        }
+        if (!(label >= 0 && label < LABELS_COUNT))
+        {
+            printf("Given label exceeds max label number\n");
+            return 1;
+        }
+        curr_cmd_data->value = code_data->labels[label];
+
         return 0;
     }
-    else if (command == CMD_PUSHR || command == CMD_POPR)
+    else if (curr_cmd_data->command == CMD_PUSHR ||
+             curr_cmd_data->command == CMD_POPR)
     {
         char reg[CMD_MAX_LEN] = {};
-        if (sscanf(line, "%s %s", operation, reg) != 2)
+        if (sscanf(curr_cmd_data->line, "%s %s", operation, reg) != 2)
         {
             DPRINTF("Wrong number of args for reg cmd\n");
             return 1;
         }
-        *value = reg[1] - 'A';
+        curr_cmd_data->value = reg[1] - 'A';
         return 0;
     }
     else
     {
-        if (sscanf(line, "%s %d", operation, value) != 2)
+        if (sscanf(curr_cmd_data->line, "%s %d",
+                   operation, &curr_cmd_data->value) != 2)
         {
             DPRINTF("Wrong number of args for push\n");
             return 1;
@@ -201,13 +284,15 @@ int GetValue(Command_t command, const char* line, int* value, CodeData_t* code_d
     return 1;
 }
 
-int AddCommandCode(Command_t command, int value,
-                   CodeData_t* code_data)
+int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
 {
     assert(code_data != NULL);
+    assert(curr_cmd_data != NULL);
 
-    // TODO: check if number is in enum
-    if (command < -1 || command > 33)
+    Command_t command = curr_cmd_data->command;
+
+    if (command < CMD_HLT ||
+        command > CMD_END)
     {
         DPRINTF("<ERROR: Unknown command code in AddCommandCode()>\n");
         return 1;
@@ -215,7 +300,7 @@ int AddCommandCode(Command_t command, int value,
     if (command == CMD_LABEL)
     {
         // labels in size_t
-        code_data->labels[value] = (int) code_data->cur_cmd;
+        code_data->labels[curr_cmd_data->value] = (int) code_data->cur_cmd;
         return 0;
     }
 
@@ -225,11 +310,11 @@ int AddCommandCode(Command_t command, int value,
     {
         if (command == CMD_POPR || command == CMD_PUSHR)
         {
-            code_data->buffer[code_data->cur_cmd++] = value;
+            code_data->buffer[code_data->cur_cmd++] = curr_cmd_data->value;
         }
         else
         {
-            code_data->buffer[code_data->cur_cmd++] = value;
+            code_data->buffer[code_data->cur_cmd++] = curr_cmd_data->value;
         }
     }
 

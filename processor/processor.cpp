@@ -1,5 +1,4 @@
 #include "processor.h"
-#include "config.h"
 
 ProcErr_t ProcCtor(Proc_t* proc_data)
 {
@@ -238,7 +237,7 @@ ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
 {
     // DPRINTF("Dumping...\n");
 
-    FILE* stream = fopen("processor.log", "w");
+    FILE* stream = fopen(PROCESSOR_LOGFILENAME, "w");
     if (stream == NULL)
     {
         DPRINTF("Can not open stream: processor.log");
@@ -274,6 +273,7 @@ ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
                     proc_data->cmd_count,
                     proc_data->code_size);
     // stack
+    // TODO: if stack_err than dont sump
     proc_data->stack.var_info = {"proc_data->stack.var_info", __FILE__, __func__, __LINE__};
     if (StackDump(&proc_data->stack, STACK_SUCCESS, "Proc dump") != STACK_SUCCESS)
     {

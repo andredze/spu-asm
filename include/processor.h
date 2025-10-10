@@ -6,6 +6,7 @@
 #include "stack.h"
 #include "commands.h"
 #include "proc_types.h"
+#include "config.h"
 
 #ifdef PROC_DEBUG
 #define PROC_OK_DEBUG(proc_data) \
