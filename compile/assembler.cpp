@@ -6,25 +6,23 @@ int SetFilenames(const char** commands_filename,
                  const char** bitecode_filename,
                  int argc, char* argv[])
 {
-    if (argc == 3)
+    switch (argc)
     {
-        *commands_filename = argv[1];
-        *bitecode_filename = argv[2];
-    }
-    else if (argc == 2)
-    {
-        *commands_filename = argv[1];
-        *bitecode_filename = BINARY_BITECODE_FILENAME;
-    }
-    else if (argc == 1)
-    {
-        *commands_filename = COMMANDS_FILENAME;
-        *bitecode_filename = BINARY_BITECODE_FILENAME;
-    }
-    else
-    {
-        printf("Too much arguments given, maximum 2 (current arguments = %d)\n", argc);
-        return 1;
+        case 3:
+            *commands_filename = argv[1];
+            *bitecode_filename = argv[2];
+            break;
+        case 2:
+            *commands_filename = argv[1];
+            *bitecode_filename = BINARY_BITECODE_FILENAME;
+            break;
+        case 1:
+            *commands_filename = COMMANDS_FILENAME;
+            *bitecode_filename = BINARY_BITECODE_FILENAME;
+            break;
+        default:
+            printf("Too much arguments given, maximum 2 (current arguments = %d)\n", argc);
+            return 1;
     }
 
     return 0;
@@ -32,20 +30,20 @@ int SetFilenames(const char** commands_filename,
 
 void DPrintAsmData(CodeData_t* code_data)
 {
-    DPRINTF("\n-----------------------------------------------------------------\n");
-    DPRINTF("code = ");
+    DPRINTF("\n-----------------------------------------------------------------\n"
+            "code = ");
     for (size_t i = 0; i < code_data->cur_cmd; i++)
     {
         DPRINTF("%d, ", code_data->buffer[i]);
     }
-    DPRINTF("\n");
-    DPRINTF("labels = ");
+    DPRINTF("\n"
+            "labels = ");
     for (int i = 0; i < LABELS_COUNT; i++)
     {
         DPRINTF("%d, ", code_data->labels[i]);
     }
-    DPRINTF("\n");
-    DPRINTF("-----------------------------------------------------------------\n");
+    DPRINTF("\n"
+            "-----------------------------------------------------------------\n");
 }
 
 AsmErr_t CompileProgramm(InputCtx_t* commands_data)
@@ -114,7 +112,7 @@ AsmErr_t CreateListingFile(InputCtx_t* commands_data,
     {
         return ASM_CREATE_LISTING_ERROR;
     }
-    fprintf(listing_file_info->stream, "address      \tcommand     cmd    \tvalue\tindex\n\n");
+    fprintf(listing_file_info->stream, "offset   \tcommand     cmd    \tvalue\tindex\n\n");
     DPRINTF("FILE = %p\n", listing_file_info->stream);
 
     return ASM_SUCCESS;
@@ -129,8 +127,8 @@ AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
 
     if (CmdArgsCount(curr_cmd_data->command) == 1)
     {
-        if (fprintf(listing_stream, "%-12p\t%-10s\t%-4d\t%-4d\t%-4zu\n",
-                    &code_data->buffer[code_data->cur_cmd],
+        if (fprintf(listing_stream, "%-9zu\t%-10s\t%-4d\t%-4d\t%-4zu\n",
+                    code_data->cur_cmd * sizeof(code_data->buffer[0]),
                     curr_cmd_data->line,
                     curr_cmd_data->command,
                     curr_cmd_data->value,
@@ -142,8 +140,8 @@ AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
     }
     else
     {
-        if (fprintf(listing_stream, "%-12p\t%-10s\t%-4d\t\t\t%-4zu\n",
-                    &code_data->buffer[code_data->cur_cmd],
+        if (fprintf(listing_stream, "%-9zu\t%-10s\t%-4d\t\t\t%-4zu\n",
+                    code_data->cur_cmd * sizeof(code_data->buffer[0]),
                     curr_cmd_data->line,
                     curr_cmd_data->command,
                     code_data->cur_cmd) < 0)
@@ -162,11 +160,13 @@ AsmErr_t CompileCommands(InputCtx_t* commands_data,
     assert(commands_data != NULL);
     assert(code_data != NULL);
 
+#ifdef LISTING
     FileInfo_t listing_file_info = {};
     if (CreateListingFile(commands_data, &listing_file_info))
     {
         return ASM_CREATE_LISTING_ERROR;
     }
+#endif /* LISTING */
 
     for (int i = 0; i < commands_data->ptrdata_params.lines_count; i++)
     {
@@ -182,16 +182,23 @@ AsmErr_t CompileCommands(InputCtx_t* commands_data,
         }
         DPRINTF("Command = %d\n", curr_cmd_data.command);
 
+#ifdef LISTING
         if (AddStringToListing(&curr_cmd_data, code_data, listing_file_info.stream) != ASM_SUCCESS)
         {
+            fclose(listing_file_info.stream);
             return ASM_LISTING_ERROR;
         }
+#endif /* LISTING */
+
         if (AddCommandCode(&curr_cmd_data, code_data))
         {
             return ASM_SET_COMMAND_ERROR;
         }
     }
+
+#ifdef LISTING
     fclose(listing_file_info.stream);
+#endif /* LISTING */
 
     return ASM_SUCCESS;
 }

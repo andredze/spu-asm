@@ -273,7 +273,7 @@ ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
                     proc_data->cmd_count,
                     proc_data->code_size);
     // stack
-    // TODO: if stack_err than dont sump
+    // if stack_err than dont dump?
     proc_data->stack.var_info = {"proc_data->stack.var_info", __FILE__, __func__, __LINE__};
     if (StackDump(&proc_data->stack, STACK_SUCCESS, "Proc dump") != STACK_SUCCESS)
     {
