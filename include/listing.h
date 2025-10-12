@@ -11,6 +11,8 @@ AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
                             CodeData_t* code_data,
                             FILE* listing_stream);
 
+void DPrintLabels(CodeData_t* code_data);
+
 void DPrintAsmData(CodeData_t* code_data);
 
 #endif /* LISTING_H */

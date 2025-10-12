@@ -49,7 +49,6 @@ AsmErr_t CompileProgramm(InputCtx_t* commands_data)
     {
         return error;
     }
-
     DPrintAsmData(&code_data);
 
     code_data.cur_cmd = 0;
@@ -57,8 +56,9 @@ AsmErr_t CompileProgramm(InputCtx_t* commands_data)
     {
         return error;
     }
-
     DPrintAsmData(&code_data);
+
+    free(code_data.labels);
 
     if (WriteBiteCode(&code_data, commands_data))
     {
@@ -102,6 +102,7 @@ int CodeDataCtor(InputCtx_t* commands_data, CodeData_t* code_data)
     {
         code_data->labels[i] = -1;
     }
+    DPrintAsmData(code_data);
 
     return 0;
 }
@@ -202,6 +203,8 @@ int GetValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
 
     if (sscanf(curr_cmd_data->line, "%s :%d", operation, &label) == 2)
     {
+        DPrintAsmData(code_data);
+        DPRINTF("%s :%d\n", operation, label);
         if (!(curr_cmd_data->command >= CMD_JMP &&
               curr_cmd_data->command <= CMD_JNE))
         {
@@ -210,17 +213,24 @@ int GetValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
         }
         if (!(label >= 0))
         {
-            printf("Syntax error: Given lable is negative\n");
+            printf("Syntax error: Given lable for jump is negative\n");
             return 1;
         }
-        if (curr_cmd_data->value >= code_data->labels_size && curr_cmd_data->value < MAX_LABELS_SIZE)
+        if (label >= MAX_LABELS_SIZE)
         {
-            if (LabelsRecalloc(code_data, 2 * curr_cmd_data->value))
+            printf("Syntax error: Given lable for jump is too big\n");
+            return 1;
+        }
+        if (label >= code_data->labels_size)
+        {
+            DPRINTF("Memory realloc...\n");
+            if (LabelsRecalloc(code_data, 2 * label))
             {
                 return 1;
             }
         }
         curr_cmd_data->value = code_data->labels[label];
+        DPRINTF("cmd = %d; value = %d;\n", curr_cmd_data->command, curr_cmd_data->value);
 
         return 0;
     }
@@ -265,14 +275,28 @@ int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
     }
     if (command == CMD_LABEL)
     {
-        if (curr_cmd_data->value >= code_data->labels_size && curr_cmd_data->value < MAX_LABELS_SIZE)
+        int label = curr_cmd_data->value;
+        DPRINTF("curr_cmd_data->value = %d\n", curr_cmd_data->value);
+        DPRINTF("label_size = %d\n", code_data->labels_size);
+        if (label >= MAX_LABELS_SIZE)
         {
-            if (LabelsRecalloc(code_data, 2 * curr_cmd_data->value))
+            printf("Syntax error: label is too big\n");
+            return 1;
+        }
+        if (label < 0)
+        {
+            printf("Syntax error: label is negative\n");
+            return 1;
+        }
+        if (label >= code_data->labels_size)
+        {
+            if (LabelsRecalloc(code_data, 2 * label))
             {
                 return 1;
             }
         }
-        code_data->labels[curr_cmd_data->value] = (int) code_data->cur_cmd;
+        code_data->labels[label] = (int) code_data->cur_cmd;
+        DPrintAsmData(code_data);
 
         return 0;
     }
@@ -296,19 +320,30 @@ int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
 
 int LabelsRecalloc(CodeData_t* code_data, int new_size)
 {
-    int* labels = (int*) realloc(code_data->labels, new_size);
+    DPrintLabels(code_data);
+    int old_size = code_data->labels_size;
+    int* labels = (int*) realloc(code_data->labels, new_size * sizeof(int));
     if (labels == NULL)
     {
         printf("Labels recalloc failed\n");
         return 1;
     }
-    code_data->labels = labels;
-    for (int i = code_data->labels_size; i < new_size; i++)
-    {
-        labels[i] = -1;
-    }
     code_data->labels_size = new_size;
+    code_data->labels = labels;
 
+    DPRINTF("old_size = %d\n", old_size);
+    DPRINTF("labels[old_size] = %d\n", code_data->labels[old_size]);
+    DPrintLabels(code_data);
+
+    for (int i = old_size; i < new_size; i++)
+    {
+        DPRINTF("%d, ", i);
+        code_data->labels[i] = -1;
+    }
+    DPRINTF("\n");
+    DPRINTF("labels[old_size] = %d\n", code_data->labels[old_size]);
+
+    DPrintLabels(code_data);
     return 0;
 }
 

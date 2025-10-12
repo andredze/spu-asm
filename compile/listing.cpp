@@ -59,6 +59,17 @@ AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
     return ASM_SUCCESS;
 }
 
+void DPrintLabels(CodeData_t* code_data)
+{
+    DPRINTF("labels_size = %d;\n", code_data->labels_size);
+    DPRINTF("labels = ");
+    for (int i = 0; i < code_data->labels_size; i++)
+    {
+        DPRINTF("%d, ", code_data->labels[i]);
+    }
+    DPRINTF("\n")
+}
+
 void DPrintAsmData(CodeData_t* code_data)
 {
     DPRINTF("\n-----------------------------------------------------------------\n"
@@ -69,7 +80,7 @@ void DPrintAsmData(CodeData_t* code_data)
     }
     DPRINTF("\n"
             "labels = ");
-    for (int i = 0; i < MIN_LABELS_SIZE; i++)
+    for (int i = 0; i < code_data->labels_size; i++)
     {
         DPRINTF("%d, ", code_data->labels[i]);
     }
