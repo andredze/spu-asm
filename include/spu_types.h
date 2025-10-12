@@ -1,5 +1,5 @@
-#ifndef PROC_TYPES_H
-#define PROC_TYPES_H
+#ifndef SPU_TYPES_H
+#define SPU_TYPES_H
 
 #include "commands.h"
 #include <stdio.h>
@@ -38,4 +38,4 @@ typedef struct Proc {
 #endif
 } Proc_t;
 
-#endif /* PROC_TYPES_H */
+#endif /* SPU_TYPES_H */

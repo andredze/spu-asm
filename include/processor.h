@@ -5,7 +5,7 @@
 #include "input.h"
 #include "stack.h"
 #include "commands.h"
-#include "proc_types.h"
+#include "spu_types.h"
 #include "config.h"
 
 #ifdef PROC_DEBUG

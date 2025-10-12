@@ -28,7 +28,8 @@ PROCOUTPUTS = answers.txt \
 ASMSOURCES = compile/main.cpp \
 			 compile/assembler.cpp \
 			 processor/input.cpp \
-			 processor/commands.cpp
+			 processor/commands.cpp \
+			 compile/listing.cpp
 
 ASMEXECUTABLE = compile.exe
 

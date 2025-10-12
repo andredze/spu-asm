@@ -1,7 +1,6 @@
 #include "assembler.h"
 #include "config.h"
 
-// TODO: labels in dynamic
 int SetFilenames(const char** commands_filename,
                  const char** bitecode_filename,
                  int argc, char* argv[])
@@ -26,24 +25,6 @@ int SetFilenames(const char** commands_filename,
     }
 
     return 0;
-}
-
-void DPrintAsmData(CodeData_t* code_data)
-{
-    DPRINTF("\n-----------------------------------------------------------------\n"
-            "code = ");
-    for (size_t i = 0; i < code_data->cur_cmd; i++)
-    {
-        DPRINTF("%d, ", code_data->buffer[i]);
-    }
-    DPRINTF("\n"
-            "labels = ");
-    for (int i = 0; i < LABELS_COUNT; i++)
-    {
-        DPRINTF("%d, ", code_data->labels[i]);
-    }
-    DPRINTF("\n"
-            "-----------------------------------------------------------------\n");
 }
 
 AsmErr_t CompileProgramm(InputCtx_t* commands_data)
@@ -95,63 +76,34 @@ AsmErr_t CompileProgramm(InputCtx_t* commands_data)
     return ASM_SUCCESS;
 }
 
-AsmErr_t CreateListingFile(InputCtx_t* commands_data,
-                           FileInfo_t* listing_file_info)
+int CodeDataCtor(InputCtx_t* commands_data, CodeData_t* code_data)
 {
-    assert(commands_data != NULL);
-    assert(listing_file_info != NULL);
+    int lines_count = commands_data->buffer_data.lines_count;
 
-    char listing_filename[MAX_FILENAME_LEN] = {};
-    strcpy(listing_filename, "logs/");
-    strcat(listing_filename, strchr(commands_data->input_file_info.filepath, '/') + 1);
-    strcat(listing_filename, "_listing.txt");
-    DPRINTF("listing_filename = %s\n", listing_filename);
-    listing_file_info->filepath = listing_filename;
-
-    if (OpenFile(listing_file_info, "w"))
+    int* buffer = (int*) calloc(lines_count * ASM_MAX_ARGS_COUNT, sizeof(int));
+    if (buffer == NULL)
     {
-        return ASM_CREATE_LISTING_ERROR;
+        DPRINTF("Buffer calloc failed\n");
+        return 1;
     }
-    fprintf(listing_file_info->stream, "offset   \tcommand     cmd    \tvalue\tindex\n\n");
-    DPRINTF("FILE = %p\n", listing_file_info->stream);
+    code_data->buffer = buffer;
+    code_data->cur_cmd = 0;
 
-    return ASM_SUCCESS;
-}
-
-AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
-                            CodeData_t* code_data,
-                            FILE* listing_stream)
-{
-    assert(curr_cmd_data != NULL);
-    assert(code_data != NULL);
-
-    if (CmdArgsCount(curr_cmd_data->command) == 1)
+    int* labels = (int*) calloc(MIN_LABELS_SIZE, sizeof(int));
+    if (labels == NULL)
     {
-        if (fprintf(listing_stream, "%-9zu\t%-10s\t%-4d\t%-4d\t%-4zu\n",
-                    code_data->cur_cmd * sizeof(code_data->buffer[0]),
-                    curr_cmd_data->line,
-                    curr_cmd_data->command,
-                    curr_cmd_data->value,
-                    code_data->cur_cmd) < 0)
-        {
-            DPRINTF("Fprintf error in listing cmd with 1 arg\n");
-            return ASM_LISTING_ERROR;
-        }
+        DPRINTF("Labels calloc failed\n");
+        return 1;
     }
-    else
+    code_data->labels = labels;
+    code_data->labels_size = MIN_LABELS_SIZE;
+
+    for (int i = 0; i < MIN_LABELS_SIZE; i++)
     {
-        if (fprintf(listing_stream, "%-9zu\t%-10s\t%-4d\t\t\t%-4zu\n",
-                    code_data->cur_cmd * sizeof(code_data->buffer[0]),
-                    curr_cmd_data->line,
-                    curr_cmd_data->command,
-                    code_data->cur_cmd) < 0)
-        {
-            DPRINTF("Fprintf error in listing cmd with 0 arg\n");
-            return ASM_LISTING_ERROR;
-        }
+        code_data->labels[i] = -1;
     }
 
-    return ASM_SUCCESS;
+    return 0;
 }
 
 AsmErr_t CompileCommands(InputCtx_t* commands_data,
@@ -256,10 +208,17 @@ int GetValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
             printf("Syntax error\n");
             return 1;
         }
-        if (!(label >= 0 && label < LABELS_COUNT))
+        if (!(label >= 0))
         {
-            printf("Given label exceeds max label number\n");
+            printf("Syntax error: Given lable is negative\n");
             return 1;
+        }
+        if (curr_cmd_data->value >= code_data->labels_size && curr_cmd_data->value < MAX_LABELS_SIZE)
+        {
+            if (LabelsRecalloc(code_data, 2 * curr_cmd_data->value))
+            {
+                return 1;
+            }
         }
         curr_cmd_data->value = code_data->labels[label];
 
@@ -306,8 +265,15 @@ int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
     }
     if (command == CMD_LABEL)
     {
-        // labels in size_t
+        if (curr_cmd_data->value >= code_data->labels_size && curr_cmd_data->value < MAX_LABELS_SIZE)
+        {
+            if (LabelsRecalloc(code_data, 2 * curr_cmd_data->value))
+            {
+                return 1;
+            }
+        }
         code_data->labels[curr_cmd_data->value] = (int) code_data->cur_cmd;
+
         return 0;
     }
 
@@ -328,23 +294,20 @@ int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
     return 0;
 }
 
-int CodeDataCtor(InputCtx_t* commands_data, CodeData_t* code_data)
+int LabelsRecalloc(CodeData_t* code_data, int new_size)
 {
-    int lines_count = commands_data->buffer_data.lines_count;
-
-    int* buffer = (int*) calloc(lines_count * ASM_MAX_ARGS_COUNT, sizeof(int));
-    if (buffer == NULL)
+    int* labels = (int*) realloc(code_data->labels, new_size);
+    if (labels == NULL)
     {
-        DPRINTF("Calloc failed\n");
+        printf("Labels recalloc failed\n");
         return 1;
     }
-    code_data->buffer = buffer;
-    code_data->cur_cmd = 0;
-
-    for (int i = 0; i < LABELS_COUNT; i++)
+    code_data->labels = labels;
+    for (int i = code_data->labels_size; i < new_size; i++)
     {
-        code_data->labels[i] = -1;
+        labels[i] = -1;
     }
+    code_data->labels_size = new_size;
 
     return 0;
 }

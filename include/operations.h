@@ -3,7 +3,7 @@
 
 #include "stack.h"
 #include "input.h"
-#include "proc_types.h"
+#include "spu_types.h"
 #include <math.h>
 
 typedef enum MathErr {
