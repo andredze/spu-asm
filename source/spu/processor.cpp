@@ -148,6 +148,7 @@ ProcErr_t ProcDtor(Proc_t* proc_data, FILE* stream)
     return PROC_SUCCESS;
 }
 
+#ifdef PROC_DEBUG
 ProcErr_t ProcVerify(Proc_t* proc_data)
 {
     // DPRINTF("Verifying proc...\n");
@@ -180,6 +181,7 @@ ProcErr_t ProcVerify(Proc_t* proc_data)
     // DPRINTF("Success in verify\n");
     return PROC_SUCCESS;
 }
+#endif /* PROC_DEBUG */
 
 int ProcErrToStr(ProcErr_t error, const char** error_str)
 {
@@ -233,6 +235,7 @@ int ProcErrToStr(ProcErr_t error, const char** error_str)
     }
 }
 
+#ifdef PROC_DEBUG
 ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
 {
     // DPRINTF("Dumping...\n");
@@ -317,6 +320,7 @@ ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
 
     return PROC_SUCCESS;
 }
+#endif /* PROC_DEBUG */
 
 ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
 {

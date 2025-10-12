@@ -70,7 +70,6 @@ AsmErr_t CompileProgramm(InputCtx_t* commands_data)
     }
 
     AsmDestroy(commands_data, &code_data);
-
     DPRINTF("\n<End of the compilator>");
 
     return ASM_SUCCESS;

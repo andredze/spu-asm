@@ -10,14 +10,14 @@ CXXFLAGS =  -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef \
 			-Wstrict-null-sentinel -Wtype-limits -Wwrite-strings -Werror=vla -D_DEBUG \
 			-D_EJUDGE_CLIENT_SIDE
 
-PROCFLAGS = $(CXXFLAGS) -Iinclude
+PROCFLAGS = $(CXXFLAGS) -Iinclude -Iinclude/spu
 
-PROCSOURCES = processor/main.cpp \
-			  processor/stack.cpp \
-			  processor/operations.cpp \
-			  processor/input.cpp \
-			  processor/commands.cpp \
-			  processor/processor.cpp
+PROCSOURCES = source/spu/main.cpp \
+			  source/spu/stack.cpp \
+			  source/spu/operations.cpp \
+			  source/spu/processor.cpp \
+			  source/input.cpp \
+			  source/commands.cpp
 
 PROCEXECUTABLE = run.exe
 
@@ -25,15 +25,15 @@ PROCOUTPUTS = answers.txt \
 			  processor.log \
 			  stack.log
 
-ASMSOURCES = compile/main.cpp \
-			 compile/assembler.cpp \
-			 processor/input.cpp \
-			 processor/commands.cpp \
-			 compile/listing.cpp
+ASMSOURCES = source/asm/main.cpp \
+			 source/asm/assembler.cpp \
+			 source/asm/listing.cpp \
+			 source/input.cpp \
+			 source/commands.cpp
 
 ASMEXECUTABLE = compile.exe
 
-ASMFLAGS = $(CXXFLAGS) -Icompile -Iinclude
+ASMFLAGS = $(CXXFLAGS) -Iinclude -Iinclude/asm
 
 ASMOUTPUTS = bitecode.bin \
 			 pretty_bc.txt
@@ -50,7 +50,7 @@ endif
 all:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)
 
-compiler:
+asm:
 	$(CXX) $(ASMFLAGS) $(ASMSOURCES) -o $(ASMEXECUTABLE)
 
 spu:

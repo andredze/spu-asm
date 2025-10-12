@@ -29,13 +29,14 @@ int main()
     }
     DPRINTF("\n");
 
+#ifdef PROC_DEBUG
     if (ProcVerify(&proc_data) != PROC_SUCCESS)
     {
         DPRINTF("Proc verify failed\n");
         return EXIT_FAILURE;
     }
-
     ProcDump(&proc_data, PROC_SUCCESS);
+#endif /* PROC_DEBUG */
 
     FILE* stream = fopen(ANSWERS_OUTPUT_FILENAME, "w");
     if (stream == NULL)
@@ -49,8 +50,6 @@ int main()
         fclose(stream);
         return EXIT_FAILURE;
     }
-
-    ProcDump(&proc_data, PROC_SUCCESS);
 
     if (ProcDtor(&proc_data, stream) != PROC_SUCCESS)
     {
