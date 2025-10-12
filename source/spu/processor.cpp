@@ -183,56 +183,19 @@ ProcErr_t ProcVerify(Proc_t* proc_data)
 }
 #endif /* PROC_DEBUG */
 
+// TODO: proc err str in array with const char*
 int ProcErrToStr(ProcErr_t error, const char** error_str)
 {
     DPRINTF("Converting error to string...\n");
 
-    switch (error)
+    if (!(0 <= error && error <= PROC_ERR_END))
     {
-        case PROC_SUCCESS:
-            *error_str = "Proc_data is OK";
-            return 0;
-        case PROC_CODE_FILE_OPENNING_ERROR:
-            *error_str = "Error with opening code file";
-            return 0;
-        case PROC_READING_FILE_ERROR:
-            *error_str = "Error with reading file";
-            return 0;
-        case PROC_CALLOC_ERROR:
-            *error_str = "Error with memory allocation";
-            return 0;
-        case PROC_OUTPUT_FILE_OPENNING_ERROR:
-            *error_str = "Error with opening output file";
-            return 0;
-        case PROC_UNKNOWN_COMMAND:
-            *error_str = "Unknown command";
-            return 0;
-        case PROC_MATH_ERROR:
-            *error_str = "Error with math ";
-            return 0;
-        case PROC_DATA_IS_NULL:
-            *error_str = "proc_data is null ptr";
-            return 0;
-        case PROC_CODE_IS_NULL:
-            *error_str = "proc_data.code is null ptr";
-            return 0;
-        case PROC_STACK_ERROR:
-            *error_str = "Error with proc_data.stack, check stack logs";
-            return 0;
-        case PROC_CMD_COUNT_EXCEEDS_LIMIT:
-            *error_str = "Proc_data.cmd_count is bigger than limit (probably was set to negative)";
-            return 0;
-        case PROC_CODE_SIZE_EXCEEDS_LIMIT:
-            *error_str = "Proc_data.code_size is bigger than limit (probably was set to negative)";
-            return 0;
-        case PROC_CMD_COUNT_BIGGER_CODE_SIZE:
-            *error_str = "Proc_data.cmd_count is bigger than code_size";
-            return 0;
-        default:
-            return 1;
-
-    return 1;
+        DPRINTF("Error in ProcErrToStr(): error not in enum\n");
+        return 1;
     }
+    *error_str = PROC_ERR_STRS[error];
+
+    return 0;
 }
 
 #ifdef PROC_DEBUG

@@ -17,7 +17,8 @@ typedef enum ProcErr {
     PROC_STACK_ERROR,
     PROC_CMD_COUNT_EXCEEDS_LIMIT,
     PROC_CODE_SIZE_EXCEEDS_LIMIT,
-    PROC_CMD_COUNT_BIGGER_CODE_SIZE
+    PROC_CMD_COUNT_BIGGER_CODE_SIZE,
+    PROC_ERR_END
 } ProcErr_t;
 
 typedef struct CmdCase {
@@ -37,5 +38,20 @@ typedef struct Proc {
     VarInfo_t var_info;
 #endif
 } Proc_t;
+
+const char* const PROC_ERR_STRS[] =
+    {"Proc_data is OK",
+     "Error with opening code file",
+     "Error with reading file",
+     "Error with memory allocation",
+     "Error with opening output file",
+     "Unknown command",
+     "Error with math",
+     "proc_data is null ptr",
+     "proc_data.code is null ptr",
+     "Error with proc_data.stack, check stack logs",
+     "Proc_data.cmd_count is bigger than limit (probably was set to negative)",
+     "Proc_data.code_size is bigger than limit (probably was set to negative)",
+     "Proc_data.cmd_count is bigger than code_size"};
 
 #endif /* SPU_TYPES_H */
