@@ -347,11 +347,11 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
         {
             return PROC_MATH_ERROR;
         }
-        StackPrint(&proc_data->stack);
         // DPRINTF("To continue press enter: ");
         // getchar();
     }
     DPRINTF("Executed commands\n");
+    printf("---Check \"answers.txt\"---\n");
 
     return PROC_SUCCESS;
 }
