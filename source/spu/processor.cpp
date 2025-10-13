@@ -181,9 +181,7 @@ ProcErr_t ProcVerify(Proc_t* proc_data)
     // DPRINTF("Success in verify\n");
     return PROC_SUCCESS;
 }
-#endif /* PROC_DEBUG */
 
-// TODO: proc err str in array with const char*
 int ProcErrToStr(ProcErr_t error, const char** error_str)
 {
     DPRINTF("Converting error to string...\n");
@@ -198,7 +196,6 @@ int ProcErrToStr(ProcErr_t error, const char** error_str)
     return 0;
 }
 
-#ifdef PROC_DEBUG
 ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
 {
     // DPRINTF("Dumping...\n");

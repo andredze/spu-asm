@@ -202,48 +202,18 @@ int GetValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
 
     if (sscanf(curr_cmd_data->line, "%s :%d", operation, &label) == 2)
     {
-        DPrintAsmData(code_data);
-        DPRINTF("%s :%d\n", operation, label);
-        if (!(curr_cmd_data->command >= CMD_JMP &&
-              curr_cmd_data->command <= CMD_JNE))
+        if (GetLabelValue(curr_cmd_data, code_data, label))
         {
-            printf("Syntax error\n");
-            return 1;
+            return ASM_GET_LABEL_ERROR;
         }
-        if (!(label >= 0))
-        {
-            printf("Syntax error: Given lable for jump is negative\n");
-            return 1;
-        }
-        if (label >= MAX_LABELS_SIZE)
-        {
-            printf("Syntax error: Given lable for jump is too big\n");
-            return 1;
-        }
-        if (label >= code_data->labels_size)
-        {
-            DPRINTF("Memory realloc...\n");
-            if (LabelsRecalloc(code_data, 2 * label))
-            {
-                return 1;
-            }
-        }
-        curr_cmd_data->value = code_data->labels[label];
-        DPRINTF("cmd = %d; value = %d;\n", curr_cmd_data->command, curr_cmd_data->value);
-
-        return 0;
     }
     else if (curr_cmd_data->command == CMD_PUSHR ||
              curr_cmd_data->command == CMD_POPR)
     {
-        char reg[CMD_MAX_LEN] = {};
-        if (sscanf(curr_cmd_data->line, "%s %s", operation, reg) != 2)
+        if (GetRegValue(curr_cmd_data))
         {
-            DPRINTF("Wrong number of args for reg cmd\n");
-            return 1;
+            return ASM_GET_REG_ERROR;
         }
-        curr_cmd_data->value = reg[1] - 'A';
-        return 0;
     }
     else
     {
@@ -251,12 +221,62 @@ int GetValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
                    operation, &curr_cmd_data->value) != 2)
         {
             DPRINTF("Wrong number of args for push\n");
-            return 1;
+            return ASM_GET_OP_ARG_ERR;
         }
-        return 0;
     }
 
-    return 1;
+    return 0;
+}
+
+int GetLabelValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data, int label)
+{
+    assert(curr_cmd_data != NULL);
+    assert(code_data != NULL);
+
+    if (!(curr_cmd_data->command >= CMD_JMP &&
+          curr_cmd_data->command <= CMD_JNE))
+    {
+        printf("Syntax error\n");
+        return 1;
+    }
+    if (!(label >= 0))
+    {
+        printf("Syntax error: Given lable for jump is negative\n");
+        return 1;
+    }
+    if (label >= MAX_LABELS_SIZE)
+    {
+        printf("Syntax error: Given lable for jump is too big\n");
+        return 1;
+    }
+    if (label >= code_data->labels_size)
+    {
+        DPRINTF("Memory realloc...\n");
+        if (LabelsRecalloc(code_data, 2 * label))
+        {
+            return 1;
+        }
+    }
+    curr_cmd_data->value = code_data->labels[label];
+    DPRINTF("cmd = %d; value = %d;\n", curr_cmd_data->command, curr_cmd_data->value);
+
+    return 0;
+}
+
+int GetRegValue(CurrCmdData_t* curr_cmd_data)
+{
+    assert(curr_cmd_data != NULL);
+
+    char operation[CMD_MAX_LEN] = {};
+    char reg[CMD_MAX_LEN] = {};
+    if (sscanf(curr_cmd_data->line, "%s %s", operation, reg) != 2)
+    {
+        DPRINTF("Wrong number of args for reg cmd\n");
+        return 1;
+    }
+    curr_cmd_data->value = reg[1] - 'A';
+
+    return 0;
 }
 
 int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
