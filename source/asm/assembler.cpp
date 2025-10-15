@@ -167,6 +167,7 @@ int GetAsmCommand(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
         DPRINTF("sscanf failed\n");
         return 1;
     }
+    // 1 scanf
     if (sscanf(curr_cmd_data->line, ":%d", &curr_cmd_data->value) == 1)
     {
         curr_cmd_data->command = CMD_LABEL;

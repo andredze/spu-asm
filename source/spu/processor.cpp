@@ -297,13 +297,14 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
 
     while (proc_data->cmd_count < proc_data->code_size)
     {
-        DPRINTF("\nEntering %zu instruction\n", proc_data->cmd_count);
+        DPRINTF("\ncode[%zu]: ", proc_data->cmd_count);
 
         if (ProcGetCommand(proc_data, &command, &value))
         {
             return PROC_UNKNOWN_COMMAND;
         }
-        DPRINTF("Command = %d\n", command);
+        DPRINTF("cmd = %d", command); // add enum_to_str
+        getchar();
         if (command == CMD_HLT)
         {
             break;

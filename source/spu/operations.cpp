@@ -240,7 +240,7 @@ int HandleCall(Proc_t* proc_data, int new_cmd_count)
         return PROC_STACK_ERROR;
     }
 
-    DPRINTF("\tCalling %d\n", proc_data->cmd_count + 1);
+    DPRINTF("\tCalling from %d to %d\n", proc_data->cmd_count + 1, new_cmd_count);
 
     if (HandleJmp(proc_data, new_cmd_count))
     {
