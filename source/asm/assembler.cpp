@@ -2,22 +2,22 @@
 #include "config.h"
 
 int SetFilenames(const char** commands_filename,
-                 const char** bitecode_filename,
+                 const char** bytecode_filename,
                  int argc, char* argv[])
 {
     switch (argc)
     {
         case 3:
             *commands_filename = argv[1];
-            *bitecode_filename = argv[2];
+            *bytecode_filename = argv[2];
             break;
         case 2:
             *commands_filename = argv[1];
-            *bitecode_filename = BINARY_BITECODE_FILENAME;
+            *bytecode_filename = BINARY_BYTECODE_FILENAME;
             break;
         case 1:
             *commands_filename = COMMANDS_FILENAME;
-            *bitecode_filename = BINARY_BITECODE_FILENAME;
+            *bytecode_filename = BINARY_BYTECODE_FILENAME;
             break;
         default:
             printf("Too much arguments given, maximum 2 (current arguments = %d)\n", argc);
@@ -60,11 +60,11 @@ AsmErr_t CompileProgramm(InputCtx_t* commands_data)
 
     free(code_data.labels);
 
-    if (WriteBiteCode(&code_data, commands_data))
+    if (WriteByteCode(&code_data, commands_data))
     {
         return ASM_PRINT_CODE_ERROR;
     }
-    if (WriteBiteCodePretty(&code_data, READABLE_BITECODE_FILENAME))
+    if (WriteByteCodePretty(&code_data, READABLE_BYTECODE_FILENAME))
     {
         return ASM_PRINT_CODE_ERROR;
     }
@@ -234,7 +234,7 @@ int GetLabelValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data, int label
     assert(code_data != NULL);
 
     if (!(curr_cmd_data->command >= CMD_JMP &&
-          curr_cmd_data->command <= CMD_JNE))
+          curr_cmd_data->command <= CMD_CALL))
     {
         printf("Syntax error\n");
         return 1;
@@ -294,28 +294,10 @@ int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
     }
     if (command == CMD_LABEL)
     {
-        int label = curr_cmd_data->value;
-        DPRINTF("curr_cmd_data->value = %d\n", curr_cmd_data->value);
-        DPRINTF("label_size = %d\n", code_data->labels_size);
-        if (label >= MAX_LABELS_SIZE)
+        if (AddLabelCode(curr_cmd_data, code_data))
         {
-            printf("Syntax error: label is too big\n");
             return 1;
         }
-        if (label < 0)
-        {
-            printf("Syntax error: label is negative\n");
-            return 1;
-        }
-        if (label >= code_data->labels_size)
-        {
-            if (LabelsRecalloc(code_data, 2 * label))
-            {
-                return 1;
-            }
-        }
-        code_data->labels[label] = (int) code_data->cur_cmd;
-        DPrintAsmData(code_data);
 
         return 0;
     }
@@ -333,6 +315,34 @@ int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
             code_data->buffer[code_data->cur_cmd++] = curr_cmd_data->value;
         }
     }
+
+    return 0;
+}
+
+int AddLabelCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
+{
+    int label = curr_cmd_data->value;
+    DPRINTF("curr_cmd_data->value = %d\n", curr_cmd_data->value);
+    DPRINTF("label_size = %d\n", code_data->labels_size);
+    if (label >= MAX_LABELS_SIZE)
+    {
+        printf("Syntax error: label is too big\n");
+        return 1;
+    }
+    if (label < 0)
+    {
+        printf("Syntax error: label is negative\n");
+        return 1;
+    }
+    if (label >= code_data->labels_size)
+    {
+        if (LabelsRecalloc(code_data, 2 * label))
+        {
+            return 1;
+        }
+    }
+    code_data->labels[label] = (int) code_data->cur_cmd;
+    DPrintAsmData(code_data);
 
     return 0;
 }
@@ -366,7 +376,7 @@ int LabelsRecalloc(CodeData_t* code_data, int new_size)
     return 0;
 }
 
-int WriteBiteCode(CodeData_t* code_data, InputCtx_t* commands_data)
+int WriteByteCode(CodeData_t* code_data, InputCtx_t* commands_data)
 {
     if (OpenFile(&commands_data->output_file_info, "wb"))
     {
@@ -397,7 +407,7 @@ int WriteBiteCode(CodeData_t* code_data, InputCtx_t* commands_data)
     return 0;
 }
 
-int WriteBiteCodePretty(CodeData_t* code_data, const char* filepath)
+int WriteByteCodePretty(CodeData_t* code_data, const char* filepath)
 {
     FileInfo_t pretty_output_info = {.filepath = filepath};
 

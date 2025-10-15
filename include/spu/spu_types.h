@@ -34,6 +34,7 @@ typedef struct Proc {
     size_t code_size;
     size_t cmd_count;
     int regs[REGS_COUNT];
+    Stack_t call_stack;
 #ifdef PROC_DEBUG
     VarInfo_t var_info;
 #endif

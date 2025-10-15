@@ -231,30 +231,17 @@ int HandleJmp(Proc_t* proc_data, size_t new_cmd_count)
     return 0;
 }
 
-// realisation without macro
-int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
-                 size_t new_cmd_count, Command_t command)
+int HandleCall(Proc_t* proc_data, int new_cmd_count)
 {
     assert(proc_data != NULL);
-    assert(stack != NULL);
 
-    int number1 = 0;
-    int number2 = 0;
-    if (StackPop(stack, &number2))
+    if (StackPush(&proc_data->call_stack, proc_data->cmd_count) != STACK_SUCCESS)
     {
-        return 1;
+        return PROC_STACK_ERROR;
     }
-    if (StackPop(stack, &number1))
-    {
-        return 1;
-    }
-    // if compare returns 0 than don't jump
-    if (!(CompareForJump(number1, number2, command)))
-    {
-        DPRINTF("-Jump rejected\n");
-        return 0;
-    }
-    // else jump
+
+    DPRINTF("\tCalling %d\n", proc_data->cmd_count + 1);
+
     if (HandleJmp(proc_data, new_cmd_count))
     {
         return 1;
@@ -263,18 +250,73 @@ int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
     return 0;
 }
 
-int CompareForJump(int number1, int number2, Command_t command)
+int HandleRet(Proc_t* proc_data)
 {
-    switch (command)
+    assert(proc_data != NULL);
+
+    DPRINTF("\tReturn\n");
+    int call_address = -1;
+
+    if (StackPop(&proc_data->call_stack, &call_address) != STACK_SUCCESS)
     {
-        case CMD_JB:  return number1 <  number2;
-        case CMD_JBE: return number1 <= number2;
-        case CMD_JA:  return number1 >  number2;
-        case CMD_JAE: return number1 >= number2;
-        case CMD_JE:  return number1 == number2;
-        case CMD_JNE: return number1 != number2;
-        default:      return EOF;
+        return PROC_STACK_ERROR;
     }
 
-    return EOF;
+    DPRINTF("\tReturning to %d\n", call_address);
+
+    if (HandleJmp(proc_data, call_address))
+    {
+        return 1;
+    }
+
+    return 0;
 }
+
+// realisation without macro
+
+// int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
+//                  size_t new_cmd_count, Command_t command)
+// {
+//     assert(proc_data != NULL);
+//     assert(stack != NULL);
+//
+//     int number1 = 0;
+//     int number2 = 0;
+//     if (StackPop(stack, &number2))
+//     {
+//         return 1;
+//     }
+//     if (StackPop(stack, &number1))
+//     {
+//         return 1;
+//     }
+//     // if compare returns 0 than don't jump
+//     if (!(CompareForJump(number1, number2, command)))
+//     {
+//         DPRINTF("-Jump rejected\n");
+//         return 0;
+//     }
+//     // else jump
+//     if (HandleJmp(proc_data, new_cmd_count))
+//     {
+//         return 1;
+//     }
+//
+//     return 0;
+// }
+
+// int CompareForJump(int number1, int number2, Command_t command)
+// {
+//     switch (command)
+//     {
+//         case CMD_JB:  return number1 <  number2;
+//         case CMD_JBE: return number1 <= number2;
+//         case CMD_JA:  return number1 >  number2;
+//         case CMD_JAE: return number1 >= number2;
+//         case CMD_JE:  return number1 == number2;
+//         case CMD_JNE: return number1 != number2;
+//         default:      return EOF;
+//     }
+//
+//     return EOF;
+// }

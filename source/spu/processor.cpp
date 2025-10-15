@@ -11,6 +11,10 @@ ProcErr_t ProcCtor(Proc_t* proc_data)
     {
         return PROC_STACK_ERROR;
     }
+    if (StackCtor(&proc_data->call_stack, PROC_MIN_STACK_CAPACITY) != STACK_SUCCESS)
+    {
+        return PROC_STACK_ERROR;
+    }
 
     DPRINTF("Proc constructed\n");
     return PROC_SUCCESS;
@@ -20,7 +24,7 @@ ProcErr_t ProcLoadPrettyBC(Proc_t* proc_data, const char* codepath)
 {
     assert(proc_data != NULL);
     assert(codepath != NULL);
-    DPRINTF("Loading pretty_bitecode...\n");
+    DPRINTF("Loading pretty_bytecode...\n");
 
     InputCtx_t commands_data = {.input_file_info =  {.filepath = codepath}};
 
@@ -70,7 +74,7 @@ ProcErr_t ProcLoadPrettyBC(Proc_t* proc_data, const char* codepath)
 
     free(commands_data.buffer_data.buffer);
     free(commands_data.ptrdata_params.ptrdata);
-    DPRINTF("Pretty bitecode loaded\n");
+    DPRINTF("Pretty bytecode loaded\n");
 
     return PROC_SUCCESS;
 }
@@ -142,6 +146,7 @@ ProcErr_t ProcDtor(Proc_t* proc_data, FILE* stream)
     free(proc_data->code);
     proc_data->code = NULL;
     StackDtor(&proc_data->stack);
+    StackDtor(&proc_data->call_stack);
     fclose(stream);
 
     DPRINTF("proc_data destroyed\n");
@@ -360,6 +365,8 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
         case CMD_JAE:   return HandleJAE(proc_data, stk_ptr, value);
         case CMD_JE:    return HandleJE (proc_data, stk_ptr, value);
         case CMD_JNE:   return HandleJNE(proc_data, stk_ptr, value);
+        case CMD_CALL:  return HandleCall(proc_data, value);
+        case CMD_RET:   return HandleRet(proc_data);
         case CMD_HLT:   return 1;
         default:        return 1;
     }

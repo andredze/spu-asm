@@ -13,7 +13,7 @@ const int MAX_FILENAME_LEN = 100;
 const int ASM_MAX_ARGS_COUNT = 2;
 
 int SetFilenames(const char** commands_filename,
-                 const char** bitecode_filename,
+                 const char** bytecode_filename,
                  int argc, char* argv[]);
 
 AsmErr_t CompileProgramm(InputCtx_t* commands_data);
@@ -31,13 +31,15 @@ int GetRegValue(CurrCmdData_t* curr_cmd_data);
 
 int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data);
 
+int AddLabelCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data);
+
 int LabelsRecalloc(CodeData_t* code_data, int new_size);
 
 int CodeDataCtor(InputCtx_t* commands_data, CodeData_t* code_data);
 
-int WriteBiteCode(CodeData_t* code_data, InputCtx_t* commands_data);
+int WriteByteCode(CodeData_t* code_data, InputCtx_t* commands_data);
 
-int WriteBiteCodePretty(CodeData_t* code_data, const char* filepath);
+int WriteByteCodePretty(CodeData_t* code_data, const char* filepath);
 
 void AsmDestroy(InputCtx_t* commands_data, CodeData_t* code_data);
 

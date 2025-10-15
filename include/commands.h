@@ -4,24 +4,26 @@
 #include <stdio.h>
 
 typedef enum Command {
-    CMD_HLT = -1,
-    CMD_OUT = 0,
-    CMD_PUSH = 1,
-    CMD_ADD = 2,
-    CMD_SUB = 3,
-    CMD_MUL = 4,
-    CMD_DIV = 5,
-    CMD_SQRT = 6,
-    CMD_IN = 7,
-    CMD_JMP = 10,
-    CMD_JB = 11,
-    CMD_JBE = 12,
-    CMD_JA = 13,
-    CMD_JAE = 14,
-    CMD_JE = 15,
-    CMD_JNE = 16,
+    CMD_HLT   = -1,
+    CMD_OUT   = 0,
+    CMD_PUSH  = 1,
+    CMD_ADD   = 2,
+    CMD_SUB   = 3,
+    CMD_MUL   = 4,
+    CMD_DIV   = 5,
+    CMD_SQRT  = 6,
+    CMD_IN    = 7,
+    CMD_JMP   = 10,
+    CMD_JB    = 11,
+    CMD_JBE   = 12,
+    CMD_JA    = 13,
+    CMD_JAE   = 14,
+    CMD_JE    = 15,
+    CMD_JNE   = 16,
     CMD_LABEL = 17,
-    CMD_POPR = 32,
+    CMD_CALL  = 18,
+    CMD_RET   = 19,
+    CMD_POPR  = 32,
     CMD_PUSHR = 33,
     CMD_END
 } Command_t;
@@ -54,7 +56,9 @@ const CommCase_t COMM_CASES[] =
      {"JA",    CMD_JA},
      {"JAE",   CMD_JAE},
      {"JE",    CMD_JE},
-     {"JNE",   CMD_JNE}};
+     {"JNE",   CMD_JNE},
+     {"CALL",  CMD_CALL},
+     {"RET",   CMD_RET}};
 
 const size_t COMM_CASES_SIZE = sizeof(COMM_CASES) / sizeof(COMM_CASES[0]);
 

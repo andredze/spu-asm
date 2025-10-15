@@ -53,9 +53,13 @@ int HandleIn(Stack_t* stack);
 
 int HandleJmp(Proc_t* proc_data, size_t new_cmd_count);
 
-int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
-                 size_t new_cmd_count, Command_t command);
+int HandleCall(Proc_t* proc_data, int new_cmd_count);
 
-int CompareForJump(int number1, int number2, Command_t command);
+int HandleRet(Proc_t* proc_data);
+
+// int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
+//                  size_t new_cmd_count, Command_t command);
+
+// int CompareForJump(int number1, int number2, Command_t command);
 
 #endif /* OPERATIONS_H */

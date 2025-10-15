@@ -13,14 +13,14 @@ int main()
     {
         return EXIT_FAILURE;
     }
-    // if (ProcLoadPrettyBC(&proc_data, READABLE_BITECODE_FILENAME) != PROC_SUCCESS)
-    // {
-    //     return EXIT_FAILURE;
-    // }
-    if (ProcLoadCode(&proc_data, BINARY_BITECODE_FILENAME) != PROC_SUCCESS)
+    if (ProcLoadPrettyBC(&proc_data, READABLE_BYTECODE_FILENAME) != PROC_SUCCESS)
     {
         return EXIT_FAILURE;
     }
+    // if (ProcLoadCode(&proc_data, BINARY_BYTECODE_FILENAME) != PROC_SUCCESS)
+    // {
+    //     return EXIT_FAILURE;
+    // }
 
     DPRINTF("proc_data.code:\n");
     for (size_t i = 0; i < proc_data.code_size; i++)

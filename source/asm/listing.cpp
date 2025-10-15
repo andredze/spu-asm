@@ -9,7 +9,7 @@ AsmErr_t CreateListingFile(InputCtx_t* commands_data,
     char listing_filename[MAX_FILENAME_LEN] = {};
     strcpy(listing_filename, "logs/");
     strcat(listing_filename, strchr(commands_data->input_file_info.filepath, '/') + 1);
-    strcat(listing_filename, "_listing.txt");
+    strcat(listing_filename, "_listing.lst");
     DPRINTF("listing_filename = %s\n", listing_filename);
     listing_file_info->filepath = listing_filename;
 

@@ -15,6 +15,7 @@ int CmdArgsCount(Command_t command)
         case CMD_JAE:   return 1;
         case CMD_JE:    return 1;
         case CMD_JNE:   return 1;
+        case CMD_CALL:  return 1;
         default:        return 0;
     }
 
