@@ -23,7 +23,8 @@ typedef enum AsmErr {
     ASM_CREATE_LISTING_ERROR,
     ASM_GET_LABEL_ERROR,
     ASM_GET_REG_ERROR,
-    ASM_GET_OP_ARG_ERR
+    ASM_GET_OP_ARG_ERR,
+    ASM_GET_RAM_ARG_ERROR
 } AsmErr_t;
 
 typedef struct CurrCmdData {

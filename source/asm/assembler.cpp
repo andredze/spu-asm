@@ -225,6 +225,14 @@ int GetValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
             return ASM_GET_REG_ERROR;
         }
     }
+    else if (curr_cmd_data->command == CMD_PUSHM ||
+             curr_cmd_data->command == CMD_POPM)
+    {
+        if (GetRamArgument(curr_cmd_data))
+        {
+            return ASM_GET_RAM_ARG_ERROR;
+        }
+    }
     else
     {
         if (sscanf(curr_cmd_data->line, "%s %d",
@@ -290,6 +298,22 @@ int GetRegValue(CurrCmdData_t* curr_cmd_data)
     return 0;
 }
 
+int GetRamArgument(CurrCmdData_t* curr_cmd_data)
+{
+    assert(curr_cmd_data != NULL);
+
+    char operation[CMD_MAX_LEN] = {};
+    char reg[CMD_MAX_LEN] = {};
+    if (sscanf(curr_cmd_data->line, "%s [%s]", operation, reg) != 2)
+    {
+        DPRINTF("Wrong number of args for ram cmd\n");
+        return 1;
+    }
+    curr_cmd_data->value = reg[1] - 'A';
+
+    return 0;
+}
+
 int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
 {
     assert(code_data != NULL);
@@ -317,7 +341,8 @@ int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
 
     if (CmdArgsCount(command) == 1)
     {
-        if (command == CMD_POPR || command == CMD_PUSHR)
+        if (command == CMD_POPR || command == CMD_PUSHR ||
+            command == CMD_POPM || command == CMD_PUSHM)
         {
             code_data->buffer[code_data->cur_cmd++] = curr_cmd_data->value;
         }

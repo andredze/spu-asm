@@ -29,6 +29,8 @@ int GetLabelValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data, int label
 
 int GetRegValue(CurrCmdData_t* curr_cmd_data);
 
+int GetRamArgument(CurrCmdData_t* curr_cmd_data);
+
 int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data);
 
 int AddLabelCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data);

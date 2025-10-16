@@ -228,6 +228,11 @@ int HandleIn(Stack_t* stack)
         printf("Input is wrong, try better :)\n");
         return 1;
     }
+
+#ifdef PROC_DEBUG
+    getchar();
+#endif /* PROC_DEBUG */
+
     if (StackPush(stack, value) != STACK_SUCCESS)
     {
         return 1;
@@ -297,6 +302,7 @@ int HandlePushm(Proc_t* proc_data, int reg_number)
     assert(proc_data != NULL);
 
     int mem_addr = proc_data->regs[reg_number];
+    DPRINTF("\tPUSHM: address = regs[%d] (R%cX) = %d\n", reg_number, 'A' + reg_number, mem_addr);
 
     if (!(mem_addr >= 0 && mem_addr < RAM_SIZE))
     {
@@ -309,6 +315,7 @@ int HandlePushm(Proc_t* proc_data, int reg_number)
     {
         return 1;
     }
+    DPRINTF("\t\tpushed from ram[%d] = %d\n", mem_addr, value);
 
     return 0;
 }
@@ -318,6 +325,7 @@ int HandlePopm(Proc_t* proc_data, int reg_number)
     assert(proc_data != NULL);
 
     int mem_addr = proc_data->regs[reg_number];
+    DPRINTF("\tPOPM: address = regs[%d] (R%cX) = %d\n", reg_number, 'A' + reg_number, mem_addr);
 
     if (!(mem_addr >= 0 && mem_addr < RAM_SIZE))
     {
@@ -332,6 +340,7 @@ int HandlePopm(Proc_t* proc_data, int reg_number)
         return 1;
     }
     proc_data->ram[mem_addr] = value;
+    DPRINTF("\t\tpoped to ram[%d] = %d\n", mem_addr, value);
 
     return 0;
 }
