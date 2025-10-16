@@ -16,6 +16,13 @@ ProcErr_t ProcCtor(Proc_t* proc_data)
         return PROC_STACK_ERROR;
     }
 
+    proc_data->ram = (int*) calloc(RAM_SIZE, sizeof(int));
+    if (proc_data->ram == NULL)
+    {
+        printf("Memory allocation for ram failed\n");
+        return PROC_CALLOC_ERROR;
+    }
+
     DPRINTF("Proc constructed\n");
     return PROC_SUCCESS;
 }
@@ -143,6 +150,8 @@ ProcErr_t ProcDtor(Proc_t* proc_data, FILE* stream)
         return PROC_DATA_IS_NULL;
     }
 
+    free(proc_data->ram);
+    proc_data->ram = NULL;
     free(proc_data->code);
     proc_data->code = NULL;
     StackDtor(&proc_data->stack);
@@ -297,14 +306,17 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
 
     while (proc_data->cmd_count < proc_data->code_size)
     {
-        DPRINTF("\ncode[%zu]: ", proc_data->cmd_count);
-
+#ifdef PROC_DEBUG
+        getchar();
+#endif /* PROC_DEBUG */
         if (ProcGetCommand(proc_data, &command, &value))
         {
             return PROC_UNKNOWN_COMMAND;
         }
-        DPRINTF("cmd = %d", command); // add enum_to_str
-        getchar();
+
+        DPRINTF(PURPLE "\ncode[%zu]: cmd = %d (%s)\n" RESET_CLR,
+                proc_data->cmd_count, command, COMM_CASES[command].str_command);
+
         if (command == CMD_HLT)
         {
             break;
@@ -313,8 +325,14 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
         {
             return PROC_MATH_ERROR;
         }
-        // DPRINTF("To continue press enter: ");
-        // getchar();
+
+#ifdef PROC_DEBUG
+        if (ProcConsoleDump(proc_data))
+        {
+            return PROC_DUMP_ERR;
+        }
+#endif /* PROC_DEBUG */
+
     }
     DPRINTF("Executed commands\n");
     printf("---Check \"answers.txt\"---\n");
@@ -326,7 +344,6 @@ ProcErr_t ProcGetCommand(Proc_t* proc_data,
                          Command_t* command,
                          int* value)
 {
-    // DPRINTF("Getting command...\n");
     PROC_OK_DEBUG(proc_data);
 
     *command = (Command_t) proc_data->code[proc_data->cmd_count++];
@@ -349,7 +366,8 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
 
     switch (command)
     {
-        case CMD_PUSH:  return StackPush(stk_ptr, value) == STACK_SUCCESS ? 0 : 1;
+        case CMD_PUSH:  DPRINTF("\tPUSH: %d\n", value);
+                        return StackPush(stk_ptr, value) == STACK_SUCCESS ? 0 : 1;
         case CMD_ADD:   return ExecuteBinaryOperation(stk_ptr, Add) == MATH_SUCCESS ? 0 : 1;
         case CMD_SUB:   return ExecuteBinaryOperation(stk_ptr, Sub) == MATH_SUCCESS ? 0 : 1;
         case CMD_MUL:   return ExecuteBinaryOperation(stk_ptr, Mul) == MATH_SUCCESS ? 0 : 1;
@@ -368,9 +386,59 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
         case CMD_JNE:   return HandleJNE(proc_data, stk_ptr, value);
         case CMD_CALL:  return HandleCall(proc_data, value);
         case CMD_RET:   return HandleRet(proc_data);
+        case CMD_PUSHM: return HandlePushm(proc_data, value);
+        case CMD_POPM:  return HandlePopm(proc_data, value);
         case CMD_HLT:   return 1;
         default:        return 1;
     }
+
+    return 0;
+}
+
+int ProcConsoleDump(Proc_t* proc_data)
+{
+    assert(proc_data != NULL);
+
+    DPRINTF(RED "------------------------<PROC DUMP>------------------------\n"
+            YELLOW "stack: [");
+    for (size_t i = 0; i < proc_data->stack.size; i++)
+    {
+        DPRINTF("%d, ", proc_data->stack.data[i])
+    }
+    DPRINTF("]\n"
+            "call_stack: [");
+    for (size_t i = 0; i < proc_data->call_stack.size; i++)
+    {
+        DPRINTF("%d, ", proc_data->call_stack.data[i])
+    }
+    DPRINTF("]\n" GREEN
+            "regs[%d] = [ ", REGS_COUNT);
+    for (int i = 0; i < REGS_COUNT; i++)
+    {
+        DPRINTF("%d, ", proc_data->regs[i]);
+    }
+    DPRINTF("]\n" BLUE
+            "code[] = [ ");
+    for (size_t i = 0; i < proc_data->code_size; i++)
+    {
+        if (i % 14 == 0 && i != 0) {
+            DPRINTF("\n\t"); }
+        if (i == proc_data->cmd_count) {
+            DPRINTF("{%d}, ", proc_data->code[i]); }
+        else {
+            DPRINTF("%d, ", proc_data->code[i]); }
+    }
+    DPRINTF("]\n"
+            LIGHT_YELLOW "ram[] = [");
+    for (int i = 0; i < RAM_SIZE; i++)
+    {
+        if (i % 14 == 0 && i != 0) {
+            DPRINTF("\n\t "); }
+        else {
+            DPRINTF("%d, ", proc_data->ram[i]); }
+    }
+    DPRINTF("]\n"
+            RED "-----------------------------------------------------------" RESET_CLR);
 
     return 0;
 }

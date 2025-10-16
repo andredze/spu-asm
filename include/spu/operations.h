@@ -57,6 +57,10 @@ int HandleCall(Proc_t* proc_data, int new_cmd_count);
 
 int HandleRet(Proc_t* proc_data);
 
+int HandlePushm(Proc_t* proc_data, int mem_addr);
+
+int HandlePopm(Proc_t* proc_data, int mem_addr);
+
 // int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
 //                  size_t new_cmd_count, Command_t command);
 

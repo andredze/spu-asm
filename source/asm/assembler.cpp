@@ -1,6 +1,8 @@
 #include "assembler.h"
 #include "config.h"
 
+// TODO: пропуск пробельных символов
+
 int SetFilenames(const char** commands_filename,
                  const char** bytecode_filename,
                  int argc, char* argv[])
@@ -120,13 +122,20 @@ AsmErr_t CompileCommands(InputCtx_t* commands_data,
     }
 #endif /* LISTING */
 
+    CurrCmdData_t curr_cmd_data = {};
+
     for (int i = 0; i < commands_data->ptrdata_params.lines_count; i++)
     {
         DPRINTF("\nEntering %d iteration of ptrdata for\n", i);
 
-        CurrCmdData_t curr_cmd_data = {.line = commands_data->ptrdata_params.ptrdata[i],
-                                       .command = CMD_HLT,
-                                       .value = 0};
+        curr_cmd_data = {.line = commands_data->ptrdata_params.ptrdata[i],
+                         .command = CMD_HLT,
+                         .value = 0};
+
+        if (curr_cmd_data.line[0] == '\0')
+        {
+            continue;
+        }
 
         if (GetAsmCommand(&curr_cmd_data, code_data))
         {
@@ -234,10 +243,11 @@ int GetLabelValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data, int label
     assert(curr_cmd_data != NULL);
     assert(code_data != NULL);
 
-    if (!(curr_cmd_data->command >= CMD_JMP &&
-          curr_cmd_data->command <= CMD_CALL))
+    if (!((curr_cmd_data->command >= CMD_JMP &&
+           curr_cmd_data->command <= CMD_JNE) ||
+           curr_cmd_data->command == CMD_CALL))
     {
-        printf("Syntax error\n");
+        printf("Syntax error: this command doesn't receive label\n");
         return 1;
     }
     if (!(label >= 0))

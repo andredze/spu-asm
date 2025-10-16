@@ -3,6 +3,7 @@
 
 #include "assembler.h"
 #include "asm_types.h"
+#include "colors.h"
 
 AsmErr_t CreateListingFile(InputCtx_t* commands_data,
                            FileInfo_t* listing_file_info);

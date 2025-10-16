@@ -16,9 +16,11 @@
         { \
             return 1; \
         } \
+        DPRINTF("\t" #cmd_name ": %d " #comp_oper " %d == %d\n", \
+                number1, number2, number1 comp_oper number2); \
         if (!(number1 comp_oper number2)) \
         { \
-            DPRINTF("-Jump rejected\n"); \
+            DPRINTF("\tJMP rejected\n"); \
             return 0; \
         } \
         if (HandleJmp(proc_data, new_cmd_count)) \
@@ -83,6 +85,8 @@ MathErr_t HandleSqrt(Stack_t* stack)
         return MATH_STACK_ERROR;
     }
 
+    DPRINTF("\tSQRT: sqrt(%d) = %d\n", number, value);
+
     return MATH_SUCCESS;
 }
 
@@ -92,6 +96,7 @@ MathErr_t Add(CalcData_t* calc_data)
     assert(calc_data->result == 0);
 
     calc_data->result = calc_data->number1 + calc_data->number2;
+    DPRINTF("\tADD: %d + %d = %d\n", calc_data->number2, calc_data->number1, calc_data->result);
 
     return MATH_SUCCESS;
 }
@@ -102,6 +107,7 @@ MathErr_t Sub(CalcData_t* calc_data)
     assert(calc_data->result == 0);
 
     calc_data->result = calc_data->number2 - calc_data->number1;
+    DPRINTF("\tSUB: %d - %d = %d\n", calc_data->number2, calc_data->number1, calc_data->result);
 
     return MATH_SUCCESS;
 }
@@ -112,6 +118,7 @@ MathErr_t Mul(CalcData_t* calc_data)
     assert(calc_data->result == 0);
 
     calc_data->result = calc_data->number1 * calc_data->number2;
+    DPRINTF("\tMUL: %d * %d = %d\n", calc_data->number2, calc_data->number1, calc_data->result);
 
     return MATH_SUCCESS;
 }
@@ -127,6 +134,7 @@ MathErr_t Div(CalcData_t* calc_data)
         return MATH_DIVISION_BY_ZERO;
     }
     calc_data->result = calc_data->number2 / calc_data->number1;
+    DPRINTF("\tDIV: %d / %d = %d\n", calc_data->number2, calc_data->number1, calc_data->result);
 
     return MATH_SUCCESS;
 }
@@ -149,6 +157,8 @@ int HandleOut(Stack_t* stack, FILE* output_stream)
     }
     fprintf(output_stream, "ANSWER = %d\n", result);
     fflush(output_stream);
+
+    DPRINTF("\tOUT: %d\n", result);
 
     return 0;
 }
@@ -177,6 +187,10 @@ int HandlePopr(Stack_t* stack, Proc_t* proc_data, int index)
     }
     proc_data->regs[index] = value;
 
+    DPRINTF("\tPOPR: poped %d\n"
+            "\t\treg[%d] = %d (R%cX)\n",
+            value, index, value, index + 'A');
+
     return 0;
 }
 
@@ -194,6 +208,11 @@ int HandlePushr(Stack_t* stack, Proc_t* proc_data, int index)
     {
         return 1;
     }
+
+    DPRINTF("\tPUSHR: reg[%d] = %d (R%cX)\n"
+            "\t\tpushed %d\n",
+            index, proc_data->regs[index],
+            index + 'A', proc_data->regs[index]);
 
     return 0;
 }
@@ -213,6 +232,7 @@ int HandleIn(Stack_t* stack)
     {
         return 1;
     }
+    DPRINTF("\tIN: got and pushed %d\n", value);
 
     return 0;
 }
@@ -227,6 +247,7 @@ int HandleJmp(Proc_t* proc_data, size_t new_cmd_count)
         return 1;
     }
     proc_data->cmd_count = new_cmd_count;
+    DPRINTF("\tJMP: jumping to %zu\n", new_cmd_count);
 
     return 0;
 }
@@ -240,7 +261,7 @@ int HandleCall(Proc_t* proc_data, int new_cmd_count)
         return PROC_STACK_ERROR;
     }
 
-    DPRINTF("\tCalling from %d to %d\n", proc_data->cmd_count + 1, new_cmd_count);
+    DPRINTF("\tCALL: pushed %d to call_stack\n", proc_data->cmd_count);
 
     if (HandleJmp(proc_data, new_cmd_count))
     {
@@ -254,7 +275,6 @@ int HandleRet(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
-    DPRINTF("\tReturn\n");
     int call_address = -1;
 
     if (StackPop(&proc_data->call_stack, &call_address) != STACK_SUCCESS)
@@ -262,12 +282,56 @@ int HandleRet(Proc_t* proc_data)
         return PROC_STACK_ERROR;
     }
 
-    DPRINTF("\tReturning to %d\n", call_address);
+    DPRINTF("\tRET: returning to %d\n", call_address);
 
     if (HandleJmp(proc_data, call_address))
     {
         return 1;
     }
+
+    return 0;
+}
+
+int HandlePushm(Proc_t* proc_data, int reg_number)
+{
+    assert(proc_data != NULL);
+
+    int mem_addr = proc_data->regs[reg_number];
+
+    if (!(mem_addr >= 0 && mem_addr < RAM_SIZE))
+    {
+        printf("Given address to pushm is too big\n");
+        return 1;
+    }
+
+    int value = proc_data->ram[mem_addr];
+    if (StackPush(&proc_data->stack, value))
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+int HandlePopm(Proc_t* proc_data, int reg_number)
+{
+    assert(proc_data != NULL);
+
+    int mem_addr = proc_data->regs[reg_number];
+
+    if (!(mem_addr >= 0 && mem_addr < RAM_SIZE))
+    {
+        printf("Given address to pushm is too big\n");
+        return 1;
+    }
+
+    int value = 0;
+
+    if (StackPop(&proc_data->stack, &value))
+    {
+        return 1;
+    }
+    proc_data->ram[mem_addr] = value;
 
     return 0;
 }

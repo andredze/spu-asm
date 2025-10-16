@@ -1,5 +1,6 @@
 #include "commands.h"
 
+// TODO: args count in comm_cases
 // в массив с командами вписывать колво аргументов, потом циклом проходить по нему и смотреть аргументы; либо пронумеровать команды так, чтобы они совпадали с индексами массива
 int CmdArgsCount(Command_t command)
 {
@@ -16,6 +17,8 @@ int CmdArgsCount(Command_t command)
         case CMD_JE:    return 1;
         case CMD_JNE:   return 1;
         case CMD_CALL:  return 1;
+        case CMD_PUSHM: return 1;
+        case CMD_POPM:  return 1;
         default:        return 0;
     }
 

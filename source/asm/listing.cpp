@@ -17,7 +17,7 @@ AsmErr_t CreateListingFile(InputCtx_t* commands_data,
     {
         return ASM_CREATE_LISTING_ERROR;
     }
-    fprintf(listing_file_info->stream, "offset   \tcommand     cmd    \tvalue\tindex\n\n");
+    fprintf(listing_file_info->stream, "addr\tcmd\t\t\tcode\tvalue\n\n");
     DPRINTF("FILE = %p\n", listing_file_info->stream);
 
     return ASM_SUCCESS;
@@ -32,12 +32,11 @@ AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
 
     if (CmdArgsCount(curr_cmd_data->command) == 1)
     {
-        if (fprintf(listing_stream, "%-9zu\t%-10s\t%-4d\t%-4d\t%-4zu\n",
-                    code_data->cur_cmd * sizeof(code_data->buffer[0]),
+        if (fprintf(listing_stream, "[%04zu]\t%-10s\t%-4d\t%-4d\n",
+                    code_data->cur_cmd,
                     curr_cmd_data->line,
                     curr_cmd_data->command,
-                    curr_cmd_data->value,
-                    code_data->cur_cmd) < 0)
+                    curr_cmd_data->value) < 0)
         {
             DPRINTF("Fprintf error in listing cmd with 1 arg\n");
             return ASM_LISTING_ERROR;
@@ -45,11 +44,10 @@ AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
     }
     else
     {
-        if (fprintf(listing_stream, "%-9zu\t%-10s\t%-4d\t\t\t%-4zu\n",
-                    code_data->cur_cmd * sizeof(code_data->buffer[0]),
+        if (fprintf(listing_stream, "[%04zu]\t%-10s\t%-4d\n",
+                    code_data->cur_cmd,
                     curr_cmd_data->line,
-                    curr_cmd_data->command,
-                    code_data->cur_cmd) < 0)
+                    curr_cmd_data->command) < 0)
         {
             DPRINTF("Fprintf error in listing cmd with 0 arg\n");
             return ASM_LISTING_ERROR;

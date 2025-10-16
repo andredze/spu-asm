@@ -7,6 +7,7 @@
 #include "commands.h"
 #include "spu_types.h"
 #include "config.h"
+#include "colors.h"
 
 #ifdef PROC_DEBUG
 #define PROC_OK_DEBUG(proc_data) \
@@ -32,9 +33,6 @@
     #define PROC_INIT(name) Proc_t name = {}
 #endif
 
-const size_t PROC_CODE_SIZE_LIMIT = SIZE_MAX / 32 * 30;
-const size_t PROC_MIN_STACK_CAPACITY = 32;
-
 ProcErr_t ProcCtor(Proc_t* proc_data);
 
 ProcErr_t ProcLoadCode(Proc_t* proc_data, const char* codepath);
@@ -59,5 +57,7 @@ ProcErr_t ProcVerify(Proc_t* proc_data);
 ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error);
 
 int ProcErrToStr(ProcErr_t error, const char** error_str);
+
+int ProcConsoleDump(Proc_t* proc_data);
 
 #endif /* PROCESSOR_H */

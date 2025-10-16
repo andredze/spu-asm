@@ -4,6 +4,8 @@
 #include "processor.h"
 #include "config.h"
 
+// TODO: run code from argc
+
 int main()
 {
     DPRINTF("Programm start\n");

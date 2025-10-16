@@ -18,6 +18,7 @@ typedef enum ProcErr {
     PROC_CMD_COUNT_EXCEEDS_LIMIT,
     PROC_CODE_SIZE_EXCEEDS_LIMIT,
     PROC_CMD_COUNT_BIGGER_CODE_SIZE,
+    PROC_DUMP_ERR,
     PROC_ERR_END
 } ProcErr_t;
 
@@ -27,6 +28,9 @@ typedef struct CmdCase {
 } CmdCase_t;
 
 const int REGS_COUNT = 8;
+const int RAM_SIZE = 100;
+const size_t PROC_CODE_SIZE_LIMIT = SIZE_MAX / 32 * 30;
+const size_t PROC_MIN_STACK_CAPACITY = 32;
 
 typedef struct Proc {
     Stack_t stack;
@@ -35,6 +39,7 @@ typedef struct Proc {
     size_t cmd_count;
     int regs[REGS_COUNT];
     Stack_t call_stack;
+    int* ram;
 #ifdef PROC_DEBUG
     VarInfo_t var_info;
 #endif
