@@ -17,6 +17,7 @@ AsmErr_t CreateListingFile(InputCtx_t* commands_data,
     {
         return ASM_CREATE_LISTING_ERROR;
     }
+
     fprintf(listing_file_info->stream, "addr\tcmd\t\t\tcode\tvalue\n\n");
     DPRINTF("FILE = %p\n", listing_file_info->stream);
 

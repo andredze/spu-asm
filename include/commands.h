@@ -14,19 +14,21 @@ typedef enum Command {
     CMD_SUB   = 7,
     CMD_MUL   = 8,
     CMD_DIV   = 9,
-    CMD_SQRT  = 10,
-    CMD_JMP   = 11,
-    CMD_JB    = 12,
-    CMD_JBE   = 13,
-    CMD_JA    = 14,
-    CMD_JAE   = 15,
-    CMD_JE    = 16,
-    CMD_JNE   = 17,
-    CMD_PUSHR = 18,
-    CMD_POPR  = 19,
-    CMD_PUSHM = 20,
-    CMD_POPM  = 21,
-    CMD_LABEL = 22,
+    CMD_MOD   = 10,
+    CMD_SQRT  = 11,
+    CMD_JMP   = 12,
+    CMD_JB    = 13,
+    CMD_JBE   = 14,
+    CMD_JA    = 15,
+    CMD_JAE   = 16,
+    CMD_JE    = 17,
+    CMD_JNE   = 18,
+    CMD_PUSHR = 19,
+    CMD_POPR  = 20,
+    CMD_PUSHM = 21,
+    CMD_POPM  = 22,
+    CMD_DRAW  = 23,
+    CMD_LABEL = 24,
     CMD_END
 } Command_t;
 
@@ -51,6 +53,7 @@ const CommCase_t COMM_CASES[] =
      {"SUB",   CMD_SUB},
      {"MUL",   CMD_MUL},
      {"DIV",   CMD_DIV},
+     {"MOD",   CMD_MOD},
      {"SQRT",  CMD_SQRT},
      {"JMP",   CMD_JMP},
      {"JB",    CMD_JB},
@@ -62,7 +65,8 @@ const CommCase_t COMM_CASES[] =
      {"PUSHR", CMD_PUSHR},
      {"POPR",  CMD_POPR},
      {"PUSHM", CMD_PUSHM},
-     {"POPM",  CMD_POPM}};
+     {"POPM",  CMD_POPM},
+     {"DRAW",  CMD_DRAW}};
 
 const size_t COMM_CASES_SIZE = sizeof(COMM_CASES) / sizeof(COMM_CASES[0]);
 

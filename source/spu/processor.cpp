@@ -1,5 +1,7 @@
 #include "processor.h"
 
+// TODO: rename struct names (asm, spu ...)
+
 ProcErr_t ProcCtor(Proc_t* proc_data)
 {
     if (proc_data == NULL)
@@ -152,10 +154,13 @@ ProcErr_t ProcDtor(Proc_t* proc_data, FILE* stream)
 
     free(proc_data->ram);
     proc_data->ram = NULL;
+
     free(proc_data->code);
     proc_data->code = NULL;
+
     StackDtor(&proc_data->stack);
     StackDtor(&proc_data->call_stack);
+
     fclose(stream);
 
     DPRINTF("proc_data destroyed\n");
@@ -372,6 +377,7 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
         case CMD_SUB:   return ExecuteBinaryOperation(stk_ptr, Sub) == MATH_SUCCESS ? 0 : 1;
         case CMD_MUL:   return ExecuteBinaryOperation(stk_ptr, Mul) == MATH_SUCCESS ? 0 : 1;
         case CMD_DIV:   return ExecuteBinaryOperation(stk_ptr, Div) == MATH_SUCCESS ? 0 : 1;
+        case CMD_MOD:   return ExecuteBinaryOperation(stk_ptr, Mod) == MATH_SUCCESS ? 0 : 1;
         case CMD_SQRT:  return HandleSqrt(stk_ptr) == MATH_SUCCESS ? 0 : 1;
         case CMD_OUT:   return HandleOut(stk_ptr, output_stream);
         case CMD_POPR:  return HandlePopr(stk_ptr, proc_data, value);
@@ -388,6 +394,7 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
         case CMD_RET:   return HandleRet(proc_data);
         case CMD_PUSHM: return HandlePushm(proc_data, value);
         case CMD_POPM:  return HandlePopm(proc_data, value);
+        case CMD_DRAW:  return HandleDraw(proc_data, value);
         case CMD_HLT:   return 1;
         default:        return 1;
     }
@@ -444,7 +451,7 @@ int ProcConsoleDump(Proc_t* proc_data)
     }
     DPRINTF("]\n"
             LIGHT_YELLOW "ram[] = [");
-    for (int i = 0; i < RAM_SIZE; i++)
+    for (size_t i = 0; i < RAM_SIZE; i++)
     {
         if (i == RAM_SIZE - 1) {
             DPRINTF("%d", proc_data->ram[i]); break; }

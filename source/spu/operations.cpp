@@ -16,7 +16,7 @@
         { \
             return 1; \
         } \
-        DPRINTF("\t" #cmd_name ": %d " #comp_oper " %d == %d\n", \
+        DPRINTF("\t" #cmd_name ": (%d " #comp_oper " %d) == %d\n", \
                 number1, number2, number1 comp_oper number2); \
         if (!(number1 comp_oper number2)) \
         { \
@@ -135,6 +135,22 @@ MathErr_t Div(CalcData_t* calc_data)
     }
     calc_data->result = calc_data->number2 / calc_data->number1;
     DPRINTF("\tDIV: %d / %d = %d\n", calc_data->number2, calc_data->number1, calc_data->result);
+
+    return MATH_SUCCESS;
+}
+
+MathErr_t Mod(CalcData_t* calc_data)
+{
+    assert(calc_data != NULL);
+    assert(calc_data->result == 0);
+
+    if (calc_data->number1 == 0)
+    {
+        printf("Can not divide by zero\n");
+        return MATH_DIVISION_BY_ZERO;
+    }
+    calc_data->result = calc_data->number2 % calc_data->number1;
+    DPRINTF("\tMOD: %d %% %d = %d\n", calc_data->number2, calc_data->number1, calc_data->result);
 
     return MATH_SUCCESS;
 }
@@ -324,10 +340,10 @@ int HandlePopm(Proc_t* proc_data, int reg_number)
 {
     assert(proc_data != NULL);
 
-    int mem_addr = proc_data->regs[reg_number];
+    size_t mem_addr = proc_data->regs[reg_number];
     DPRINTF("\tPOPM: address = regs[%d] (R%cX) = %d\n", reg_number, 'A' + reg_number, mem_addr);
 
-    if (!(mem_addr >= 0 && mem_addr < RAM_SIZE))
+    if (!(mem_addr <= MAX_RAM_ADDRESS && mem_addr < RAM_SIZE))
     {
         printf("Given address to pushm is too big\n");
         return 1;
@@ -340,7 +356,29 @@ int HandlePopm(Proc_t* proc_data, int reg_number)
         return 1;
     }
     proc_data->ram[mem_addr] = value;
-    DPRINTF("\t\tpoped to ram[%d] = %d\n", mem_addr, value);
+    DPRINTF("\t\tpoped to ram[%zu] = %d\n", mem_addr, value);
+
+    return 0;
+}
+
+int HandleDraw(Proc_t* proc_data, int sleep_time)
+{
+    assert(proc_data != NULL);
+    assert(sleep_time >= 0);
+
+    for (size_t i = 0; i < RAM_SIZE; i++)
+    {
+        if (proc_data->ram[i] == 0) {
+            printf(" - "); }
+        else {
+            printf(" %c ", proc_data->ram[i]); }
+        if ((i + 1) % 10 == 0)
+        {
+            printf("\n");
+        }
+    }
+    printf("\n\n");
+    Sleep(sleep_time);
 
     return 0;
 }

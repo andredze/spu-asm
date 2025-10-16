@@ -5,6 +5,7 @@
 #include "input.h"
 #include "spu_types.h"
 #include <math.h>
+#include <windows.h>
 
 typedef enum MathErr {
     MATH_SUCCESS,
@@ -41,6 +42,8 @@ MathErr_t Mul(CalcData_t* calc_data);
 
 MathErr_t Div(CalcData_t* calc_data);
 
+MathErr_t Mod(CalcData_t* calc_data);
+
 MathErr_t HandleSqrt(Stack_t* stack);
 
 int HandleOut(Stack_t* stack, FILE* output_stream);
@@ -60,6 +63,8 @@ int HandleRet(Proc_t* proc_data);
 int HandlePushm(Proc_t* proc_data, int mem_addr);
 
 int HandlePopm(Proc_t* proc_data, int mem_addr);
+
+int HandleDraw(Proc_t* proc_data, int sleep_time);
 
 // int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
 //                  size_t new_cmd_count, Command_t command);
