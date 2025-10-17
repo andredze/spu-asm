@@ -28,6 +28,7 @@ PROCOUTPUTS = answers.txt \
 ASMSOURCES = source/asm/main.cpp \
 			 source/asm/assembler.cpp \
 			 source/asm/listing.cpp \
+			 source/asm/add_operations.cpp \
 			 source/input.cpp \
 			 source/commands.cpp
 

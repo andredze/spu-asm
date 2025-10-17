@@ -2,47 +2,32 @@
 #define ASSEMBLER_H
 
 #include "input.h"
-#include "commands.h"
 #include "listing.h"
 #include "asm_types.h"
-
-const int MIN_LABELS_SIZE = 10;
-const int MAX_LABELS_SIZE = 1000;
+#include "add_operations.h"
+#include "asm_commands.h"
 
 const int MAX_FILENAME_LEN = 100;
 const int ASM_MAX_ARGS_COUNT = 2;
+const char COMMENT_SYMBOL = '#';
 
 int SetFilenames(const char** commands_filename,
                  const char** bytecode_filename,
                  int argc, char* argv[]);
 
-AsmErr_t CompileProgramm(InputCtx_t* commands_data);
+AsmErr_t CompileProgramm(InputCtx_t* input_ctx);
 
-AsmErr_t CompileCommands(InputCtx_t* commands_data,
-                         CodeData_t* code_data);
+int AsmCtxCtor(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx);
 
-int GetAsmCommand(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data);
+AsmErr_t CompileCommands(InputCtx_t* input_ctx,
+                         AsmCtx_t* asm_ctx);
 
-int GetValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data);
+AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx);
 
-int GetLabelValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data, int label);
+int WriteByteCode(AsmCtx_t* asm_ctx, InputCtx_t* input_ctx);
 
-int GetRegValue(CurrCmdData_t* curr_cmd_data);
+int WriteByteCodePretty(AsmCtx_t* asm_ctx, const char* filepath);
 
-int GetRamArgument(CurrCmdData_t* curr_cmd_data);
-
-int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data);
-
-int AddLabelCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data);
-
-int LabelsRecalloc(CodeData_t* code_data, int new_size);
-
-int CodeDataCtor(InputCtx_t* commands_data, CodeData_t* code_data);
-
-int WriteByteCode(CodeData_t* code_data, InputCtx_t* commands_data);
-
-int WriteByteCodePretty(CodeData_t* code_data, const char* filepath);
-
-void AsmDestroy(InputCtx_t* commands_data, CodeData_t* code_data);
+void AsmDestroy(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx);
 
 #endif /* ASSEMBLER_H */

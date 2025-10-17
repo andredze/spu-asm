@@ -2,18 +2,19 @@
 #define LISTING_H
 
 #include "assembler.h"
+#include "commands.h"
 #include "asm_types.h"
 #include "colors.h"
 
-AsmErr_t CreateListingFile(InputCtx_t* commands_data,
+AsmErr_t CreateListingFile(InputCtx_t* input_ctx,
                            FileInfo_t* listing_file_info);
 
-AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
-                            CodeData_t* code_data,
+AsmErr_t AddStringToListing(CmdCtx_t* cmd_ctx,
+                            AsmCtx_t* asm_ctx,
                             FILE* listing_stream);
 
-void DPrintLabels(CodeData_t* code_data);
+void DPrintLabels(AsmCtx_t* asm_ctx);
 
-void DPrintAsmData(CodeData_t* code_data);
+void DPrintAsmData(AsmCtx_t* asm_ctx);
 
 #endif /* LISTING_H */

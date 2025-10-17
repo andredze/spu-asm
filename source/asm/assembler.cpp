@@ -2,6 +2,7 @@
 #include "config.h"
 
 // TODO: пропуск пробельных символов
+// TODO: сделать чтобы можно было не писать inputs/...
 
 int SetFilenames(const char** commands_filename,
                  const char** bytecode_filename,
@@ -29,57 +30,57 @@ int SetFilenames(const char** commands_filename,
     return 0;
 }
 
-AsmErr_t CompileProgramm(InputCtx_t* commands_data)
+AsmErr_t CompileProgramm(InputCtx_t* input_ctx)
 {
-    assert(commands_data != NULL);
+    assert(input_ctx != NULL);
 
-    if (ReadAndParseFile(commands_data))
+    if (ReadAndParseFile(input_ctx))
     {
         return ASM_ERROR_WITH_READING_FILE;
     }
-    DPRINTF("lines_count = %d\n", commands_data->buffer_data.lines_count);
+    DPRINTF("lines_count = %d\n", input_ctx->buffer_data.lines_count);
 
-    CodeData_t code_data = {};
+    AsmCtx_t asm_ctx = {};
 
-    if (CodeDataCtor(commands_data, &code_data))
+    if (AsmCtxCtor(input_ctx, &asm_ctx))
     {
         return ASM_CALLOC_ERROR;
     }
 
     AsmErr_t error = ASM_SUCCESS;
-    if ((error = CompileCommands(commands_data, &code_data)) != ASM_SUCCESS)
+    if ((error = CompileCommands(input_ctx, &asm_ctx)) != ASM_SUCCESS)
     {
         return error;
     }
-    DPrintAsmData(&code_data);
+    DPrintAsmData(&asm_ctx);
 
-    code_data.cur_cmd = 0;
-    if ((error = CompileCommands(commands_data, &code_data)) != ASM_SUCCESS)
+    asm_ctx.cur_cmd = 0; // сброс счетчика
+    if ((error = CompileCommands(input_ctx, &asm_ctx)) != ASM_SUCCESS)
     {
         return error;
     }
-    DPrintAsmData(&code_data);
+    DPrintAsmData(&asm_ctx);
 
-    free(code_data.labels);
+    free(asm_ctx.labels);
 
-    if (WriteByteCode(&code_data, commands_data))
+    if (WriteByteCode(&asm_ctx, input_ctx))
     {
         return ASM_PRINT_CODE_ERROR;
     }
-    if (WriteByteCodePretty(&code_data, READABLE_BYTECODE_FILENAME))
+    if (WriteByteCodePretty(&asm_ctx, READABLE_BYTECODE_FILENAME))
     {
         return ASM_PRINT_CODE_ERROR;
     }
 
-    AsmDestroy(commands_data, &code_data);
+    AsmDestroy(input_ctx, &asm_ctx);
     DPRINTF("\n<End of the compilator>");
 
     return ASM_SUCCESS;
 }
 
-int CodeDataCtor(InputCtx_t* commands_data, CodeData_t* code_data)
+int AsmCtxCtor(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx)
 {
-    int lines_count = commands_data->buffer_data.lines_count;
+    int lines_count = input_ctx->buffer_data.lines_count;
 
     int* buffer = (int*) calloc(lines_count * ASM_MAX_ARGS_COUNT, sizeof(int));
     if (buffer == NULL)
@@ -87,363 +88,144 @@ int CodeDataCtor(InputCtx_t* commands_data, CodeData_t* code_data)
         DPRINTF("Buffer calloc failed\n");
         return 1;
     }
-    code_data->buffer = buffer;
-    code_data->cur_cmd = 0;
+    asm_ctx->buffer = buffer;
+    asm_ctx->cur_cmd = 0;
 
-    int* labels = (int*) calloc(MIN_LABELS_SIZE, sizeof(int));
+    size_t* labels = (size_t*) calloc(MIN_LABELS_SIZE, sizeof(size_t));
     if (labels == NULL)
     {
         DPRINTF("Labels calloc failed\n");
         return 1;
     }
-    code_data->labels = labels;
-    code_data->labels_size = MIN_LABELS_SIZE;
+    asm_ctx->labels = labels;
+    asm_ctx->labels_size = MIN_LABELS_SIZE;
 
     for (int i = 0; i < MIN_LABELS_SIZE; i++)
     {
-        code_data->labels[i] = -1;
+        asm_ctx->labels[i] = 777;
     }
-    DPrintAsmData(code_data);
+    DPrintAsmData(asm_ctx);
 
     return 0;
 }
 
-AsmErr_t CompileCommands(InputCtx_t* commands_data,
-                         CodeData_t* code_data)
+AsmErr_t CompileCommands(InputCtx_t* input_ctx,
+                         AsmCtx_t* asm_ctx)
 {
-    assert(commands_data != NULL);
-    assert(code_data != NULL);
+    assert(input_ctx != NULL);
+    assert(asm_ctx != NULL);
 
 #ifdef LISTING
     FileInfo_t listing_file_info = {};
-    if (CreateListingFile(commands_data, &listing_file_info))
+    if (CreateListingFile(input_ctx, &listing_file_info))
     {
         return ASM_CREATE_LISTING_ERROR;
     }
 #endif /* LISTING */
 
-    CurrCmdData_t curr_cmd_data = {};
+    CmdCtx_t cmd_ctx = {};
+    char* comment_start = NULL;
 
-    for (int i = 0; i < commands_data->ptrdata_params.lines_count; i++)
+    for (int i = 0; i < input_ctx->ptrdata_params.lines_count; i++)
     {
-        DPRINTF("\nEntering %d iteration of ptrdata for\n", i);
+        DPRINTF("\nEntering ptrdata[%d]:\n", i);
+        cmd_ctx = {.line = input_ctx->ptrdata_params.ptrdata[i]};
 
-        curr_cmd_data = {.line = commands_data->ptrdata_params.ptrdata[i],
-                         .command = CMD_HLT,
-                         .value = 0};
-
-        if (curr_cmd_data.line[0] == '\0')
+        if ((comment_start = strchr(cmd_ctx.line, COMMENT_SYMBOL)) != NULL)
         {
+            *comment_start = '\0';
+        }
+
+        if (cmd_ctx.line[0] == '\0')
             continue;
-        }
 
-        if (GetAsmCommand(&curr_cmd_data, code_data))
+        if (ProcessLabelCase(asm_ctx, &cmd_ctx) != ASM_SUCCESS)
         {
-            return ASM_GET_COMMAND_ERROR;
+            return ASM_LABEL_CASE_ERROR;
         }
-        DPRINTF("Command = %d\n", curr_cmd_data.command);
+        if (cmd_ctx.command == CMD_LABEL) continue;
 
+        if (GetCmd(asm_ctx, &cmd_ctx) != ASM_SUCCESS)
+        {
+            return ASM_GET_CMD_ERROR;
+        }
+        DPRINTF(LIGHT_YELLOW "cmd = %s (%d)\n" RESET_CLR,
+                ASM_CMD_CASES[cmd_ctx.command].str_command, cmd_ctx.command);
+        if (ASM_CMD_CASES[cmd_ctx.command].add_op(&cmd_ctx, asm_ctx) != ASM_SUCCESS)
+        {
+            return ASM_ADD_OP_ERROR;
+        }
 #ifdef LISTING
-        if (AddStringToListing(&curr_cmd_data, code_data, listing_file_info.stream) != ASM_SUCCESS)
+        if (AddStringToListing(&cmd_ctx, asm_ctx, listing_file_info.stream) != ASM_SUCCESS)
         {
             fclose(listing_file_info.stream);
             return ASM_LISTING_ERROR;
         }
 #endif /* LISTING */
-
-        if (AddCommandCode(&curr_cmd_data, code_data))
-        {
-            return ASM_SET_COMMAND_ERROR;
-        }
     }
-
 #ifdef LISTING
     fclose(listing_file_info.stream);
 #endif /* LISTING */
-
     return ASM_SUCCESS;
 }
 
-int GetAsmCommand(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
+AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
 {
-    assert(code_data != NULL);
-    assert(curr_cmd_data != NULL);
+    assert(asm_ctx != NULL);
+    assert(cmd_ctx != NULL);
 
     char operation[CMD_MAX_LEN] = {};
 
-    if (sscanf(curr_cmd_data->line, "%s", operation) != 1)
+    if (sscanf(cmd_ctx->line, "%s", operation) != 1)
     {
-        DPRINTF("sscanf failed\n");
-        return 1;
+        DPRINTF("sscanf for GetCmd() failed\n");
+        return ASM_SYNTAX_ERROR;
     }
-    // 1 scanf
-    if (sscanf(curr_cmd_data->line, ":%d", &curr_cmd_data->value) == 1)
+    for (size_t i = 0; i < ASM_CMD_CASES_SIZE; i++)
     {
-        curr_cmd_data->command = CMD_LABEL;
-        return 0;
-    }
-    for (size_t i = 0; i < COMM_CASES_SIZE; i++)
-    {
-        if (strcmp(operation, COMM_CASES[i].str_command) == 0)
+        if (strcmp(operation, ASM_CMD_CASES[i].str_command) == 0)
         {
-            curr_cmd_data->command = COMM_CASES[i].command;
-            break;
-        }
-    }
-    if (CmdArgsCount(curr_cmd_data->command) == 1)
-    {
-        if (GetValue(curr_cmd_data, code_data))
-        {
-            return 1;
+            cmd_ctx->command = ASM_CMD_CASES[i].command;
+            return ASM_SUCCESS;
         }
     }
 
-    return 0;
+    printf("Syntax error: unknown command\n");
+    return ASM_SYNTAX_ERROR;
 }
 
-int GetValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
+int WriteByteCode(AsmCtx_t* asm_ctx, InputCtx_t* input_ctx)
 {
-    assert(code_data != NULL);
-    assert(curr_cmd_data != NULL);
-
-    DPRINTF("cmd = %d\n", curr_cmd_data->command);
-    char operation[CMD_MAX_LEN] = {};
-    int label = 0;
-
-    if (sscanf(curr_cmd_data->line, "%s :%d", operation, &label) == 2)
-    {
-        if (GetLabelValue(curr_cmd_data, code_data, label))
-        {
-            return ASM_GET_LABEL_ERROR;
-        }
-    }
-    else if (curr_cmd_data->command == CMD_PUSHR ||
-             curr_cmd_data->command == CMD_POPR)
-    {
-        if (GetRegValue(curr_cmd_data))
-        {
-            return ASM_GET_REG_ERROR;
-        }
-    }
-    else if (curr_cmd_data->command == CMD_PUSHM ||
-             curr_cmd_data->command == CMD_POPM)
-    {
-        if (GetRamArgument(curr_cmd_data))
-        {
-            return ASM_GET_RAM_ARG_ERROR;
-        }
-    }
-    else
-    {
-        if (sscanf(curr_cmd_data->line, "%s %d",
-                   operation, &curr_cmd_data->value) != 2)
-        {
-            DPRINTF("Wrong number of args for push\n");
-            return ASM_GET_OP_ARG_ERR;
-        }
-    }
-
-    return 0;
-}
-
-int GetLabelValue(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data, int label)
-{
-    assert(curr_cmd_data != NULL);
-    assert(code_data != NULL);
-
-    if (!((curr_cmd_data->command >= CMD_JMP &&
-           curr_cmd_data->command <= CMD_JNE) ||
-           curr_cmd_data->command == CMD_CALL))
-    {
-        printf("Syntax error: this command doesn't receive label\n");
-        return 1;
-    }
-    if (!(label >= 0))
-    {
-        printf("Syntax error: Given lable for jump is negative\n");
-        return 1;
-    }
-    if (label >= MAX_LABELS_SIZE)
-    {
-        printf("Syntax error: Given lable for jump is too big\n");
-        return 1;
-    }
-    if (label >= code_data->labels_size)
-    {
-        DPRINTF("Memory realloc...\n");
-        if (LabelsRecalloc(code_data, 2 * label))
-        {
-            return 1;
-        }
-    }
-    curr_cmd_data->value = code_data->labels[label];
-    DPRINTF("cmd = %d; value = %d;\n", curr_cmd_data->command, curr_cmd_data->value);
-
-    return 0;
-}
-
-int GetRegValue(CurrCmdData_t* curr_cmd_data)
-{
-    assert(curr_cmd_data != NULL);
-
-    char operation[CMD_MAX_LEN] = {};
-    char reg[CMD_MAX_LEN] = {};
-    if (sscanf(curr_cmd_data->line, "%s %s", operation, reg) != 2)
-    {
-        DPRINTF("Wrong number of args for reg cmd\n");
-        return 1;
-    }
-    curr_cmd_data->value = reg[1] - 'A';
-
-    return 0;
-}
-
-int GetRamArgument(CurrCmdData_t* curr_cmd_data)
-{
-    assert(curr_cmd_data != NULL);
-
-    char operation[CMD_MAX_LEN] = {};
-    char reg[CMD_MAX_LEN] = {};
-    if (sscanf(curr_cmd_data->line, "%s [%s]", operation, reg) != 2)
-    {
-        DPRINTF("Wrong number of args for ram cmd\n");
-        return 1;
-    }
-    curr_cmd_data->value = reg[1] - 'A';
-
-    return 0;
-}
-
-int AddCommandCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
-{
-    assert(code_data != NULL);
-    assert(curr_cmd_data != NULL);
-
-    Command_t command = curr_cmd_data->command;
-
-    if (command < CMD_HLT ||
-        command > CMD_END)
-    {
-        DPRINTF("<ERROR: Unknown command code in AddCommandCode()>\n");
-        return 1;
-    }
-    if (command == CMD_LABEL)
-    {
-        if (AddLabelCode(curr_cmd_data, code_data))
-        {
-            return 1;
-        }
-
-        return 0;
-    }
-
-    code_data->buffer[code_data->cur_cmd++] = command;
-
-    if (CmdArgsCount(command) == 1)
-    {
-        if (command == CMD_POPR || command == CMD_PUSHR ||
-            command == CMD_POPM || command == CMD_PUSHM)
-        {
-            code_data->buffer[code_data->cur_cmd++] = curr_cmd_data->value;
-        }
-        else
-        {
-            code_data->buffer[code_data->cur_cmd++] = curr_cmd_data->value;
-        }
-    }
-
-    return 0;
-}
-
-int AddLabelCode(CurrCmdData_t* curr_cmd_data, CodeData_t* code_data)
-{
-    int label = curr_cmd_data->value;
-    DPRINTF("curr_cmd_data->value = %d\n", curr_cmd_data->value);
-    DPRINTF("label_size = %d\n", code_data->labels_size);
-    if (label >= MAX_LABELS_SIZE)
-    {
-        printf("Syntax error: label is too big\n");
-        return 1;
-    }
-    if (label < 0)
-    {
-        printf("Syntax error: label is negative\n");
-        return 1;
-    }
-    if (label >= code_data->labels_size)
-    {
-        if (LabelsRecalloc(code_data, 2 * label))
-        {
-            return 1;
-        }
-    }
-    code_data->labels[label] = (int) code_data->cur_cmd;
-    DPrintAsmData(code_data);
-
-    return 0;
-}
-
-int LabelsRecalloc(CodeData_t* code_data, int new_size)
-{
-    DPrintLabels(code_data);
-    int old_size = code_data->labels_size;
-    int* labels = (int*) realloc(code_data->labels, new_size * sizeof(int));
-    if (labels == NULL)
-    {
-        printf("Labels recalloc failed\n");
-        return 1;
-    }
-    code_data->labels_size = new_size;
-    code_data->labels = labels;
-
-    DPRINTF("old_size = %d\n", old_size);
-    DPRINTF("labels[old_size] = %d\n", code_data->labels[old_size]);
-    DPrintLabels(code_data);
-
-    for (int i = old_size; i < new_size; i++)
-    {
-        DPRINTF("%d, ", i);
-        code_data->labels[i] = -1;
-    }
-    DPRINTF("\n");
-    DPRINTF("labels[old_size] = %d\n", code_data->labels[old_size]);
-
-    DPrintLabels(code_data);
-    return 0;
-}
-
-int WriteByteCode(CodeData_t* code_data, InputCtx_t* commands_data)
-{
-    if (OpenFile(&commands_data->output_file_info, "wb"))
+    if (OpenFile(&input_ctx->output_file_info, "wb"))
     {
         return 1;
     }
 
     CodeParams_t code_params = {.version = CODE_VERSION,
-                                .code_size = code_data->cur_cmd};
+                                .code_size = asm_ctx->cur_cmd};
     if (fwrite(&code_params,
                sizeof(code_params),
                1,
-               commands_data->output_file_info.stream) != 1)
+               input_ctx->output_file_info.stream) != 1)
     {
         DPRINTF("Code_params writing in file error\n");
         return 1;
     }
 
-    if (fwrite(code_data->buffer,
-               sizeof(code_data->buffer[0]),
-               code_data->cur_cmd,
-               commands_data->output_file_info.stream) != code_data->cur_cmd)
+    if (fwrite(asm_ctx->buffer,
+               sizeof(asm_ctx->buffer[0]),
+               asm_ctx->cur_cmd,
+               input_ctx->output_file_info.stream) != asm_ctx->cur_cmd)
     {
         DPRINTF("Fwrite error\n");
         return 1;
     }
-    fclose(commands_data->output_file_info.stream);
+    fclose(input_ctx->output_file_info.stream);
 
     return 0;
 }
 
-int WriteByteCodePretty(CodeData_t* code_data, const char* filepath)
+int WriteByteCodePretty(AsmCtx_t* asm_ctx, const char* filepath)
 {
     FileInfo_t pretty_output_info = {.filepath = filepath};
 
@@ -454,21 +236,21 @@ int WriteByteCodePretty(CodeData_t* code_data, const char* filepath)
     }
 
     size_t i = 0;
-    while (i < code_data->cur_cmd)
+    while (i < asm_ctx->cur_cmd)
     {
-        if (CmdArgsCount((Command_t) code_data->buffer[i]) == 1)
+        if (CmdArgsCount((Command_t) asm_ctx->buffer[i]) == 1)
         {
             fprintf(pretty_output_info.stream,
                     "%d %d\n",
-                    code_data->buffer[i],
-                    code_data->buffer[i + 1]);
+                    asm_ctx->buffer[i],
+                    asm_ctx->buffer[i + 1]);
             i++;
         }
         else
         {
             fprintf(pretty_output_info.stream,
                     "%d\n",
-                    code_data->buffer[i]);
+                    asm_ctx->buffer[i]);
         }
         i++;
     }
@@ -477,9 +259,10 @@ int WriteByteCodePretty(CodeData_t* code_data, const char* filepath)
     return 0;
 }
 
-void AsmDestroy(InputCtx_t* commands_data, CodeData_t* code_data)
+void AsmDestroy(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx)
 {
-    free(code_data->buffer);
-    free(commands_data->buffer_data.buffer);
-    free(commands_data->ptrdata_params.ptrdata);
+    free(asm_ctx->buffer);
+    free(asm_ctx->labels);
+    free(input_ctx->buffer_data.buffer);
+    free(input_ctx->ptrdata_params.ptrdata);
 }

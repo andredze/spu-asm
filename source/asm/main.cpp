@@ -11,11 +11,11 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    InputCtx_t asm_commands_data =
+    InputCtx_t asm_input_ctx =
         {.input_file_info =  {.filepath = commands_filename},
          .output_file_info = {.filepath = bytecode_filename}};
 
-    if (CompileProgramm(&asm_commands_data) != ASM_SUCCESS)
+    if (CompileProgramm(&asm_input_ctx) != ASM_SUCCESS)
     {
         return EXIT_FAILURE;
     }

@@ -1,5 +1,7 @@
 #include "operations.h"
 
+// TODO: add square
+
 #define DECLARE_HANDLE_JUMP_IF(comp_oper, cmd_name) \
     int Handle##cmd_name(Proc_t* proc_data, Stack_t* stack, int new_cmd_count) \
     { \
@@ -372,7 +374,7 @@ int HandleDraw(Proc_t* proc_data, int sleep_time)
             printf(" - "); }
         else {
             printf(" %c ", proc_data->ram[i]); }
-        if ((i + 1) % 10 == 0)
+        if ((i + 1) % RAM_SIDE_SIZE == 0)
         {
             printf("\n");
         }

@@ -1,6 +1,6 @@
 #include "processor.h"
 
-// TODO: rename struct names (asm, spu ...)
+// TODO: rename struct names (asm_ctx, spu ...)
 
 ProcErr_t ProcCtor(Proc_t* proc_data)
 {
@@ -35,16 +35,16 @@ ProcErr_t ProcLoadPrettyBC(Proc_t* proc_data, const char* codepath)
     assert(codepath != NULL);
     DPRINTF("Loading pretty_bytecode...\n");
 
-    InputCtx_t commands_data = {.input_file_info =  {.filepath = codepath}};
+    InputCtx_t input_ctx = {.input_file_info =  {.filepath = codepath}};
 
-    if (ReadAndParseFile(&commands_data))
+    if (ReadAndParseFile(&input_ctx))
     {
         return PROC_READING_FILE_ERROR;
     }
     DPRINTF("Read and parsed file\n");
-    DPRINTF("lines_count = %d\n", commands_data.buffer_data.lines_count);
+    DPRINTF("lines_count = %d\n", input_ctx.buffer_data.lines_count);
 
-    proc_data->code_size = commands_data.buffer_data.lines_count * 2;
+    proc_data->code_size = input_ctx.buffer_data.lines_count * 2;
     proc_data->code = (int*) calloc(proc_data->code_size, sizeof(int));
     if (proc_data->code == NULL)
     {
@@ -54,13 +54,13 @@ ProcErr_t ProcLoadPrettyBC(Proc_t* proc_data, const char* codepath)
 
     int args_count = 0;
 
-    for (int i = 0; i < commands_data.buffer_data.lines_count; i++)
+    for (int i = 0; i < input_ctx.buffer_data.lines_count; i++)
     {
-        args_count = sscanf(commands_data.ptrdata_params.ptrdata[i],
+        args_count = sscanf(input_ctx.ptrdata_params.ptrdata[i],
                             "%d %d",
                             &proc_data->code[proc_data->cmd_count],
                             &proc_data->code[proc_data->cmd_count + 1]);
-        DPRINTF("str = %s\n", commands_data.ptrdata_params.ptrdata[i]);
+        DPRINTF("str = %s\n", input_ctx.ptrdata_params.ptrdata[i]);
         if (args_count == 2)
         {
             DPRINTF("got: %d %d\n", proc_data->code[proc_data->cmd_count],
@@ -81,8 +81,8 @@ ProcErr_t ProcLoadPrettyBC(Proc_t* proc_data, const char* codepath)
     }
     proc_data->cmd_count = 0;
 
-    free(commands_data.buffer_data.buffer);
-    free(commands_data.ptrdata_params.ptrdata);
+    free(input_ctx.buffer_data.buffer);
+    free(input_ctx.ptrdata_params.ptrdata);
     DPRINTF("Pretty bytecode loaded\n");
 
     return PROC_SUCCESS;
@@ -454,8 +454,8 @@ int ProcConsoleDump(Proc_t* proc_data)
     for (size_t i = 0; i < RAM_SIZE; i++)
     {
         if (i == RAM_SIZE - 1) {
-            DPRINTF("%d", proc_data->ram[i]); break; }
-        if ((i + 1) % 17 == 0 && i != 0) {
+            DPRINTF("%d", proc_data->ram[i]); }
+        else if (i % 17 == 0 && i != 0) {
             DPRINTF("\n\t "); }
         else {
             DPRINTF("%d, ", proc_data->ram[i]); }

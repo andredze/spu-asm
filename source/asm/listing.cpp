@@ -1,14 +1,14 @@
 #include "listing.h"
 
-AsmErr_t CreateListingFile(InputCtx_t* commands_data,
+AsmErr_t CreateListingFile(InputCtx_t* input_ctx,
                            FileInfo_t* listing_file_info)
 {
-    assert(commands_data != NULL);
+    assert(input_ctx != NULL);
     assert(listing_file_info != NULL);
 
     char listing_filename[MAX_FILENAME_LEN] = {};
     strcpy(listing_filename, "logs/");
-    strcat(listing_filename, strchr(commands_data->input_file_info.filepath, '/') + 1);
+    strcat(listing_filename, strchr(input_ctx->input_file_info.filepath, '/') + 1);
     strcat(listing_filename, ".lst");
     DPRINTF("listing_filename = %s\n", listing_filename);
     listing_file_info->filepath = listing_filename;
@@ -24,20 +24,20 @@ AsmErr_t CreateListingFile(InputCtx_t* commands_data,
     return ASM_SUCCESS;
 }
 
-AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
-                            CodeData_t* code_data,
+AsmErr_t AddStringToListing(CmdCtx_t* cmd_ctx,
+                            AsmCtx_t* asm_ctx,
                             FILE* listing_stream)
 {
-    assert(curr_cmd_data != NULL);
-    assert(code_data != NULL);
+    assert(cmd_ctx != NULL);
+    assert(asm_ctx != NULL);
 
-    if (CmdArgsCount(curr_cmd_data->command) == 1)
+    if (CmdArgsCount(cmd_ctx->command) == 1)
     {
         if (fprintf(listing_stream, "[%04zu]\t%-10s\t%-4d\t%-4d\n",
-                    code_data->cur_cmd,
-                    curr_cmd_data->line,
-                    curr_cmd_data->command,
-                    curr_cmd_data->value) < 0)
+                    asm_ctx->cur_cmd,
+                    cmd_ctx->line,
+                    cmd_ctx->command,
+                    cmd_ctx->value) < 0)
         {
             DPRINTF("Fprintf error in listing cmd with 1 arg\n");
             return ASM_LISTING_ERROR;
@@ -46,9 +46,9 @@ AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
     else
     {
         if (fprintf(listing_stream, "[%04zu]\t%-10s\t%-4d\n",
-                    code_data->cur_cmd,
-                    curr_cmd_data->line,
-                    curr_cmd_data->command) < 0)
+                    asm_ctx->cur_cmd,
+                    cmd_ctx->line,
+                    cmd_ctx->command) < 0)
         {
             DPRINTF("Fprintf error in listing cmd with 0 arg\n");
             return ASM_LISTING_ERROR;
@@ -58,30 +58,30 @@ AsmErr_t AddStringToListing(CurrCmdData_t* curr_cmd_data,
     return ASM_SUCCESS;
 }
 
-void DPrintLabels(CodeData_t* code_data)
+void DPrintLabels(AsmCtx_t* asm_ctx)
 {
-    DPRINTF("labels_size = %d;\n", code_data->labels_size);
+    DPRINTF("labels_size = %d;\n", asm_ctx->labels_size);
     DPRINTF("labels = ");
-    for (int i = 0; i < code_data->labels_size; i++)
+    for (int i = 0; i < asm_ctx->labels_size; i++)
     {
-        DPRINTF("%d, ", code_data->labels[i]);
+        DPRINTF("%zu, ", asm_ctx->labels[i]);
     }
     DPRINTF("\n")
 }
 
-void DPrintAsmData(CodeData_t* code_data)
+void DPrintAsmData(AsmCtx_t* asm_ctx)
 {
     DPRINTF("\n-----------------------------------------------------------------\n"
             "code = ");
-    for (size_t i = 0; i < code_data->cur_cmd; i++)
+    for (size_t i = 0; i < asm_ctx->cur_cmd; i++)
     {
-        DPRINTF("%d, ", code_data->buffer[i]);
+        DPRINTF("%d, ", asm_ctx->buffer[i]);
     }
     DPRINTF("\n"
             "labels = ");
-    for (int i = 0; i < code_data->labels_size; i++)
+    for (int i = 0; i < asm_ctx->labels_size; i++)
     {
-        DPRINTF("%d, ", code_data->labels[i]);
+        DPRINTF("%zu, ", asm_ctx->labels[i]);
     }
     DPRINTF("\n"
             "-----------------------------------------------------------------\n");

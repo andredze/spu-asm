@@ -1,15 +1,21 @@
 #ifndef ASM_TYPES_H
 #define ASM_TYPES_H
 
-#include "commands.h"
 #include <stdio.h>
+#include "commands.h"
 
-typedef struct CodeData {
+typedef struct AsmCtx {
     int* buffer;
     size_t cur_cmd;
-    int* labels;
+    size_t* labels;
     int labels_size;
-} CodeData_t;
+} AsmCtx_t;
+
+typedef struct CmdCtx {
+    char* line;
+    Command_t command;
+    int value;
+} CmdCtx_t;
 
 typedef enum AsmErr {
     ASM_SUCCESS,
@@ -24,13 +30,13 @@ typedef enum AsmErr {
     ASM_GET_LABEL_ERROR,
     ASM_GET_REG_ERROR,
     ASM_GET_OP_ARG_ERR,
-    ASM_GET_RAM_ARG_ERROR
+    ASM_GET_RAM_ARG_ERROR,
+    ASM_LABEL_CASE_ERROR,
+    ASM_GET_CMD_ERROR,
+    ASM_ADD_OP_ERROR,
+    ASM_SYNTAX_ERROR,
+    ASM_LABELS_RECALLOC_ERROR,
+    ASM_LABEL_ERROR
 } AsmErr_t;
-
-typedef struct CurrCmdData {
-    char* line;
-    Command_t command;
-    int value;
-} CurrCmdData_t;
 
 #endif /* ASM_TYPES_H */
