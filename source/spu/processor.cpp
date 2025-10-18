@@ -459,7 +459,7 @@ int ProcConsoleDump(Proc_t* proc_data)
             DPRINTF("%d, ", proc_data->ram[i]); }
     }
     DPRINTF("]\n"
-            RED "-----------------------------------------------------------" RESET_CLR);
+            RED "-----------------------------------------------------------\n" RESET_CLR);
 
     return 0;
 }

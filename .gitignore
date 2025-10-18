@@ -1,6 +1,9 @@
 # Directories
 .vscode/
 
+# Video
+*.mp4
+
 # Outputs
 *.bin
 *.log

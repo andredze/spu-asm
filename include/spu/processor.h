@@ -8,6 +8,7 @@
 #include "spu_types.h"
 #include "config.h"
 #include "colors.h"
+#include "cmd_cases.h"
 
 #ifdef PROC_DEBUG
 #define PROC_OK_DEBUG(proc_data)                                            \

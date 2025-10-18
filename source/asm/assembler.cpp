@@ -73,10 +73,10 @@ AsmErr_t CompileProgramm(InputCtx_t* input_ctx, int listing_flag)
     {
         return ASM_PRINT_CODE_ERROR;
     }
-    if (WriteByteCodePretty(&asm_ctx, READABLE_BYTECODE_FILENAME))
-    {
-        return ASM_PRINT_CODE_ERROR;
-    }
+    // if (WriteByteCodePretty(&asm_ctx, READABLE_BYTECODE_FILENAME))
+    // {
+    //     return ASM_PRINT_CODE_ERROR;
+    // }
 
     AsmDestroy(input_ctx, &asm_ctx);
     DPRINTF("\n<End of the compilator>");
@@ -137,13 +137,15 @@ AsmErr_t CompileCommands(InputCtx_t* input_ctx,
     for (int i = 0; i < input_ctx->ptrdata_params.lines_count; i++)
     {
         DPRINTF("\nEntering ptrdata[%d]:\n", i);
+#ifdef ASM_DEBUG
+        getchar();
+#endif /* ASM_DEBUG */
         cmd_ctx = {.line = input_ctx->ptrdata_params.ptrdata[i]};
 
         if ((comment_start = strchr(cmd_ctx.line, COMMENT_SYMBOL)) != NULL)
         {
             *comment_start = '\0';
         }
-
         if (cmd_ctx.line[0] == '\0')
             continue;
 
@@ -157,9 +159,7 @@ AsmErr_t CompileCommands(InputCtx_t* input_ctx,
         {
             return ASM_GET_CMD_ERROR;
         }
-        DPRINTF(LIGHT_YELLOW "cmd = %s (%d)\n" RESET_CLR,
-                ASM_CMD_CASES[cmd_ctx.command].str_command, cmd_ctx.command);
-        if (ASM_CMD_CASES[cmd_ctx.command].add_op(&cmd_ctx, asm_ctx) != ASM_SUCCESS)
+        if (CMD_CASES[cmd_ctx.command].add_op(&cmd_ctx, asm_ctx) != ASM_SUCCESS)
         {
             return ASM_ADD_OP_ERROR;
         }
@@ -192,13 +192,15 @@ AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
         DPRINTF("sscanf for GetCmd() failed\n");
         return ASM_SYNTAX_ERROR;
     }
-    cmd_ctx->line = cmd_ctx->line + op_len;
+    cmd_ctx->op_len = op_len;
 
-    for (size_t i = 0; i < ASM_CMD_CASES_SIZE; i++)
+    for (size_t i = 0; i < CMD_CASES_SIZE; i++)
     {
-        if (strcmp(operation, ASM_CMD_CASES[i].str_command) == 0)
+        if (strcmp(operation, CMD_CASES[i].str_command) == 0)
         {
-            cmd_ctx->command = ASM_CMD_CASES[i].command;
+            cmd_ctx->command = CMD_CASES[i].command;
+            DPRINTF(LIGHT_YELLOW "cmd = %s (%d)\n" RESET_CLR,
+                    CMD_CASES[cmd_ctx->command].str_command, cmd_ctx->command);
             return ASM_SUCCESS;
         }
     }
@@ -251,7 +253,7 @@ int WriteByteCodePretty(AsmCtx_t* asm_ctx, const char* filepath)
     size_t i = 0;
     while (i < asm_ctx->cur_cmd)
     {
-        if (COMM_CASES[(Command_t) asm_ctx->buffer[i]].args_count == 2)
+        if (CMD_CASES[(Command_t) asm_ctx->buffer[i]].args_count == 2)
         {
             fprintf(pretty_output_info.stream,
                     "%d %d\n",

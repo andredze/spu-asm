@@ -4,19 +4,6 @@
 #include <stdio.h>
 #include "commands.h"
 
-typedef struct AsmCtx {
-    int* buffer;
-    size_t cur_cmd;
-    size_t* labels;
-    int labels_size;
-} AsmCtx_t;
-
-typedef struct CmdCtx {
-    char* line;
-    Command_t command;
-    int value;
-} CmdCtx_t;
-
 typedef enum AsmErr {
     ASM_SUCCESS,
     ASM_ERROR_WITH_READING_FILE,
@@ -38,5 +25,19 @@ typedef enum AsmErr {
     ASM_LABELS_RECALLOC_ERROR,
     ASM_LABEL_ERROR
 } AsmErr_t;
+
+typedef struct AsmCtx {
+    int* buffer;
+    size_t cur_cmd;
+    size_t* labels;
+    int labels_size;
+} AsmCtx_t;
+
+typedef struct CmdCtx {
+    char* line;
+    Command_t command;
+    int value;
+    int op_len;
+} CmdCtx_t;
 
 #endif /* ASM_TYPES_H */

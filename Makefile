@@ -38,7 +38,7 @@ ASMOUTPUTS = bytecode.bin \
 			 pretty_bc.txt
 
 ifdef DEBUG
-ASMFLAGS += -DDEBUG
+ASMFLAGS += -DASM_DEBUG
 PROCFLAGS += -DPROC_DEBUG -DSTACK_DEBUG -DDEBUG
 endif
 

@@ -1,11 +1,15 @@
 #ifndef ASSEMBLER_H
 #define ASSEMBLER_H
 
+#ifdef ASM_DEBUG
+    #define DEBUG
+#endif /* ASM_DEBUG */
+
 #include "input.h"
 #include "listing.h"
 #include "asm_types.h"
-#include "add_operations.h"
-#include "asm_commands.h"
+#include "commands.h"
+#include "cmd_cases.h"
 
 const int MAX_FILENAME_LEN = 100;
 const int ASM_MAX_ARGS_COUNT = 2;
