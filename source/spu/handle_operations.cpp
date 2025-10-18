@@ -25,17 +25,17 @@
         }                                                               \
         if (Jump(proc_data, new_cmd_count))                             \
         {                                                               \
-            return HANDLE_OP_INVALID_ARG;                               \
+            return HANDLE_OP_INVALID_JUMP_ARG;                          \
         }                                                               \
         return HANDLE_OP_SUCCESS;                                       \
     }
 
-DECLARE_HANDLE_JUMP_IF(<,  Jb);
-DECLARE_HANDLE_JUMP_IF(<=, Jbe);
-DECLARE_HANDLE_JUMP_IF(>,  Ja);
-DECLARE_HANDLE_JUMP_IF(>=, Jae);
-DECLARE_HANDLE_JUMP_IF(==, Je);
-DECLARE_HANDLE_JUMP_IF(!=, Jne);
+DECLARE_HANDLE_JUMP_IF(<,  JB);
+DECLARE_HANDLE_JUMP_IF(<=, JBE);
+DECLARE_HANDLE_JUMP_IF(>,  JA);
+DECLARE_HANDLE_JUMP_IF(>=, JAE);
+DECLARE_HANDLE_JUMP_IF(==, JE);
+DECLARE_HANDLE_JUMP_IF(!=, JNE);
 
 #define DECLARE_HANDLE_MATH_OP(cmd_name, calculate)                             \
     HandleOpErr_t Handle##cmd_name(Proc_t* proc_data)                           \
@@ -62,18 +62,33 @@ DECLARE_HANDLE_JUMP_IF(!=, Jne);
         return HANDLE_OP_SUCCESS;                                               \
     }
 
-DECLARE_HANDLE_MATH_OP(Add, Add); // +
-DECLARE_HANDLE_MATH_OP(Sub, Sub); // -
-DECLARE_HANDLE_MATH_OP(Mul, Mul);
-DECLARE_HANDLE_MATH_OP(Div, Div); // / , {if (b == 0) Error();}
-DECLARE_HANDLE_MATH_OP(Mod, Mod);
+DECLARE_HANDLE_MATH_OP(ADD, Add); // +
+DECLARE_HANDLE_MATH_OP(SUB, Sub); // -
+DECLARE_HANDLE_MATH_OP(MUL, Mul);
+DECLARE_HANDLE_MATH_OP(DIV, Div); // / , {if (b == 0) Error();}
+DECLARE_HANDLE_MATH_OP(MOD, Mod);
 
 HandleOpErr_t HandleHLT(Proc_t* proc_data)
 {
     return HANDLE_OP_BREAK_LOOP;
 }
 
-HandleOpErr_t HandleSqrt(Proc_t* proc_data)
+HandleOpErr_t HandlePUSH(Proc_t* proc_data)
+{
+    assert(proc_data != NULL);
+
+    int value = proc_data->code[proc_data->cmd_count++];
+
+    DPRINTF("\tPUSH: %d\n", value);
+    if (StackPush(&proc_data->stack, value) != STACK_SUCCESS)
+    {
+        return HANDLE_OP_STACK_ERROR;
+    }
+
+    return HANDLE_OP_SUCCESS;
+}
+
+HandleOpErr_t HandleSQRT(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -92,7 +107,7 @@ HandleOpErr_t HandleSqrt(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
-HandleOpErr_t HandleSqr(Proc_t* proc_data)
+HandleOpErr_t HandleSQR(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -176,7 +191,7 @@ MathErr_t Mod(CalcData_t* calc_data)
     return MATH_SUCCESS;
 }
 
-HandleOpErr_t HandleOut(Proc_t* proc_data)
+HandleOpErr_t HandleOUT(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -196,10 +211,10 @@ HandleOpErr_t HandleOut(Proc_t* proc_data)
 
     DPRINTF("\tOUT: %d\n", result);
 
-    return 0;
+    return HANDLE_OP_SUCCESS;
 }
 
-HandleOpErr_t HandlePopr(Proc_t* proc_data)
+HandleOpErr_t HandlePOPR(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -230,7 +245,7 @@ HandleOpErr_t HandlePopr(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
-HandleOpErr_t HandlePushr(Proc_t* proc_data)
+HandleOpErr_t HandlePUSHR(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -254,7 +269,7 @@ HandleOpErr_t HandlePushr(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
-HandleOpErr_t HandleIn(Proc_t* proc_data)
+HandleOpErr_t HandleIN(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -279,7 +294,7 @@ HandleOpErr_t HandleIn(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
-HandleOpErr_t HandleJmp(Proc_t* proc_data)
+HandleOpErr_t HandleJMP(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -309,7 +324,7 @@ int Jump(Proc_t* proc_data, int new_cmd_count)
     return 0;
 }
 
-HandleOpErr_t HandleCall(Proc_t* proc_data)
+HandleOpErr_t HandleCALL(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -330,7 +345,7 @@ HandleOpErr_t HandleCall(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
-HandleOpErr_t HandleRet(Proc_t* proc_data)
+HandleOpErr_t HandleRET(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -351,7 +366,7 @@ HandleOpErr_t HandleRet(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
-HandleOpErr_t HandlePushm(Proc_t* proc_data)
+HandleOpErr_t HandlePUSHM(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -375,7 +390,7 @@ HandleOpErr_t HandlePushm(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
-HandleOpErr_t HandlePopm(Proc_t* proc_data)
+HandleOpErr_t HandlePOPM(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -401,7 +416,7 @@ HandleOpErr_t HandlePopm(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
-HandleOpErr_t HandleDraw(Proc_t* proc_data)
+HandleOpErr_t HandleDRAW(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -420,21 +435,6 @@ HandleOpErr_t HandleDraw(Proc_t* proc_data)
     }
     printf("\n\n");
     Sleep(sleep_time);
-
-    return HANDLE_OP_SUCCESS;
-}
-
-HandleOpErr_t HandlePush(Proc_t* proc_data)
-{
-    assert(proc_data != NULL);
-
-    int value = proc_data->code[proc_data->cmd_count++];
-
-    DPRINTF("\tPUSH: %d\n", value);
-    if (StackPush(&proc_data->stack, value) != STACK_SUCCESS)
-    {
-        return HANDLE_OP_STACK_ERROR;
-    }
 
     return HANDLE_OP_SUCCESS;
 }

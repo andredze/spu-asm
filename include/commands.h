@@ -2,6 +2,12 @@
 #define COMMANDS_H
 
 #include <stdio.h>
+#ifdef ASM
+    #include "add_operations.h"
+#endif
+#ifdef SPU
+    #include "handle_operations.h"
+#endif
 
 typedef enum Command {
     CMD_HLT   = 0,
@@ -38,40 +44,56 @@ typedef struct CodeParams {
     size_t code_size;
 } CodeParams_t;
 
-typedef struct CommCase {
+typedef struct CmdCase {
     const char* str_command;
     Command_t command;
     int args_count;
-} CommCase_t;
+#ifdef SPU
+    HandleOpErr_t (*handle_op) (Proc_t* proc_data);
+#endif /* SPU */
+#ifdef ASM
+    AsmErr_t (*add_op) (CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx);
+#endif /* ASM */
+} CmdCase_t;
 
-const CommCase_t COMM_CASES[] =
-    {{"HLT",   CMD_HLT,   1},
-     {"PUSH",  CMD_PUSH,  2},
-     {"OUT",   CMD_OUT,   1},
-     {"IN",    CMD_IN,    1},
-     {"CALL",  CMD_CALL,  2},
-     {"RET",   CMD_RET,   1},
-     {"ADD",   CMD_ADD,   1},
-     {"SUB",   CMD_SUB,   1},
-     {"MUL",   CMD_MUL,   1},
-     {"DIV",   CMD_DIV,   1},
-     {"MOD",   CMD_MOD,   1},
-     {"SQRT",  CMD_SQRT,  1},
-     {"SQR",   CMD_SQR,   1},
-     {"JMP",   CMD_JMP,   2},
-     {"JB",    CMD_JB,    2},
-     {"JBE",   CMD_JBE,   2},
-     {"JA",    CMD_JA,    2},
-     {"JAE",   CMD_JAE,   2},
-     {"JE",    CMD_JE,    2},
-     {"JNE",   CMD_JNE,   2},
-     {"PUSHR", CMD_PUSHR, 2},
-     {"POPR",  CMD_POPR,  2},
-     {"PUSHM", CMD_PUSHM, 2},
-     {"POPM",  CMD_POPM,  2},
-     {"DRAW",  CMD_DRAW,  2}};
+#ifdef SPU
+    #define SET_CMD_CASE(name, args_count)   {#name, CMD_ ## name, (args_count), Handle ## name}
+#endif /* SPU */
+#ifdef ASM
+    #define SET_CMD_CASE(name, args_count)   {#name, CMD_ ## name, (args_count), AddOp ## name}
+#endif /* ASM */
+#ifndef SET_CMD_CASE
+    #define SET_CMD_CASE(name, args_count)   {#name, CMD_ ## name, (args_count)}
+#endif /* SET_CMD_CASE */
 
-const size_t COMM_CASES_SIZE = sizeof(COMM_CASES) / sizeof(COMM_CASES[0]);
+const CmdCase_t CMD_CASES[] =
+    {SET_CMD_CASE (HLT,   1),
+     SET_CMD_CASE (PUSH,  2),
+     SET_CMD_CASE (OUT,   1),
+     SET_CMD_CASE (IN,    1),
+     SET_CMD_CASE (CALL,  2),
+     SET_CMD_CASE (RET,   1),
+     SET_CMD_CASE (ADD,   1),
+     SET_CMD_CASE (SUB,   1),
+     SET_CMD_CASE (MUL,   1),
+     SET_CMD_CASE (DIV,   1),
+     SET_CMD_CASE (MOD,   1),
+     SET_CMD_CASE (SQRT,  1),
+     SET_CMD_CASE (SQR,   1),
+     SET_CMD_CASE (JMP,   2),
+     SET_CMD_CASE (JB,    2),
+     SET_CMD_CASE (JBE,   2),
+     SET_CMD_CASE (JA,    2),
+     SET_CMD_CASE (JAE,   2),
+     SET_CMD_CASE (JE,    2),
+     SET_CMD_CASE (JNE,   2),
+     SET_CMD_CASE (PUSHR, 2),
+     SET_CMD_CASE (POPR,  2),
+     SET_CMD_CASE (PUSHM, 2),
+     SET_CMD_CASE (POPM,  2),
+     SET_CMD_CASE (DRAW,  2)};
+
+const size_t CMD_CASES_SIZE = sizeof(CMD_CASES) / sizeof(CMD_CASES[0]);
 
 const int CMD_MAX_LEN = 50;
 

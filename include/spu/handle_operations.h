@@ -26,9 +26,9 @@ typedef enum HandleOpErr {
 } HandleOpErr_t;
 
 typedef struct CalcData {
-    HandleOpErr_t number1;
-    HandleOpErr_t number2;
-    HandleOpErr_t result;
+    int number1;
+    int number2;
+    int result;
 } CalcData_t;
 
 MathErr_t Add(CalcData_t* calc_data);

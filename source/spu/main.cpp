@@ -1,7 +1,3 @@
-#include <TXLib.h>
-#include "stack.h"
-#include "input.h"
-#include "operations.h"
 #include "processor.h"
 #include "config.h"
 

@@ -323,7 +323,7 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
     DPRINTF("Executing commands...\n");
     PROC_OK_DEBUG(proc_data);
 
-    Command_t command = CMD_HLT;
+    Command_t command = CMD_END;
     int break_loop = 0;
 
     while (proc_data->cmd_count < proc_data->code_size)
@@ -336,7 +336,7 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
             return PROC_UNKNOWN_COMMAND;
         }
         DPRINTF(PURPLE "\ncode[%zu]: cmd = %d (%s)\n" RESET_CLR,
-                proc_data->cmd_count, command, COMM_CASES[command].str_command);
+                proc_data->cmd_count, command, CMD_CASES[command].str_command);
 
         if (ProcExecuteOperation(proc_data, command, &break_loop) != PROC_SUCCESS)
         {
@@ -370,23 +370,23 @@ ProcErr_t ProcGetCommand(Proc_t* proc_data, Command_t* command)
     return PROC_SUCCESS;
 }
 
-ProcErr_t ProcExecuteOperation(Proc_t* proc_data, Command_t command, int break_loop)
+ProcErr_t ProcExecuteOperation(Proc_t* proc_data, Command_t command, int* break_loop)
 {
     PROC_OK_DEBUG(proc_data);
 
-    if (command == HLT)
-    {
-        *break_loop = 1;
-        return PROC_SUCCESS;
-    }
-
-    if (command < 0 || command >= SPU_HANDLE_OP_TABLE_SIZE)
+    if (command < 0 || command >= CMD_CASES_SIZE)
     {
         DPRINTF("Invalid command for ProcRunCommand()");
         return PROC_UNKNOWN_COMMAND;
     }
 
-    if (SPU_HANDLE_OP_TABLE[command](proc_data))
+    HandleOpErr_t handle_op_return = CMD_CASES[command].handle_op(proc_data);
+    if (handle_op_return == HANDLE_OP_BREAK_LOOP)
+    {
+        *break_loop = 1;
+        return PROC_SUCCESS;
+    }
+    else if (handle_op_return != HANDLE_OP_SUCCESS)
     {
         return PROC_EXECUTE_OP_ERROR;
     }

@@ -1,14 +1,13 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 
-#include "operations.h"
+#include "handle_operations.h"
 #include "input.h"
 #include "stack.h"
 #include "commands.h"
 #include "spu_types.h"
 #include "config.h"
 #include "colors.h"
-#include "spu_commands.h"
 
 #ifdef PROC_DEBUG
 #define PROC_OK_DEBUG(proc_data)                                            \
@@ -47,7 +46,7 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data);
 
 ProcErr_t ProcGetCommand(Proc_t* proc_data, Command_t* command);
 
-ProcErr_t ProcExecuteOperation(Proc_t* proc_data, Command_t command, int break_loop);
+ProcErr_t ProcExecuteOperation(Proc_t* proc_data, Command_t command, int* break_loop);
 
 ProcErr_t ProcDtor(Proc_t* proc_data);
 

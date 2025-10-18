@@ -14,7 +14,7 @@ PROCFLAGS = $(CXXFLAGS) -Iinclude -Iinclude/spu
 
 PROCSOURCES = source/spu/main.cpp \
 			  source/spu/stack.cpp \
-			  source/spu/operations.cpp \
+			  source/spu/handle_operations.cpp \
 			  source/spu/processor.cpp \
 			  source/input.cpp
 
@@ -46,10 +46,10 @@ all:
 	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(EXECUTABLE)
 
 asm:
-	$(CXX) $(ASMFLAGS) $(ASMSOURCES) -o $(ASMEXECUTABLE)
+	$(CXX) -DASM $(ASMFLAGS) $(ASMSOURCES) -o $(ASMEXECUTABLE)
 
 spu:
-	$(CXX) $(PROCFLAGS) $(PROCSOURCES) -o $(PROCEXECUTABLE)
+	$(CXX) -DSPU $(PROCFLAGS) $(PROCSOURCES) -o $(PROCEXECUTABLE)
 
 clean:
 	rm $(PROCOUTPUTS) $(ASMOUTPUTS) $(PROCEXECUTABLE) $(ASMEXECUTABLE)
