@@ -1,10 +1,10 @@
-# RPN-calculator
-Calculator using reverse Polish notation
+# SPU + ASM
+Soft processor unit and assembler
 
 ## Build compiler
 
 ```powershell
-  make compiler
+  make asm
 ```
 
 ## Build programm
@@ -17,7 +17,7 @@ Calculator using reverse Polish notation
 
 Build compiler
 ```powershell
-  make compiler DEBUG=1
+  make asm DEBUG=1
 ```
 
 Build programm
@@ -27,7 +27,11 @@ Build programm
 
 ## Compiling
 ```powershell
-  compile.exe
+  compile.exe <your_code.asm> <bitecode_name.bin>
+```
+### For assembler listing
+```powershell
+  compile.exe <your_code.asm> <bitecode_name.bin> LIST=1
 ```
 
 ## Usage
@@ -51,7 +55,7 @@ Input file example
 
 Execute programm
 ```powershell
-  run.exe
+  run <bytecode_name.bin>
 ```
 
 Output of the example
