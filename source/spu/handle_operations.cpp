@@ -37,36 +37,55 @@ DECLARE_HANDLE_JUMP_IF(>=, JAE);
 DECLARE_HANDLE_JUMP_IF(==, JE);
 DECLARE_HANDLE_JUMP_IF(!=, JNE);
 
-#define DECLARE_HANDLE_MATH_OP(cmd_name, calculate)                             \
+#define DECLARE_HANDLE_BINARY_MATH_OP(cmd_name, math_oper, check_errors)        \
     HandleOpErr_t Handle##cmd_name(Proc_t* proc_data)                           \
     {                                                                           \
         assert(proc_data->stack.size >= 2);                                     \
                                                                                 \
-        CalcData_t calc_data = {};                                              \
-        if (StackPop(&proc_data->stack, &calc_data.number1) != STACK_SUCCESS)   \
+        int number1 = 0;                                                        \
+        int number2 = 0;                                                        \
+                                                                                \
+        if (StackPop(&proc_data->stack, &number2) != STACK_SUCCESS)             \
         {                                                                       \
             return HANDLE_OP_STACK_ERROR;                                       \
         }                                                                       \
-        if (StackPop(&proc_data->stack, &calc_data.number2) != STACK_SUCCESS)   \
+        if (StackPop(&proc_data->stack, &number1) != STACK_SUCCESS)             \
         {                                                                       \
             return HANDLE_OP_STACK_ERROR;                                       \
         }                                                                       \
-        if (calculate(&calc_data) != MATH_SUCCESS)                              \
-        {                                                                       \
-            return HANDLE_OP_DIVISION_BY_ZERO;                                  \
-        }                                                                       \
-        if (StackPush(&proc_data->stack, calc_data.result) != STACK_SUCCESS)    \
+                                                                                \
+        check_errors;                                                           \
+        int result = number1 math_oper number2;                                 \
+        DPRINTF("\t" #cmd_name ": %d %s %d = %d\n",                             \
+                number1, #math_oper, number2, result);                          \
+                                                                                \
+        if (StackPush(&proc_data->stack, result) != STACK_SUCCESS)              \
         {                                                                       \
             return HANDLE_OP_STACK_ERROR;                                       \
         }                                                                       \
         return HANDLE_OP_SUCCESS;                                               \
     }
 
-DECLARE_HANDLE_MATH_OP(ADD, Add); // +
-DECLARE_HANDLE_MATH_OP(SUB, Sub); // -
-DECLARE_HANDLE_MATH_OP(MUL, Mul);
-DECLARE_HANDLE_MATH_OP(DIV, Div); // / , {if (b == 0) Error();}
-DECLARE_HANDLE_MATH_OP(MOD, Mod);
+DECLARE_HANDLE_BINARY_MATH_OP(ADD, +, {};);
+DECLARE_HANDLE_BINARY_MATH_OP(SUB, -, {};);
+DECLARE_HANDLE_BINARY_MATH_OP(MUL, *, {};);
+DECLARE_HANDLE_BINARY_MATH_OP(DIV, /, {if (number2 == 0) {printf("Error: division by zero\n"); return HANDLE_OP_DIVISION_BY_ZERO;}});
+DECLARE_HANDLE_BINARY_MATH_OP(MOD, /, {if (number2 == 0) {printf("Error: division by zero\n"); return HANDLE_OP_DIVISION_BY_ZERO;}});
+
+int Jump(Proc_t* proc_data, int new_cmd_count)
+{
+    assert(proc_data != NULL);
+
+    if (new_cmd_count > proc_data->code_size || new_cmd_count < 0)
+    {
+        DPRINTF("Invalid argument for jump\n");
+        return 1;
+    }
+    proc_data->cmd_count = new_cmd_count;
+    DPRINTF("\t   jumping to %d\n", new_cmd_count);
+
+    return 0;
+}
 
 HandleOpErr_t HandleHLT(Proc_t* proc_data)
 {
@@ -83,6 +102,96 @@ HandleOpErr_t HandlePUSH(Proc_t* proc_data)
     if (StackPush(&proc_data->stack, value) != STACK_SUCCESS)
     {
         return HANDLE_OP_STACK_ERROR;
+    }
+
+    return HANDLE_OP_SUCCESS;
+}
+
+HandleOpErr_t HandleOUT(Proc_t* proc_data)
+{
+    assert(proc_data != NULL);
+
+    int result = 0;
+    StackErr_t pop_return = StackPop(&proc_data->stack, &result);
+
+    if (pop_return == STACK_SIZE_IS_ZERO)
+    {
+        return HANDLE_OP_SUCCESS;
+    }
+    if (pop_return != STACK_SUCCESS)
+    {
+        return HANDLE_OP_STACK_ERROR;
+    }
+    printf("ANSWER = %d\n", result);
+    fflush(stdout);
+
+    DPRINTF("\tOUT: %d\n", result);
+
+    return HANDLE_OP_SUCCESS;
+}
+
+HandleOpErr_t HandleIN(Proc_t* proc_data)
+{
+    assert(proc_data != NULL);
+
+    int value = 0;
+    printf("Enter int value: ");
+    if (scanf("%d", &value) != 1)
+    {
+        printf("Input is wrong, try better :)\n");
+        return HANDLE_OP_INPUT_ERROR;
+    }
+
+#ifdef PROC_DEBUG
+    getchar();
+#endif /* PROC_DEBUG */
+
+    if (StackPush(&proc_data->stack, value) != STACK_SUCCESS)
+    {
+        return HANDLE_OP_STACK_ERROR;
+    }
+    DPRINTF("\tIN: got and pushed %d\n", value);
+
+    return HANDLE_OP_SUCCESS;
+}
+
+HandleOpErr_t HandleCALL(Proc_t* proc_data)
+{
+    assert(proc_data != NULL);
+
+    int new_cmd_count = proc_data->code[proc_data->cmd_count++];
+
+    if (StackPush(&proc_data->call_stack, proc_data->cmd_count) != STACK_SUCCESS)
+    {
+        return HANDLE_OP_STACK_ERROR;
+    }
+
+    DPRINTF("\tCALL: pushed %zu to call_stack\n", proc_data->cmd_count);
+
+    if (Jump(proc_data, new_cmd_count))
+    {
+        return HANDLE_OP_INVALID_JUMP_ARG;
+    }
+
+    return HANDLE_OP_SUCCESS;
+}
+
+HandleOpErr_t HandleRET(Proc_t* proc_data)
+{
+    assert(proc_data != NULL);
+
+    int call_address = -1;
+
+    if (StackPop(&proc_data->call_stack, &call_address) != STACK_SUCCESS)
+    {
+        return HANDLE_OP_STACK_ERROR;
+    }
+
+    DPRINTF("\tRET: returning to %d\n", call_address);
+
+    if (Jump(proc_data, call_address))
+    {
+        return HANDLE_OP_INVALID_JUMP_ARG;
     }
 
     return HANDLE_OP_SUCCESS;
@@ -126,90 +235,41 @@ HandleOpErr_t HandleSQR(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
-MathErr_t Add(CalcData_t* calc_data)
-{
-    assert(calc_data != NULL);
-    assert(calc_data->result == 0);
-
-    calc_data->result = calc_data->number1 + calc_data->number2;
-    DPRINTF("\tADD: %d + %d = %d\n", calc_data->number2, calc_data->number1, calc_data->result);
-
-    return MATH_SUCCESS;
-}
-
-MathErr_t Sub(CalcData_t* calc_data)
-{
-    assert(calc_data != NULL);
-    assert(calc_data->result == 0);
-
-    calc_data->result = calc_data->number2 - calc_data->number1;
-    DPRINTF("\tSUB: %d - %d = %d\n", calc_data->number2, calc_data->number1, calc_data->result);
-
-    return MATH_SUCCESS;
-}
-
-MathErr_t Mul(CalcData_t* calc_data)
-{
-    assert(calc_data != NULL);
-    assert(calc_data->result == 0);
-
-    calc_data->result = calc_data->number1 * calc_data->number2;
-    DPRINTF("\tMUL: %d * %d = %d\n", calc_data->number2, calc_data->number1, calc_data->result);
-
-    return MATH_SUCCESS;
-}
-
-MathErr_t Div(CalcData_t* calc_data)
-{
-    assert(calc_data != NULL);
-    assert(calc_data->result == 0);
-
-    if (calc_data->number1 == 0)
-    {
-        printf("Can not divide by zero\n");
-        return MATH_DIVISION_BY_ZERO;
-    }
-    calc_data->result = calc_data->number2 / calc_data->number1;
-    DPRINTF("\tDIV: %d / %d = %d\n", calc_data->number2, calc_data->number1, calc_data->result);
-
-    return MATH_SUCCESS;
-}
-
-MathErr_t Mod(CalcData_t* calc_data)
-{
-    assert(calc_data != NULL);
-    assert(calc_data->result == 0);
-
-    if (calc_data->number1 == 0)
-    {
-        printf("Can not divide by zero\n");
-        return MATH_DIVISION_BY_ZERO;
-    }
-    calc_data->result = calc_data->number2 % calc_data->number1;
-    DPRINTF("\tMOD: %d %% %d = %d\n", calc_data->number2, calc_data->number1, calc_data->result);
-
-    return MATH_SUCCESS;
-}
-
-HandleOpErr_t HandleOUT(Proc_t* proc_data)
+HandleOpErr_t HandleJMP(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
-    int result = 0;
-    StackErr_t pop_return = StackPop(&proc_data->stack, &result);
+    int new_cmd_count = proc_data->code[proc_data->cmd_count++];
 
-    if (pop_return == STACK_SIZE_IS_ZERO)
+    DPRINTF("\tJMP: ");
+    if (Jump(proc_data, new_cmd_count))
     {
-        return HANDLE_OP_SUCCESS;
+        return HANDLE_OP_INVALID_JUMP_ARG;
     }
-    if (pop_return != STACK_SUCCESS)
+
+    return HANDLE_OP_SUCCESS;
+}
+
+HandleOpErr_t HandlePUSHR(Proc_t* proc_data)
+{
+    assert(proc_data != NULL);
+
+    int index = proc_data->code[proc_data->cmd_count++];
+
+    if (index < 0 || index > 7)
+    {
+        DPRINTF("Invalid register index given\n");
+        return HANDLE_OP_INVALID_REG_ARG;
+    }
+    if (StackPush(&proc_data->stack, proc_data->regs[index]) != STACK_SUCCESS)
     {
         return HANDLE_OP_STACK_ERROR;
     }
-    printf("ANSWER = %d\n", result);
-    fflush(stdout);
 
-    DPRINTF("\tOUT: %d\n", result);
+    DPRINTF("\tPUSHR: reg[%d] = %d (R%cX)\n"
+            "\t\tpushed %d\n",
+            index, proc_data->regs[index],
+            index + 'A', proc_data->regs[index]);
 
     return HANDLE_OP_SUCCESS;
 }
@@ -241,127 +301,6 @@ HandleOpErr_t HandlePOPR(Proc_t* proc_data)
     DPRINTF("\tPOPR: poped %d\n"
             "\t\treg[%d] = %d (R%cX)\n",
             value, index, value, index + 'A');
-
-    return HANDLE_OP_SUCCESS;
-}
-
-HandleOpErr_t HandlePUSHR(Proc_t* proc_data)
-{
-    assert(proc_data != NULL);
-
-    int index = proc_data->code[proc_data->cmd_count++];
-
-    if (index < 0 || index > 7)
-    {
-        DPRINTF("Invalid register index given\n");
-        return HANDLE_OP_INVALID_REG_ARG;
-    }
-    if (StackPush(&proc_data->stack, proc_data->regs[index]) != STACK_SUCCESS)
-    {
-        return HANDLE_OP_STACK_ERROR;
-    }
-
-    DPRINTF("\tPUSHR: reg[%d] = %d (R%cX)\n"
-            "\t\tpushed %d\n",
-            index, proc_data->regs[index],
-            index + 'A', proc_data->regs[index]);
-
-    return HANDLE_OP_SUCCESS;
-}
-
-HandleOpErr_t HandleIN(Proc_t* proc_data)
-{
-    assert(proc_data != NULL);
-
-    int value = 0;
-    printf("Enter int value: ");
-    if (scanf("%d", &value) != 1)
-    {
-        printf("Input is wrong, try better :)\n");
-        return HANDLE_OP_INPUT_ERROR;
-    }
-
-#ifdef PROC_DEBUG
-    getchar();
-#endif /* PROC_DEBUG */
-
-    if (StackPush(&proc_data->stack, value) != STACK_SUCCESS)
-    {
-        return HANDLE_OP_STACK_ERROR;
-    }
-    DPRINTF("\tIN: got and pushed %d\n", value);
-
-    return HANDLE_OP_SUCCESS;
-}
-
-HandleOpErr_t HandleJMP(Proc_t* proc_data)
-{
-    assert(proc_data != NULL);
-
-    int new_cmd_count = proc_data->code[proc_data->cmd_count++];
-
-    DPRINTF("\tJMP: ");
-    if (Jump(proc_data, new_cmd_count))
-    {
-        return HANDLE_OP_INVALID_JUMP_ARG;
-    }
-
-    return HANDLE_OP_SUCCESS;
-}
-
-int Jump(Proc_t* proc_data, int new_cmd_count)
-{
-    assert(proc_data != NULL);
-
-    if (new_cmd_count > proc_data->code_size || new_cmd_count < 0)
-    {
-        DPRINTF("Invalid argument for jump\n");
-        return 1;
-    }
-    proc_data->cmd_count = new_cmd_count;
-    DPRINTF("\t   jumping to %d\n", new_cmd_count);
-
-    return 0;
-}
-
-HandleOpErr_t HandleCALL(Proc_t* proc_data)
-{
-    assert(proc_data != NULL);
-
-    int new_cmd_count = proc_data->code[proc_data->cmd_count++];
-
-    if (StackPush(&proc_data->call_stack, proc_data->cmd_count) != STACK_SUCCESS)
-    {
-        return HANDLE_OP_STACK_ERROR;
-    }
-
-    DPRINTF("\tCALL: pushed %zu to call_stack\n", proc_data->cmd_count);
-
-    if (Jump(proc_data, new_cmd_count))
-    {
-        return HANDLE_OP_INVALID_JUMP_ARG;
-    }
-
-    return HANDLE_OP_SUCCESS;
-}
-
-HandleOpErr_t HandleRET(Proc_t* proc_data)
-{
-    assert(proc_data != NULL);
-
-    int call_address = -1;
-
-    if (StackPop(&proc_data->call_stack, &call_address) != STACK_SUCCESS)
-    {
-        return HANDLE_OP_STACK_ERROR;
-    }
-
-    DPRINTF("\tRET: returning to %d\n", call_address);
-
-    if (Jump(proc_data, call_address))
-    {
-        return HANDLE_OP_INVALID_JUMP_ARG;
-    }
 
     return HANDLE_OP_SUCCESS;
 }

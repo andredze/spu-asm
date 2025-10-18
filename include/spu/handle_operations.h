@@ -8,12 +8,6 @@
 #include "input.h"
 #include "spu_types.h"
 
-typedef enum MathErr {
-    MATH_SUCCESS,
-    MATH_DIVISION_BY_ZERO,
-    MATH_STACK_ERROR,
-} MathErr_t;
-
 typedef enum HandleOpErr {
     HANDLE_OP_SUCCESS,
     HANDLE_OP_DIVISION_BY_ZERO,
@@ -24,22 +18,6 @@ typedef enum HandleOpErr {
     HANDLE_OP_INPUT_ERROR,
     HANDLE_OP_BREAK_LOOP
 } HandleOpErr_t;
-
-typedef struct CalcData {
-    int number1;
-    int number2;
-    int result;
-} CalcData_t;
-
-MathErr_t Add(CalcData_t* calc_data);
-
-MathErr_t Sub(CalcData_t* calc_data);
-
-MathErr_t Mul(CalcData_t* calc_data);
-
-MathErr_t Div(CalcData_t* calc_data);
-
-MathErr_t Mod(CalcData_t* calc_data);
 
 int Jump(Proc_t* proc_data, int new_cmd_count);
 
