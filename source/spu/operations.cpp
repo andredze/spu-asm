@@ -32,12 +32,12 @@
         return 0; \
     }
 
-DECLARE_HANDLE_JUMP_IF(<,  JB);
-DECLARE_HANDLE_JUMP_IF(<=, JBE);
-DECLARE_HANDLE_JUMP_IF(>,  JA);
-DECLARE_HANDLE_JUMP_IF(>=, JAE);
-DECLARE_HANDLE_JUMP_IF(==, JE);
-DECLARE_HANDLE_JUMP_IF(!=, JNE);
+DECLARE_HANDLE_JUMP_IF(<,  Jb);
+DECLARE_HANDLE_JUMP_IF(<=, Jbe);
+DECLARE_HANDLE_JUMP_IF(>,  Ja);
+DECLARE_HANDLE_JUMP_IF(>=, Jae);
+DECLARE_HANDLE_JUMP_IF(==, Je);
+DECLARE_HANDLE_JUMP_IF(!=, Jne);
 
 #define DECLARE_HANDLE_MATH_OP(cmd_name, calculate) \
     int Handle##cmd_name(Proc_t* proc_data) \
@@ -67,11 +67,11 @@ DECLARE_HANDLE_JUMP_IF(!=, JNE);
         return 0; \
     }
 
-DECLARE_HANDLE_MATH_OP(ADD, Add);
-DECLARE_HANDLE_MATH_OP(SUB, Sub);
-DECLARE_HANDLE_MATH_OP(MUL, Mul);
-DECLARE_HANDLE_MATH_OP(DIV, Div);
-DECLARE_HANDLE_MATH_OP(MOD, Mod);
+DECLARE_HANDLE_MATH_OP(Add, Add);
+DECLARE_HANDLE_MATH_OP(Sub, Sub);
+DECLARE_HANDLE_MATH_OP(Mul, Mul);
+DECLARE_HANDLE_MATH_OP(Div, Div);
+DECLARE_HANDLE_MATH_OP(Mod, Mod);
 
 int HandleSqrt(Proc_t* proc_data)
 {
@@ -266,7 +266,7 @@ int HandleJmp(Proc_t* proc_data)
 
     int new_cmd_count = proc_data->code[proc_data->cmd_count++];
 
-    DPRINTF("\tJMP: ", new_cmd_count);
+    DPRINTF("\tJMP: ");
     if (Jump(proc_data, new_cmd_count))
     {
         return 1;
@@ -285,7 +285,7 @@ int Jump(Proc_t* proc_data, int new_cmd_count)
         return 1;
     }
     proc_data->cmd_count = new_cmd_count;
-    DPRINTF("\t   jumping to %zu\n", new_cmd_count);
+    DPRINTF("\t   jumping to %d\n", new_cmd_count);
 
     return 0;
 }
@@ -301,7 +301,7 @@ int HandleCall(Proc_t* proc_data)
         return PROC_STACK_ERROR;
     }
 
-    DPRINTF("\tCALL: pushed %d to call_stack\n", proc_data->cmd_count);
+    DPRINTF("\tCALL: pushed %zu to call_stack\n", proc_data->cmd_count);
 
     if (Jump(proc_data, new_cmd_count))
     {
@@ -362,7 +362,7 @@ int HandlePopm(Proc_t* proc_data)
 
     int reg_number = proc_data->code[proc_data->cmd_count++];
     size_t mem_addr = proc_data->regs[reg_number];
-    DPRINTF("\tPOPM: address = regs[%d] (R%cX) = %d\n", reg_number, 'A' + reg_number, mem_addr);
+    DPRINTF("\tPOPM: address = regs[%d] (R%cX) = %zu\n", reg_number, 'A' + reg_number, mem_addr);
 
     if (!(mem_addr <= MAX_RAM_ADDRESS && mem_addr < RAM_SIZE))
     {

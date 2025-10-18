@@ -8,6 +8,7 @@
 #include "spu_types.h"
 #include "config.h"
 #include "colors.h"
+#include "spu_commands.h"
 
 #ifdef PROC_DEBUG
 #define PROC_OK_DEBUG(proc_data) \
@@ -47,8 +48,6 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data);
 ProcErr_t ProcGetCommand(Proc_t* proc_data, Command_t* command);
 
 int ProcRunCommand(Proc_t* proc_data, Command_t command);
-
-int ProcHandleOut(Stack_t* stack, FILE* output_stream);
 
 ProcErr_t ProcDtor(Proc_t* proc_data);
 

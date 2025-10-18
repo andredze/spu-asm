@@ -356,9 +356,7 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
 #endif /* PROC_DEBUG */
 
     }
-    DPRINTF("Executed commands\n");
     printf("---Executed commands---\n");
-    // printf("---Check \"answers.txt\"---\n");
 
     return PROC_SUCCESS;
 }
@@ -376,33 +374,15 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command)
 {
     PROC_OK_DEBUG(proc_data);
 
-    switch (command)
+    if (command < 0 || command >= SPU_HANDLE_OP_TABLE_SIZE)
     {
-        case CMD_PUSH:  return HandlePush(proc_data);
-        case CMD_ADD:   return HandleADD(proc_data);
-        case CMD_SUB:   return HandleSUB(proc_data);
-        case CMD_MUL:   return HandleMUL(proc_data);
-        case CMD_DIV:   return HandleDIV(proc_data);
-        case CMD_MOD:   return HandleMOD(proc_data);
-        case CMD_SQRT:  return HandleSqrt(proc_data);
-        case CMD_OUT:   return HandleOut(proc_data);
-        case CMD_POPR:  return HandlePopr(proc_data);
-        case CMD_PUSHR: return HandlePushr(proc_data);
-        case CMD_IN:    return HandleIn(proc_data);
-        case CMD_JMP:   return HandleJmp(proc_data);
-        case CMD_JB:    return HandleJB (proc_data);
-        case CMD_JBE:   return HandleJBE(proc_data);
-        case CMD_JA:    return HandleJA (proc_data);
-        case CMD_JAE:   return HandleJAE(proc_data);
-        case CMD_JE:    return HandleJE (proc_data);
-        case CMD_JNE:   return HandleJNE(proc_data);
-        case CMD_CALL:  return HandleCall(proc_data);
-        case CMD_RET:   return HandleRet(proc_data);
-        case CMD_PUSHM: return HandlePushm(proc_data);
-        case CMD_POPM:  return HandlePopm(proc_data);
-        case CMD_DRAW:  return HandleDraw(proc_data);
-        case CMD_HLT:   return 1;
-        default:        return 1;
+        DPRINTF("Invalid command for ProcRunCommand()");
+        return 1;
+    }
+
+    if (SPU_HANDLE_OP_TABLE[command](proc_data))
+    {
+        return 1;
     }
 
     return 0;
