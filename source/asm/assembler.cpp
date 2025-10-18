@@ -3,10 +3,18 @@
 
 int SetFilenames(const char** commands_filename,
                  const char** bytecode_filename,
-                 int argc, char* argv[])
+                 int argc, char* argv[], int* listing_flag)
 {
     switch (argc)
     {
+        case 4:
+            *commands_filename = argv[1];
+            *bytecode_filename = argv[2];
+            if (strcmp(argv[3], "LIST=1") == 0)
+            {
+                *listing_flag = 1;
+            }
+            break;
         case 3:
             *commands_filename = argv[1];
             *bytecode_filename = argv[2];
@@ -27,7 +35,7 @@ int SetFilenames(const char** commands_filename,
     return 0;
 }
 
-AsmErr_t CompileProgramm(InputCtx_t* input_ctx)
+AsmErr_t CompileProgramm(InputCtx_t* input_ctx, int listing_flag)
 {
     assert(input_ctx != NULL);
 
@@ -45,7 +53,7 @@ AsmErr_t CompileProgramm(InputCtx_t* input_ctx)
     }
 
     AsmErr_t error = ASM_SUCCESS;
-    if ((error = CompileCommands(input_ctx, &asm_ctx)) != ASM_SUCCESS)
+    if ((error = CompileCommands(input_ctx, &asm_ctx, 0)) != ASM_SUCCESS)
     {
         return error;
     }
@@ -53,7 +61,7 @@ AsmErr_t CompileProgramm(InputCtx_t* input_ctx)
 
     // two-pass compilation for labels that are declared after usage
     asm_ctx.cur_cmd = 0; // reset current compile command to start
-    if ((error = CompileCommands(input_ctx, &asm_ctx)) != ASM_SUCCESS)
+    if ((error = CompileCommands(input_ctx, &asm_ctx, listing_flag)) != ASM_SUCCESS)
     {
         return error;
     }
@@ -108,18 +116,20 @@ int AsmCtxCtor(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx)
 }
 
 AsmErr_t CompileCommands(InputCtx_t* input_ctx,
-                         AsmCtx_t* asm_ctx)
+                         AsmCtx_t* asm_ctx,
+                         int listing_flag)
 {
     assert(input_ctx != NULL);
     assert(asm_ctx != NULL);
 
-#ifdef LISTING
     FileInfo_t listing_file_info = {};
-    if (CreateListingFile(input_ctx, &listing_file_info))
+    if (listing_flag == 1)
     {
-        return ASM_CREATE_LISTING_ERROR;
+        if (CreateListingFile(input_ctx, &listing_file_info))
+        {
+            return ASM_CREATE_LISTING_ERROR;
+        }
     }
-#endif /* LISTING */
 
     CmdCtx_t cmd_ctx = {};
     char* comment_start = NULL;
@@ -153,17 +163,19 @@ AsmErr_t CompileCommands(InputCtx_t* input_ctx,
         {
             return ASM_ADD_OP_ERROR;
         }
-#ifdef LISTING
-        if (AddStringToListing(&cmd_ctx, asm_ctx, listing_file_info.stream) != ASM_SUCCESS)
+        if (listing_flag == 1)
         {
-            fclose(listing_file_info.stream);
-            return ASM_LISTING_ERROR;
+            if (AddStringToListing(&cmd_ctx, asm_ctx, listing_file_info.stream) != ASM_SUCCESS)
+            {
+                fclose(listing_file_info.stream);
+                return ASM_LISTING_ERROR;
+            }
         }
-#endif /* LISTING */
     }
-#ifdef LISTING
-    fclose(listing_file_info.stream);
-#endif /* LISTING */
+    if (listing_flag == 1)
+    {
+        fclose(listing_file_info.stream);
+    }
     return ASM_SUCCESS;
 }
 
