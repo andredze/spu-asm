@@ -1,34 +1,34 @@
 #include <TXLib.h>
 #include "operations.h"
 
-#define DECLARE_HANDLE_JUMP_IF(comp_oper, cmd_name) \
-    int Handle##cmd_name(Proc_t* proc_data) \
-    { \
-        assert(proc_data != NULL); \
-        \
-        int new_cmd_count = proc_data->code[proc_data->cmd_count++]; \
-        int number1 = 0; \
-        int number2 = 0; \
-        if (StackPop(&proc_data->stack, &number2)) \
-        { \
-            return 1; \
-        } \
-        if (StackPop(&proc_data->stack, &number1)) \
-        { \
-            return 1; \
-        } \
-        DPRINTF("\t" #cmd_name ": (%d " #comp_oper " %d) == %d\n", \
-                number1, number2, number1 comp_oper number2); \
-        if (!(number1 comp_oper number2)) \
-        { \
-            DPRINTF("\tJMP rejected\n"); \
-            return 0; \
-        } \
-        if (Jump(proc_data, new_cmd_count)) \
-        { \
-            return 1; \
-        } \
-        return 0; \
+#define DECLARE_HANDLE_JUMP_IF(comp_oper, cmd_name)                     \
+    int Handle##cmd_name(Proc_t* proc_data)                             \
+    {                                                                   \
+        assert(proc_data != NULL);                                      \
+                                                                        \
+        int new_cmd_count = proc_data->code[proc_data->cmd_count++];    \
+        int number1 = 0;                                                \
+        int number2 = 0;                                                \
+        if (StackPop(&proc_data->stack, &number2))                      \
+        {                                                               \
+            return 1;                                                   \
+        }                                                               \
+        if (StackPop(&proc_data->stack, &number1))                      \
+        {                                                               \
+            return 1;                                                   \
+        }                                                               \
+        DPRINTF("\t" #cmd_name ": (%d " #comp_oper " %d) == %d\n",      \
+                number1, number2, number1 comp_oper number2);           \
+        if (!(number1 comp_oper number2))                               \
+        {                                                               \
+            DPRINTF("\tJMP rejected\n");                                \
+            return 0;                                                   \
+        }                                                               \
+        if (Jump(proc_data, new_cmd_count))                             \
+        {                                                               \
+            return 1;                                                   \
+        }                                                               \
+        return 0;                                                       \
     }
 
 DECLARE_HANDLE_JUMP_IF(<,  Jb);
@@ -38,38 +38,35 @@ DECLARE_HANDLE_JUMP_IF(>=, Jae);
 DECLARE_HANDLE_JUMP_IF(==, Je);
 DECLARE_HANDLE_JUMP_IF(!=, Jne);
 
-#define DECLARE_HANDLE_MATH_OP(cmd_name, calculate) \
-    int Handle##cmd_name(Proc_t* proc_data) \
-    { \
-        assert(proc_data->stack.size >= 2); \
-        \
-        CalcData_t calc_data = {}; \
-        \
-        if (StackPop(&proc_data->stack, &calc_data.number1) != STACK_SUCCESS) \
-        { \
-            return 1; \
-        } \
-        if (StackPop(&proc_data->stack, &calc_data.number2) != STACK_SUCCESS) \
-        { \
-            return 1; \
-        } \
-        \
-        if (calculate(&calc_data) != MATH_SUCCESS) \
-        { \
-            return 2; \
-        } \
-        if (StackPush(&proc_data->stack, calc_data.result) != STACK_SUCCESS) \
-        { \
-            return 1; \
-        } \
-        \
-        return 0; \
+#define DECLARE_HANDLE_MATH_OP(cmd_name, calculate)                             \
+    int Handle##cmd_name(Proc_t* proc_data)                                     \
+    {                                                                           \
+        assert(proc_data->stack.size >= 2);                                     \
+                                                                                \
+        CalcData_t calc_data = {};                                              \
+        if (StackPop(&proc_data->stack, &calc_data.number1) != STACK_SUCCESS)   \
+        {                                                                       \
+            return 1;                                                           \
+        }                                                                       \
+        if (StackPop(&proc_data->stack, &calc_data.number2) != STACK_SUCCESS)   \
+        {                                                                       \
+            return 1;                                                           \
+        }                                                                       \
+        if (calculate(&calc_data) != MATH_SUCCESS)                              \
+        {                                                                       \
+            return 2;                                                           \
+        }                                                                       \
+        if (StackPush(&proc_data->stack, calc_data.result) != STACK_SUCCESS)    \
+        {                                                                       \
+            return 1;                                                           \
+        }                                                                       \
+        return 0;                                                               \
     }
 
-DECLARE_HANDLE_MATH_OP(Add, Add);
-DECLARE_HANDLE_MATH_OP(Sub, Sub);
+DECLARE_HANDLE_MATH_OP(Add, Add); // +
+DECLARE_HANDLE_MATH_OP(Sub, Sub); // -
 DECLARE_HANDLE_MATH_OP(Mul, Mul);
-DECLARE_HANDLE_MATH_OP(Div, Div);
+DECLARE_HANDLE_MATH_OP(Div, Div); // / , {if (b == 0) Error();}
 DECLARE_HANDLE_MATH_OP(Mod, Mod);
 
 int HandleSqrt(Proc_t* proc_data)
