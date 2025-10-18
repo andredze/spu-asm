@@ -19,17 +19,17 @@ typedef struct CalcData {
     int result;
 } CalcData_t;
 
-int HandleJB(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+int HandleJB(Proc_t* proc_data, int new_cmd_count);
 
-int HandleJBE(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+int HandleJBE(Proc_t* proc_data, int new_cmd_count);
 
-int HandleJA(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+int HandleJA(Proc_t* proc_data, int new_cmd_count);
 
-int HandleJAE(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+int HandleJAE(Proc_t* proc_data, int new_cmd_count);
 
-int HandleJE(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+int HandleJE(Proc_t* proc_data, int new_cmd_count);
 
-int HandleJNE(Proc_t* proc_data, Stack_t* stack, int new_cmd_count);
+int HandleJNE(Proc_t* proc_data, int new_cmd_count);
 
 MathErr_t ExecuteBinaryOperation(Stack_t* stack,
                                MathErr_t (* calculate) (CalcData_t* calc_data));
@@ -46,11 +46,11 @@ MathErr_t Mod(CalcData_t* calc_data);
 
 MathErr_t HandleSqrt(Stack_t* stack);
 
-int HandleOut(Stack_t* stack, FILE* output_stream);
+int HandleOut(Stack_t* stack);
 
-int HandlePopr(Stack_t* stack, Proc_t* proc_data, int index);
+int HandlePopr(Proc_t* proc_data, int index);
 
-int HandlePushr(Stack_t* stack, Proc_t* proc_data, int index);
+int HandlePushr(Proc_t* proc_data, int index);
 
 int HandleIn(Stack_t* stack);
 

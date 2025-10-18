@@ -1,6 +1,25 @@
 #include "processor.h"
 
-// TODO: rename struct names (asm_ctx, spu ...)
+// TODO: rename struct names (spu ...)
+
+int SpuSetFilenames(const char** code_filename,
+                    int argc, char* argv[])
+{
+    switch (argc)
+    {
+        case 2:
+            *code_filename = argv[1];
+            break;
+        case 1:
+            *code_filename = BINARY_BYTECODE_FILENAME;
+            break;
+        default:
+            printf("Too much arguments given, maximum 1 (current arguments = %d)\n", argc);
+            return 1;
+    }
+
+    return 0;
+}
 
 ProcErr_t ProcCtor(Proc_t* proc_data)
 {
@@ -137,7 +156,7 @@ ProcErr_t ProcLoadCode(Proc_t* proc_data, const char* codepath)
     return PROC_SUCCESS;
 }
 
-ProcErr_t ProcDtor(Proc_t* proc_data, FILE* stream)
+ProcErr_t ProcDtor(Proc_t* proc_data)
 {
     DPRINTF("Destroying proc_data...\n");
 
@@ -160,8 +179,6 @@ ProcErr_t ProcDtor(Proc_t* proc_data, FILE* stream)
 
     StackDtor(&proc_data->stack);
     StackDtor(&proc_data->call_stack);
-
-    fclose(stream);
 
     DPRINTF("proc_data destroyed\n");
     return PROC_SUCCESS;
@@ -301,7 +318,7 @@ ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
 }
 #endif /* PROC_DEBUG */
 
-ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
+ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
 {
     DPRINTF("Executing commands...\n");
     PROC_OK_DEBUG(proc_data);
@@ -327,7 +344,7 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
             DPRINTF(RED "\nProgramm ran successfully\n" RESET_CLR);
             break;
         }
-        if (ProcRunCommand(proc_data, command, value, stream))
+        if (ProcRunCommand(proc_data, command, value))
         {
             return PROC_MATH_ERROR;
         }
@@ -341,7 +358,8 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream)
 
     }
     DPRINTF("Executed commands\n");
-    printf("---Check \"answers.txt\"---\n");
+    printf("---Executed commands---\n");
+    // printf("---Check \"answers.txt\"---\n");
 
     return PROC_SUCCESS;
 }
@@ -362,10 +380,8 @@ ProcErr_t ProcGetCommand(Proc_t* proc_data,
     return PROC_SUCCESS;
 }
 
-int ProcRunCommand(Proc_t* proc_data, Command_t command,
-                   int value, FILE* output_stream)
+int ProcRunCommand(Proc_t* proc_data, Command_t command, int value)
 {
-    assert(output_stream != NULL);
     PROC_OK_DEBUG(proc_data);
     Stack_t* stk_ptr = &proc_data->stack;
 
@@ -379,17 +395,17 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command,
         case CMD_DIV:   return ExecuteBinaryOperation(stk_ptr, Div) == MATH_SUCCESS ? 0 : 1;
         case CMD_MOD:   return ExecuteBinaryOperation(stk_ptr, Mod) == MATH_SUCCESS ? 0 : 1;
         case CMD_SQRT:  return HandleSqrt(stk_ptr) == MATH_SUCCESS ? 0 : 1;
-        case CMD_OUT:   return HandleOut(stk_ptr, output_stream);
-        case CMD_POPR:  return HandlePopr(stk_ptr, proc_data, value);
-        case CMD_PUSHR: return HandlePushr(stk_ptr, proc_data, value);
+        case CMD_OUT:   return HandleOut(stk_ptr);
+        case CMD_POPR:  return HandlePopr(proc_data, value);
+        case CMD_PUSHR: return HandlePushr(proc_data, value);
         case CMD_IN:    return HandleIn(stk_ptr);
         case CMD_JMP:   return HandleJmp(proc_data, value);
-        case CMD_JB:    return HandleJB (proc_data, stk_ptr, value);
-        case CMD_JBE:   return HandleJBE(proc_data, stk_ptr, value);
-        case CMD_JA:    return HandleJA (proc_data, stk_ptr, value);
-        case CMD_JAE:   return HandleJAE(proc_data, stk_ptr, value);
-        case CMD_JE:    return HandleJE (proc_data, stk_ptr, value);
-        case CMD_JNE:   return HandleJNE(proc_data, stk_ptr, value);
+        case CMD_JB:    return HandleJB (proc_data, value);
+        case CMD_JBE:   return HandleJBE(proc_data, value);
+        case CMD_JA:    return HandleJA (proc_data, value);
+        case CMD_JAE:   return HandleJAE(proc_data, value);
+        case CMD_JE:    return HandleJE (proc_data, value);
+        case CMD_JNE:   return HandleJNE(proc_data, value);
         case CMD_CALL:  return HandleCall(proc_data, value);
         case CMD_RET:   return HandleRet(proc_data);
         case CMD_PUSHM: return HandlePushm(proc_data, value);

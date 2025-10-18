@@ -3,18 +3,17 @@
 // TODO: add square
 
 #define DECLARE_HANDLE_JUMP_IF(comp_oper, cmd_name) \
-    int Handle##cmd_name(Proc_t* proc_data, Stack_t* stack, int new_cmd_count) \
+    int Handle##cmd_name(Proc_t* proc_data, int new_cmd_count) \
     { \
         assert(proc_data != NULL); \
-        assert(stack != NULL); \
         \
         int number1 = 0; \
         int number2 = 0; \
-        if (StackPop(stack, &number2)) \
+        if (StackPop(&proc_data->stack, &number2)) \
         { \
             return 1; \
         } \
-        if (StackPop(stack, &number1)) \
+        if (StackPop(&proc_data->stack, &number1)) \
         { \
             return 1; \
         } \
@@ -157,10 +156,9 @@ MathErr_t Mod(CalcData_t* calc_data)
     return MATH_SUCCESS;
 }
 
-int HandleOut(Stack_t* stack, FILE* output_stream)
+int HandleOut(Stack_t* stack)
 {
     assert(stack != NULL);
-    assert(output_stream != NULL);
 
     int result = 0;
     StackErr_t pop_return = StackPop(stack, &result);
@@ -173,21 +171,20 @@ int HandleOut(Stack_t* stack, FILE* output_stream)
     {
         return 1;
     }
-    fprintf(output_stream, "ANSWER = %d\n", result);
-    fflush(output_stream);
+    printf("ANSWER = %d\n", result);
+    fflush(stdout);
 
     DPRINTF("\tOUT: %d\n", result);
 
     return 0;
 }
 
-int HandlePopr(Stack_t* stack, Proc_t* proc_data, int index)
+int HandlePopr(Proc_t* proc_data, int index)
 {
-    assert(stack != NULL);
     assert(proc_data != NULL);
 
     int value = 0;
-    StackErr_t pop_return = StackPop(stack, &value);
+    StackErr_t pop_return = StackPop(&proc_data->stack, &value);
 
     if (pop_return == STACK_SIZE_IS_ZERO)
     {
@@ -212,9 +209,8 @@ int HandlePopr(Stack_t* stack, Proc_t* proc_data, int index)
     return 0;
 }
 
-int HandlePushr(Stack_t* stack, Proc_t* proc_data, int index)
+int HandlePushr(Proc_t* proc_data, int index)
 {
-    assert(stack != NULL);
     assert(proc_data != NULL);
 
     if (index < 0 || index > 7)
@@ -222,7 +218,7 @@ int HandlePushr(Stack_t* stack, Proc_t* proc_data, int index)
         DPRINTF("Invalid register index given\n");
         return 1;
     }
-    if (StackPush(stack, proc_data->regs[index]) != STACK_SUCCESS)
+    if (StackPush(&proc_data->stack, proc_data->regs[index]) != STACK_SUCCESS)
     {
         return 1;
     }

@@ -4,13 +4,18 @@
 #include "processor.h"
 #include "config.h"
 
-// TODO: run code from argc
-
-int main()
+int main(int argc, char* argv[])
 {
-    DPRINTF("Programm start\n");
+    const char* code_filename = NULL;
+
+    if (SpuSetFilenames(&code_filename, argc, argv))
+    {
+        return EXIT_FAILURE;
+    }
+    DPRINTF("filename = %s\n", code_filename);
+
     PROC_INIT(proc_data);
-    DPRINTF("Proc initialized\n");
+
     if (ProcCtor(&proc_data) != PROC_SUCCESS)
     {
         return EXIT_FAILURE;
@@ -19,7 +24,7 @@ int main()
     // {
     //     return EXIT_FAILURE;
     // }
-    if (ProcLoadCode(&proc_data, BINARY_BYTECODE_FILENAME) != PROC_SUCCESS)
+    if (ProcLoadCode(&proc_data, code_filename) != PROC_SUCCESS)
     {
         return EXIT_FAILURE;
     }
@@ -40,20 +45,11 @@ int main()
     ProcDump(&proc_data, PROC_SUCCESS);
 #endif /* PROC_DEBUG */
 
-    FILE* stream = fopen(ANSWERS_OUTPUT_FILENAME, "w");
-    if (stream == NULL)
+    if (ProcExecuteCommands(&proc_data) != PROC_SUCCESS)
     {
-        printf("Error opening output file\n");
         return EXIT_FAILURE;
     }
-
-    if (ProcExecuteCommands(&proc_data, stream) != PROC_SUCCESS)
-    {
-        fclose(stream);
-        return EXIT_FAILURE;
-    }
-
-    if (ProcDtor(&proc_data, stream) != PROC_SUCCESS)
+    if (ProcDtor(&proc_data) != PROC_SUCCESS)
     {
         return EXIT_FAILURE;
     }

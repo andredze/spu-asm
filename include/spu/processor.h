@@ -33,24 +33,26 @@
     #define PROC_INIT(name) Proc_t name = {}
 #endif
 
+int SpuSetFilenames(const char** code_filename,
+                    int argc, char* argv[]);
+
 ProcErr_t ProcCtor(Proc_t* proc_data);
 
 ProcErr_t ProcLoadCode(Proc_t* proc_data, const char* codepath);
 
 ProcErr_t ProcLoadPrettyBC(Proc_t* proc_data, const char* codepath);
 
-ProcErr_t ProcExecuteCommands(Proc_t* proc_data, FILE* stream);
+ProcErr_t ProcExecuteCommands(Proc_t* proc_data);
 
 ProcErr_t ProcGetCommand(Proc_t* proc_data,
                          Command_t* command,
                          int* value);
 
-int ProcRunCommand(Proc_t* proc_data, Command_t command,
-                   int value, FILE* output_stream);
+int ProcRunCommand(Proc_t* proc_data, Command_t command, int value);
 
 int ProcHandleOut(Stack_t* stack, FILE* output_stream);
 
-ProcErr_t ProcDtor(Proc_t* proc_data, FILE* stream);
+ProcErr_t ProcDtor(Proc_t* proc_data);
 
 ProcErr_t ProcVerify(Proc_t* proc_data);
 

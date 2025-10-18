@@ -1,7 +1,6 @@
 #include "assembler.h"
 #include "config.h"
 
-// TODO: пропуск пробельных символов
 // TODO: сделать чтобы можно было не писать inputs/...
 
 int SetFilenames(const char** commands_filename,
@@ -54,7 +53,8 @@ AsmErr_t CompileProgramm(InputCtx_t* input_ctx)
     }
     DPrintAsmData(&asm_ctx);
 
-    asm_ctx.cur_cmd = 0; // сброс счетчика
+    // two-pass compilation for labels that are declared after usage
+    asm_ctx.cur_cmd = 0; // reset current compile command to start
     if ((error = CompileCommands(input_ctx, &asm_ctx)) != ASM_SUCCESS)
     {
         return error;
