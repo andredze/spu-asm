@@ -30,14 +30,11 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    DPRINTF("proc_data.code:\n");
-    for (size_t i = 0; i < proc_data.code_size; i++)
-    {
-        DPRINTF("%d, ", proc_data.code[i]);
-    }
-    DPRINTF("\n");
-
 #ifdef PROC_DEBUG
+    if (ProcConsoleDump(&proc_data) != PROC_SUCCESS)
+    {
+        return EXIT_FAILURE;
+    }
     if (ProcVerify(&proc_data) != PROC_SUCCESS)
     {
         DPRINTF("Proc verify failed\n");
