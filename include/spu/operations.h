@@ -53,6 +53,8 @@ int HandleMod(Proc_t* proc_data);
 
 int HandleSqrt(Proc_t* proc_data);
 
+int HandleSqr(Proc_t* proc_data);
+
 int HandleJmp(Proc_t* proc_data);
 
 int HandleJb(Proc_t* proc_data);

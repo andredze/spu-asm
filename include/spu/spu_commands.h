@@ -16,6 +16,7 @@ int (* const SPU_HANDLE_OP_TABLE[]) (Proc_t*) = {
     HandleDiv,
     HandleMod,
     HandleSqrt,
+    HandleSqr,
     HandleJmp,
     HandleJb,
     HandleJbe,

@@ -1,8 +1,6 @@
 #include <TXLib.h>
 #include "operations.h"
 
-// TODO: add square
-
 #define DECLARE_HANDLE_JUMP_IF(comp_oper, cmd_name) \
     int Handle##cmd_name(Proc_t* proc_data) \
     { \
@@ -89,6 +87,25 @@ int HandleSqrt(Proc_t* proc_data)
         return 1;
     }
     DPRINTF("\tSQRT: sqrt(%d) = %d\n", number, value);
+
+    return 0;
+}
+
+int HandleSqr(Proc_t* proc_data)
+{
+    assert(proc_data != NULL);
+
+    int number = 0;
+    if (StackPop(&proc_data->stack, &number) != STACK_SUCCESS)
+    {
+        return 1;
+    }
+    int value = number * number;
+    if (StackPush(&proc_data->stack, value) != STACK_SUCCESS)
+    {
+        return 1;
+    }
+    DPRINTF("\tSQR: %d ** 2 = %d\n", number, value);
 
     return 0;
 }
@@ -444,36 +461,3 @@ int DrawInWindow(Proc_t* proc_data)
 
     return 0;
 }
-
-// color = TX_WHITE;
-// if (proc_data->ram[y_ram * RAM_SIDE_SIZE + x_ram] != 0)
-//     color = TX_GREEN;
-// txSetPixel(x_ram, y_ram, color, dc);
-
-// int DrawInWindow(Proc_t* proc_data)
-// {
-//     txCreateWindow(100, 100);
-//     HDC dc = txDC();
-//     txSetDefaults();
-//     txSetColor(TX_WHITE, 0, dc);
-//
-//     COLORREF color = TX_WHITE;
-//     for (int x_ram = 0; x_ram < RAM_SIDE_SIZE; x_ram++)
-//     {
-//         for (int y_ram = 0; y_ram < RAM_SIDE_SIZE; y_ram++)
-//         {
-//             color = TX_WHITE;
-//             if (proc_data->ram[y_ram * RAM_SIDE_SIZE + x_ram] != 0)
-//             {
-//                 color = TX_GREEN;
-//             }
-//             txSetFillColor(color, dc);
-//             txRectangle(x_ram * 10, y_ram * 10,
-//                         x_ram * 10 + 10, y_ram * 10 + 10, dc);
-//         }
-//     }
-//
-//     txSaveImage("draw.bmp", dc);
-//
-//     return 0;
-// }

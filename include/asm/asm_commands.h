@@ -25,6 +25,7 @@ const AsmCmdCase_t ASM_CMD_CASES[] = {
     {"DIV",   CMD_DIV,   AddDefaultOp,   1},
     {"MOD",   CMD_MOD,   AddDefaultOp,   1},
     {"SQRT",  CMD_SQRT,  AddDefaultOp,   1},
+    {"SQR",   CMD_SQR,   AddDefaultOp,   1},
     {"JMP",   CMD_JMP,   AddLabelArgOp,  2},
     {"JB",    CMD_JB,    AddLabelArgOp,  2},
     {"JBE",   CMD_JBE,   AddLabelArgOp,  2},

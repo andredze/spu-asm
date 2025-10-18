@@ -13,14 +13,15 @@ const char COMMENT_SYMBOL = '#';
 
 int SetFilenames(const char** commands_filename,
                  const char** bytecode_filename,
-                 int argc, char* argv[]);
+                 int argc, char* argv[], int* listing_flag);
 
-AsmErr_t CompileProgramm(InputCtx_t* input_ctx);
+AsmErr_t CompileProgramm(InputCtx_t* input_ctx, int listing_flag);
 
 int AsmCtxCtor(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx);
 
 AsmErr_t CompileCommands(InputCtx_t* input_ctx,
-                         AsmCtx_t* asm_ctx);
+                         AsmCtx_t* asm_ctx,
+                         int listing_flag);
 
 AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx);
 
