@@ -29,17 +29,17 @@ int HandleDIV(Proc_t* proc_data);
 
 int HandleMOD(Proc_t* proc_data);
 
-int HandleJB(Proc_t* proc_data, int new_cmd_count);
+int HandleJB(Proc_t* proc_data);
 
-int HandleJBE(Proc_t* proc_data, int new_cmd_count);
+int HandleJBE(Proc_t* proc_data);
 
-int HandleJA(Proc_t* proc_data, int new_cmd_count);
+int HandleJA(Proc_t* proc_data);
 
-int HandleJAE(Proc_t* proc_data, int new_cmd_count);
+int HandleJAE(Proc_t* proc_data);
 
-int HandleJE(Proc_t* proc_data, int new_cmd_count);
+int HandleJE(Proc_t* proc_data);
 
-int HandleJNE(Proc_t* proc_data, int new_cmd_count);
+int HandleJNE(Proc_t* proc_data);
 
 MathErr_t Add(CalcData_t* calc_data);
 
@@ -55,25 +55,27 @@ int HandleSqrt(Proc_t* proc_data);
 
 int HandleOut(Proc_t* proc_data);
 
-int HandlePopr(Proc_t* proc_data, int index);
+int HandlePopr(Proc_t* proc_data);
 
-int HandlePushr(Proc_t* proc_data, int index);
+int HandlePushr(Proc_t* proc_data);
 
 int HandleIn(Proc_t* proc_data);
 
-int HandleJmp(Proc_t* proc_data, size_t new_cmd_count);
+int HandleJmp(Proc_t* proc_data);
 
-int HandleCall(Proc_t* proc_data, int new_cmd_count);
+int Jump(Proc_t* proc_data, int new_cmd_count);
+
+int HandleCall(Proc_t* proc_data);
 
 int HandleRet(Proc_t* proc_data);
 
-int HandlePushm(Proc_t* proc_data, int mem_addr);
+int HandlePushm(Proc_t* proc_data);
 
-int HandlePopm(Proc_t* proc_data, int mem_addr);
+int HandlePopm(Proc_t* proc_data);
 
-int HandleDraw(Proc_t* proc_data, int sleep_time);
+int HandleDraw(Proc_t* proc_data);
 
-int HandlePush(Proc_t* proc_data, int value);
+int HandlePush(Proc_t* proc_data);
 
 // int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
 //                  size_t new_cmd_count, Command_t command);

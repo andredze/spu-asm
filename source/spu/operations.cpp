@@ -3,10 +3,11 @@
 // TODO: add square
 
 #define DECLARE_HANDLE_JUMP_IF(comp_oper, cmd_name) \
-    int Handle##cmd_name(Proc_t* proc_data, int new_cmd_count) \
+    int Handle##cmd_name(Proc_t* proc_data) \
     { \
         assert(proc_data != NULL); \
         \
+        int new_cmd_count = proc_data->code[proc_data->cmd_count++]; \
         int number1 = 0; \
         int number2 = 0; \
         if (StackPop(&proc_data->stack, &number2)) \
@@ -24,7 +25,7 @@
             DPRINTF("\tJMP rejected\n"); \
             return 0; \
         } \
-        if (HandleJmp(proc_data, new_cmd_count)) \
+        if (Jump(proc_data, new_cmd_count)) \
         { \
             return 1; \
         } \
@@ -179,10 +180,11 @@ int HandleOut(Proc_t* proc_data)
     return 0;
 }
 
-int HandlePopr(Proc_t* proc_data, int index)
+int HandlePopr(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
+    int index = proc_data->code[proc_data->cmd_count++];
     int value = 0;
     StackErr_t pop_return = StackPop(&proc_data->stack, &value);
 
@@ -209,9 +211,11 @@ int HandlePopr(Proc_t* proc_data, int index)
     return 0;
 }
 
-int HandlePushr(Proc_t* proc_data, int index)
+int HandlePushr(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
+
+    int index = proc_data->code[proc_data->cmd_count++];
 
     if (index < 0 || index > 7)
     {
@@ -256,24 +260,41 @@ int HandleIn(Proc_t* proc_data)
     return 0;
 }
 
-int HandleJmp(Proc_t* proc_data, size_t new_cmd_count)
+int HandleJmp(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
-    if (new_cmd_count > proc_data->code_size)
+    int new_cmd_count = proc_data->code[proc_data->cmd_count++];
+
+    DPRINTF("\tJMP: ", new_cmd_count);
+    if (Jump(proc_data, new_cmd_count))
     {
-        DPRINTF("Invalid argument in JMP\n");
         return 1;
     }
-    proc_data->cmd_count = new_cmd_count;
-    DPRINTF("\tJMP: jumping to %zu\n", new_cmd_count);
 
     return 0;
 }
 
-int HandleCall(Proc_t* proc_data, int new_cmd_count)
+int Jump(Proc_t* proc_data, int new_cmd_count)
 {
     assert(proc_data != NULL);
+
+    if (new_cmd_count > proc_data->code_size || new_cmd_count < 0)
+    {
+        DPRINTF("Invalid argument for jump\n");
+        return 1;
+    }
+    proc_data->cmd_count = new_cmd_count;
+    DPRINTF("\t   jumping to %zu\n", new_cmd_count);
+
+    return 0;
+}
+
+int HandleCall(Proc_t* proc_data)
+{
+    assert(proc_data != NULL);
+
+    int new_cmd_count = proc_data->code[proc_data->cmd_count++];
 
     if (StackPush(&proc_data->call_stack, proc_data->cmd_count) != STACK_SUCCESS)
     {
@@ -282,7 +303,7 @@ int HandleCall(Proc_t* proc_data, int new_cmd_count)
 
     DPRINTF("\tCALL: pushed %d to call_stack\n", proc_data->cmd_count);
 
-    if (HandleJmp(proc_data, new_cmd_count))
+    if (Jump(proc_data, new_cmd_count))
     {
         return 1;
     }
@@ -303,7 +324,7 @@ int HandleRet(Proc_t* proc_data)
 
     DPRINTF("\tRET: returning to %d\n", call_address);
 
-    if (HandleJmp(proc_data, call_address))
+    if (Jump(proc_data, call_address))
     {
         return 1;
     }
@@ -311,10 +332,11 @@ int HandleRet(Proc_t* proc_data)
     return 0;
 }
 
-int HandlePushm(Proc_t* proc_data, int reg_number)
+int HandlePushm(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
+    int reg_number = proc_data->code[proc_data->cmd_count++];
     int mem_addr = proc_data->regs[reg_number];
     DPRINTF("\tPUSHM: address = regs[%d] (R%cX) = %d\n", reg_number, 'A' + reg_number, mem_addr);
 
@@ -334,10 +356,11 @@ int HandlePushm(Proc_t* proc_data, int reg_number)
     return 0;
 }
 
-int HandlePopm(Proc_t* proc_data, int reg_number)
+int HandlePopm(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
+    int reg_number = proc_data->code[proc_data->cmd_count++];
     size_t mem_addr = proc_data->regs[reg_number];
     DPRINTF("\tPOPM: address = regs[%d] (R%cX) = %d\n", reg_number, 'A' + reg_number, mem_addr);
 
@@ -359,10 +382,11 @@ int HandlePopm(Proc_t* proc_data, int reg_number)
     return 0;
 }
 
-int HandleDraw(Proc_t* proc_data, int sleep_time)
+int HandleDraw(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
-    assert(sleep_time >= 0);
+
+    int sleep_time = proc_data->code[proc_data->cmd_count++];
 
     for (size_t i = 0; i < RAM_SIZE; i++)
     {
@@ -381,9 +405,11 @@ int HandleDraw(Proc_t* proc_data, int sleep_time)
     return 0;
 }
 
-int HandlePush(Proc_t* proc_data, int value)
+int HandlePush(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
+
+    int value = proc_data->code[proc_data->cmd_count++];
 
     DPRINTF("\tPUSH: %d\n", value);
     if (StackPush(&proc_data->stack, value) != STACK_SUCCESS)
@@ -419,7 +445,7 @@ int HandlePush(Proc_t* proc_data, int value)
 //         return 0;
 //     }
 //     // else jump
-//     if (HandleJmp(proc_data, new_cmd_count))
+//     if (Jump(proc_data, new_cmd_count))
 //     {
 //         return 1;
 //     }

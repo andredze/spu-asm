@@ -324,14 +324,13 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
     PROC_OK_DEBUG(proc_data);
 
     Command_t command = CMD_HLT;
-    int value = 0;
 
     while (proc_data->cmd_count < proc_data->code_size)
     {
 #ifdef PROC_DEBUG
         getchar();
 #endif /* PROC_DEBUG */
-        if (ProcGetCommand(proc_data, &command, &value))
+        if (ProcGetCommand(proc_data, &command))
         {
             return PROC_UNKNOWN_COMMAND;
         }
@@ -344,7 +343,7 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
             DPRINTF(RED "\nProgramm ran successfully\n" RESET_CLR);
             break;
         }
-        if (ProcRunCommand(proc_data, command, value))
+        if (ProcRunCommand(proc_data, command))
         {
             return PROC_MATH_ERROR;
         }
@@ -364,29 +363,22 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
     return PROC_SUCCESS;
 }
 
-ProcErr_t ProcGetCommand(Proc_t* proc_data,
-                         Command_t* command,
-                         int* value)
+ProcErr_t ProcGetCommand(Proc_t* proc_data, Command_t* command)
 {
     PROC_OK_DEBUG(proc_data);
 
     *command = (Command_t) proc_data->code[proc_data->cmd_count++];
 
-    if (CmdArgsCount(*command) == 1)
-    {
-        *value = proc_data->code[proc_data->cmd_count++];
-    }
-
     return PROC_SUCCESS;
 }
 
-int ProcRunCommand(Proc_t* proc_data, Command_t command, int value)
+int ProcRunCommand(Proc_t* proc_data, Command_t command)
 {
     PROC_OK_DEBUG(proc_data);
 
     switch (command)
     {
-        case CMD_PUSH:  return HandlePush(proc_data, value);
+        case CMD_PUSH:  return HandlePush(proc_data);
         case CMD_ADD:   return HandleADD(proc_data);
         case CMD_SUB:   return HandleSUB(proc_data);
         case CMD_MUL:   return HandleMUL(proc_data);
@@ -394,21 +386,21 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command, int value)
         case CMD_MOD:   return HandleMOD(proc_data);
         case CMD_SQRT:  return HandleSqrt(proc_data);
         case CMD_OUT:   return HandleOut(proc_data);
-        case CMD_POPR:  return HandlePopr(proc_data, value);
-        case CMD_PUSHR: return HandlePushr(proc_data, value);
+        case CMD_POPR:  return HandlePopr(proc_data);
+        case CMD_PUSHR: return HandlePushr(proc_data);
         case CMD_IN:    return HandleIn(proc_data);
-        case CMD_JMP:   return HandleJmp(proc_data, value);
-        case CMD_JB:    return HandleJB (proc_data, value);
-        case CMD_JBE:   return HandleJBE(proc_data, value);
-        case CMD_JA:    return HandleJA (proc_data, value);
-        case CMD_JAE:   return HandleJAE(proc_data, value);
-        case CMD_JE:    return HandleJE (proc_data, value);
-        case CMD_JNE:   return HandleJNE(proc_data, value);
-        case CMD_CALL:  return HandleCall(proc_data, value);
+        case CMD_JMP:   return HandleJmp(proc_data);
+        case CMD_JB:    return HandleJB (proc_data);
+        case CMD_JBE:   return HandleJBE(proc_data);
+        case CMD_JA:    return HandleJA (proc_data);
+        case CMD_JAE:   return HandleJAE(proc_data);
+        case CMD_JE:    return HandleJE (proc_data);
+        case CMD_JNE:   return HandleJNE(proc_data);
+        case CMD_CALL:  return HandleCall(proc_data);
         case CMD_RET:   return HandleRet(proc_data);
-        case CMD_PUSHM: return HandlePushm(proc_data, value);
-        case CMD_POPM:  return HandlePopm(proc_data, value);
-        case CMD_DRAW:  return HandleDraw(proc_data, value);
+        case CMD_PUSHM: return HandlePushm(proc_data);
+        case CMD_POPM:  return HandlePopm(proc_data);
+        case CMD_DRAW:  return HandleDraw(proc_data);
         case CMD_HLT:   return 1;
         default:        return 1;
     }
