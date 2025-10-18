@@ -16,8 +16,7 @@ PROCSOURCES = source/spu/main.cpp \
 			  source/spu/stack.cpp \
 			  source/spu/operations.cpp \
 			  source/spu/processor.cpp \
-			  source/input.cpp \
-			  source/commands.cpp
+			  source/input.cpp
 
 PROCEXECUTABLE = run.exe
 
@@ -29,8 +28,7 @@ ASMSOURCES = source/asm/main.cpp \
 			 source/asm/assembler.cpp \
 			 source/asm/listing.cpp \
 			 source/asm/add_operations.cpp \
-			 source/input.cpp \
-			 source/commands.cpp
+			 source/input.cpp
 
 ASMEXECUTABLE = compile.exe
 

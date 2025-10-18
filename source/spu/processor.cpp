@@ -218,18 +218,18 @@ ProcErr_t ProcVerify(Proc_t* proc_data)
     return PROC_SUCCESS;
 }
 
-int ProcErrToStr(ProcErr_t error, const char** error_str)
+ProcErr_t ProcErrToStr(ProcErr_t error, const char** error_str)
 {
     DPRINTF("Converting error to string...\n");
 
     if (!(0 <= error && error <= PROC_ERR_END))
     {
         DPRINTF("Error in ProcErrToStr(): error not in enum\n");
-        return 1;
+        return PROC_UNKNOWN_COMMAND;
     }
     *error_str = PROC_ERR_STRS[error];
 
-    return 0;
+    return PROC_SUCCESS;
 }
 
 ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
@@ -244,7 +244,7 @@ ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
     }
 
     const char* error_str = "";
-    if (ProcErrToStr(error, &error_str))
+    if (ProcErrToStr(error, &error_str) != PROC_SUCCESS)
     {
         return PROC_UNKNOWN_COMMAND;
     }
@@ -343,9 +343,9 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
             DPRINTF(RED "\nProgramm ran successfully\n" RESET_CLR);
             break;
         }
-        if (ProcRunCommand(proc_data, command))
+        if (ProcExecuteOperation(proc_data, command) != PROC_SUCCESS)
         {
-            return PROC_MATH_ERROR;
+            return PROC_EXECUTE_OP_ERROR;
         }
 
 #ifdef PROC_DEBUG
@@ -370,22 +370,22 @@ ProcErr_t ProcGetCommand(Proc_t* proc_data, Command_t* command)
     return PROC_SUCCESS;
 }
 
-int ProcRunCommand(Proc_t* proc_data, Command_t command)
+ProcErr_t ProcExecuteOperation(Proc_t* proc_data, Command_t command)
 {
     PROC_OK_DEBUG(proc_data);
 
     if (command < 0 || command >= SPU_HANDLE_OP_TABLE_SIZE)
     {
         DPRINTF("Invalid command for ProcRunCommand()");
-        return 1;
+        return PROC_UNKNOWN_COMMAND;
     }
 
     if (SPU_HANDLE_OP_TABLE[command](proc_data))
     {
-        return 1;
+        return PROC_EXECUTE_OP_ERROR;
     }
 
-    return 0;
+    return PROC_SUCCESS;
 }
 
 int ProcConsoleDump(Proc_t* proc_data)

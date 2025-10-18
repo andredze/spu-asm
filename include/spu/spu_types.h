@@ -11,6 +11,7 @@ typedef enum ProcErr {
     PROC_CALLOC_ERROR,
     PROC_OUTPUT_FILE_OPENNING_ERROR,
     PROC_UNKNOWN_COMMAND,
+    PROC_EXECUTE_OP_ERROR,
     PROC_MATH_ERROR,
     PROC_DATA_IS_NULL,
     PROC_CODE_IS_NULL,
@@ -21,11 +22,6 @@ typedef enum ProcErr {
     PROC_DUMP_ERR,
     PROC_ERR_END
 } ProcErr_t;
-
-typedef struct CmdCase {
-    const char* str_command;
-    Command_t cmd;
-} CmdCase_t;
 
 const int REGS_COUNT = 8;
 const size_t RAM_SIDE_SIZE = 20;

@@ -1,8 +1,6 @@
 #include "assembler.h"
 #include "config.h"
 
-// TODO: сделать чтобы можно было не писать inputs/...
-
 int SetFilenames(const char** commands_filename,
                  const char** bytecode_filename,
                  int argc, char* argv[])
@@ -238,7 +236,7 @@ int WriteByteCodePretty(AsmCtx_t* asm_ctx, const char* filepath)
     size_t i = 0;
     while (i < asm_ctx->cur_cmd)
     {
-        if (CmdArgsCount((Command_t) asm_ctx->buffer[i]) == 1)
+        if (COMM_CASES[(Command_t) asm_ctx->buffer[i]].args_count == 2)
         {
             fprintf(pretty_output_info.stream,
                     "%d %d\n",

@@ -40,38 +40,37 @@ typedef struct CodeParams {
 typedef struct CommCase {
     const char* str_command;
     Command_t command;
+    int args_count;
 } CommCase_t;
 
 const CommCase_t COMM_CASES[] =
-    {{"HLT",   CMD_HLT},
-     {"PUSH",  CMD_PUSH},
-     {"OUT",   CMD_OUT},
-     {"IN",    CMD_IN},
-     {"CALL",  CMD_CALL},
-     {"RET",   CMD_RET},
-     {"ADD",   CMD_ADD},
-     {"SUB",   CMD_SUB},
-     {"MUL",   CMD_MUL},
-     {"DIV",   CMD_DIV},
-     {"MOD",   CMD_MOD},
-     {"SQRT",  CMD_SQRT},
-     {"JMP",   CMD_JMP},
-     {"JB",    CMD_JB},
-     {"JBE",   CMD_JBE},
-     {"JA",    CMD_JA},
-     {"JAE",   CMD_JAE},
-     {"JE",    CMD_JE},
-     {"JNE",   CMD_JNE},
-     {"PUSHR", CMD_PUSHR},
-     {"POPR",  CMD_POPR},
-     {"PUSHM", CMD_PUSHM},
-     {"POPM",  CMD_POPM},
-     {"DRAW",  CMD_DRAW}};
+    {{"HLT",   CMD_HLT,   1},
+     {"PUSH",  CMD_PUSH,  2},
+     {"OUT",   CMD_OUT,   1},
+     {"IN",    CMD_IN,    1},
+     {"CALL",  CMD_CALL,  2},
+     {"RET",   CMD_RET,   1},
+     {"ADD",   CMD_ADD,   1},
+     {"SUB",   CMD_SUB,   1},
+     {"MUL",   CMD_MUL,   1},
+     {"DIV",   CMD_DIV,   1},
+     {"MOD",   CMD_MOD,   1},
+     {"SQRT",  CMD_SQRT,  1},
+     {"JMP",   CMD_JMP,   2},
+     {"JB",    CMD_JB,    2},
+     {"JBE",   CMD_JBE,   2},
+     {"JA",    CMD_JA,    2},
+     {"JAE",   CMD_JAE,   2},
+     {"JE",    CMD_JE,    2},
+     {"JNE",   CMD_JNE,   2},
+     {"PUSHR", CMD_PUSHR, 2},
+     {"POPR",  CMD_POPR,  2},
+     {"PUSHM", CMD_PUSHM, 2},
+     {"POPM",  CMD_POPM,  2},
+     {"DRAW",  CMD_DRAW,  2}};
 
 const size_t COMM_CASES_SIZE = sizeof(COMM_CASES) / sizeof(COMM_CASES[0]);
 
 const int CMD_MAX_LEN = 50;
-
-int CmdArgsCount(Command_t command);
 
 #endif /* COMMANDS_H */
