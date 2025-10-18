@@ -55,7 +55,7 @@ Input file example
 
 Execute programm
 ```powershell
-  run <bytecode_name.bin>
+  run.exe <bytecode_name.bin>
 ```
 
 Output of the example
@@ -64,4 +64,66 @@ Output of the example
   ANSWER = 4
   ANSWER = 9
   ANSWER = 16
+```
+
+## Assembler commands
+Comment
+```
+# <your_commentary>
+```
+End programm
+```
+  HLT
+```
+Push to stack
+```
+  PUSH 1
+```
+Commands using console
+```
+  OUT
+  IN
+```
+Labels
+```
+:10
+```
+Functions
+```
+  CALL :5
+  RET
+```
+Math operations
+```
+  ADD
+  SUB
+  MUL
+  DIV
+  MOD
+  SQRT
+  SQR
+```
+Jumps
+```
+  JMP :19
+  JB :19
+  JBE :19
+  JA :19
+  JAE :19
+  JE :19
+  JNE :19
+```
+Commands using registers
+```
+  PUSHR RAX
+  POPR RAX
+```
+Commands using ram
+```
+  PUSHM [RAX]
+  POPM [RAX]
+```
+Draw in window
+```
+  DRAW 1000
 ```
