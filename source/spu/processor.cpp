@@ -324,6 +324,7 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
     PROC_OK_DEBUG(proc_data);
 
     Command_t command = CMD_HLT;
+    int break_loop = 0;
 
     while (proc_data->cmd_count < proc_data->code_size)
     {
@@ -334,18 +335,17 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
         {
             return PROC_UNKNOWN_COMMAND;
         }
-
         DPRINTF(PURPLE "\ncode[%zu]: cmd = %d (%s)\n" RESET_CLR,
                 proc_data->cmd_count, command, COMM_CASES[command].str_command);
 
-        if (command == CMD_HLT)
+        if (ProcExecuteOperation(proc_data, command, &break_loop) != PROC_SUCCESS)
+        {
+            return PROC_EXECUTE_OP_ERROR;
+        }
+        if (break_loop == 1)
         {
             DPRINTF(RED "\nProgramm ran successfully\n" RESET_CLR);
             break;
-        }
-        if (ProcExecuteOperation(proc_data, command) != PROC_SUCCESS)
-        {
-            return PROC_EXECUTE_OP_ERROR;
         }
 
 #ifdef PROC_DEBUG
@@ -370,9 +370,15 @@ ProcErr_t ProcGetCommand(Proc_t* proc_data, Command_t* command)
     return PROC_SUCCESS;
 }
 
-ProcErr_t ProcExecuteOperation(Proc_t* proc_data, Command_t command)
+ProcErr_t ProcExecuteOperation(Proc_t* proc_data, Command_t command, int break_loop)
 {
     PROC_OK_DEBUG(proc_data);
+
+    if (command == HLT)
+    {
+        *break_loop = 1;
+        return PROC_SUCCESS;
+    }
 
     if (command < 0 || command >= SPU_HANDLE_OP_TABLE_SIZE)
     {
@@ -435,11 +441,17 @@ int ProcConsoleDump(Proc_t* proc_data)
         else {
             DPRINTF("%d, ", proc_data->code[i]); }
     }
+
+    size_t ram_size = RAM_SIZE;
+    if (ram_size > 64)
+    {
+        ram_size = 64;
+    }
     DPRINTF("]\n"
             LIGHT_YELLOW "ram[] = [");
-    for (size_t i = 0; i < RAM_SIZE; i++)
+    for (size_t i = 0; i < ram_size; i++)
     {
-        if (i == RAM_SIZE - 1) {
+        if (i == ram_size - 1) {
             DPRINTF("%d", proc_data->ram[i]); }
         else if (i % 17 == 0 && i != 0) {
             DPRINTF("\n\t "); }
