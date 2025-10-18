@@ -348,14 +348,19 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
             break;
         }
 
+        // if (ConsoleDrawVram(proc_data, DEFAULT_SLEEP_TIME))
+        // {
+        //     return PROC_EXECUTE_OP_ERROR;
+        // }
+
 #ifdef PROC_DEBUG
         if (ProcConsoleDump(proc_data))
         {
             return PROC_DUMP_ERR;
         }
 #endif /* PROC_DEBUG */
-
     }
+
     printf("---Executed commands---\n");
 
     return PROC_SUCCESS;

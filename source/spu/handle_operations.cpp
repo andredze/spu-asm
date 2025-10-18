@@ -361,29 +361,42 @@ HandleOpErr_t HandleDRAW(Proc_t* proc_data)
 
     int sleep_time = proc_data->code[proc_data->cmd_count++];
 
-    for (size_t i = 0; i < RAM_SIZE; i++)
+    if (ConsoleDrawVram(proc_data, sleep_time))
     {
-        if (proc_data->ram[i] == 0) {
-            printf(" - "); }
-        else {
-            printf(" %c ", proc_data->ram[i]); }
-        if ((i + 1) % RAM_SIDE_SIZE == 0)
-        {
-            printf("\n");
-        }
+        return HANDLE_OP_DRAW_ERROR;
     }
-    printf("\n\n");
-    Sleep(sleep_time);
 
     return HANDLE_OP_SUCCESS;
 }
 
 HandleOpErr_t HandleWDRAW(Proc_t* proc_data)
 {
+    assert(proc_data != NULL);
+
+    int sleep_time = proc_data->code[proc_data->cmd_count++];
+
+    WindowOpen();
+
+    if (WindowDrawVram(proc_data, sleep_time))
+    {
+        return HANDLE_OP_DRAW_ERROR;
+    }
+
+    return HANDLE_OP_SUCCESS;
+}
+
+int WindowOpen()
+{
     txCreateWindow(100, 100);
-    HDC dc = txDC();
     txSetDefaults();
-    txSetColor(TX_WHITE, 0, dc);
+    txSetColor(TX_WHITE, 0);
+
+    return 0;
+}
+
+int WindowDrawVram(Proc_t* proc_data, int sleep_time)
+{
+    HDC dc = txDC();
 
     COLORREF color = TX_WHITE;
     for (int x_ram = 0; x_ram < RAM_SIDE_SIZE; x_ram++)
@@ -398,6 +411,28 @@ HandleOpErr_t HandleWDRAW(Proc_t* proc_data)
     }
 
     txSaveImage("draw.bmp", dc);
+    Sleep(sleep_time);
 
-    return HANDLE_OP_SUCCESS;
+    return 0;
+}
+
+int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
+{
+    assert(proc_data != NULL);
+
+    for (size_t i = 0; i < RAM_SIZE; i++)
+    {
+        if (proc_data->ram[i] == 0) {
+            printf(" - "); }
+        else {
+            printf(" %c ", proc_data->ram[i]); }
+        if ((i + 1) % RAM_SIDE_SIZE == 0)
+        {
+            printf("\n");
+        }
+    }
+    printf("\n\n");
+    Sleep(sleep_time);
+
+    return 0;
 }

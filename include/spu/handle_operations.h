@@ -16,10 +16,17 @@ typedef enum HandleOpErr {
     HANDLE_OP_INVALID_REG_ARG,
     HANDLE_OP_INVALID_RAM_ARG,
     HANDLE_OP_INPUT_ERROR,
-    HANDLE_OP_BREAK_LOOP
+    HANDLE_OP_BREAK_LOOP,
+    HANDLE_OP_DRAW_ERROR
 } HandleOpErr_t;
 
 int Jump(Proc_t* proc_data, int new_cmd_count);
+
+int ConsoleDrawVram(Proc_t* proc_data, int sleep_time);
+
+int WindowOpen();
+
+int WindowDrawVram(Proc_t* proc_data, int sleep_time);
 
 HandleOpErr_t HandleHLT   (Proc_t* proc_data);
 HandleOpErr_t HandlePUSH  (Proc_t* proc_data);
