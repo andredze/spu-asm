@@ -386,8 +386,7 @@ int ProcRunCommand(Proc_t* proc_data, Command_t command, int value)
 
     switch (command)
     {
-        case CMD_PUSH:  DPRINTF("\tPUSH: %d\n", value);
-                        return StackPush(&proc_data->stack, value) == STACK_SUCCESS ? 0 : 1;
+        case CMD_PUSH:  return HandlePush(proc_data, value);
         case CMD_ADD:   return HandleADD(proc_data);
         case CMD_SUB:   return HandleSUB(proc_data);
         case CMD_MUL:   return HandleMUL(proc_data);

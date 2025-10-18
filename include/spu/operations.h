@@ -20,9 +20,13 @@ typedef struct CalcData {
 } CalcData_t;
 
 int HandleADD(Proc_t* proc_data);
+
 int HandleSUB(Proc_t* proc_data);
+
 int HandleMUL(Proc_t* proc_data);
+
 int HandleDIV(Proc_t* proc_data);
+
 int HandleMOD(Proc_t* proc_data);
 
 int HandleJB(Proc_t* proc_data, int new_cmd_count);
@@ -36,9 +40,6 @@ int HandleJAE(Proc_t* proc_data, int new_cmd_count);
 int HandleJE(Proc_t* proc_data, int new_cmd_count);
 
 int HandleJNE(Proc_t* proc_data, int new_cmd_count);
-
-MathErr_t ExecuteBinaryOperation(Stack_t* stack,
-                               MathErr_t (* calculate) (CalcData_t* calc_data));
 
 MathErr_t Add(CalcData_t* calc_data);
 
@@ -71,6 +72,8 @@ int HandlePushm(Proc_t* proc_data, int mem_addr);
 int HandlePopm(Proc_t* proc_data, int mem_addr);
 
 int HandleDraw(Proc_t* proc_data, int sleep_time);
+
+int HandlePush(Proc_t* proc_data, int value);
 
 // int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
 //                  size_t new_cmd_count, Command_t command);

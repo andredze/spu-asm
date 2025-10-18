@@ -72,38 +72,6 @@ DECLARE_HANDLE_MATH_OP(MUL, Mul);
 DECLARE_HANDLE_MATH_OP(DIV, Div);
 DECLARE_HANDLE_MATH_OP(MOD, Mod);
 
-MathErr_t ExecuteBinaryOperation(Stack_t* stack,
-                                 MathErr_t (* calculate) (CalcData_t* calc_data))
-{
-    assert(stack != NULL);
-    assert(stack->data != NULL);
-    assert(calculate != NULL);
-    assert(stack->size >= 2);
-
-    CalcData_t calc_data = {};
-
-    if (StackPop(stack, &calc_data.number1) != STACK_SUCCESS)
-    {
-        return MATH_STACK_ERROR;
-    }
-    if (StackPop(stack, &calc_data.number2) != STACK_SUCCESS)
-    {
-        return MATH_STACK_ERROR;
-    }
-
-    MathErr_t error = MATH_SUCCESS;
-    if ((error = calculate(&calc_data)) != MATH_SUCCESS)
-    {
-        return error;
-    }
-    if (StackPush(stack, calc_data.result) != STACK_SUCCESS)
-    {
-        return MATH_STACK_ERROR;
-    }
-
-    return MATH_SUCCESS;
-}
-
 int HandleSqrt(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
@@ -113,13 +81,11 @@ int HandleSqrt(Proc_t* proc_data)
     {
         return 1;
     }
-
     int value = (int) sqrt((double) number);
     if (StackPush(&proc_data->stack, value) != STACK_SUCCESS)
     {
         return 1;
     }
-
     DPRINTF("\tSQRT: sqrt(%d) = %d\n", number, value);
 
     return 0;
@@ -411,6 +377,19 @@ int HandleDraw(Proc_t* proc_data, int sleep_time)
     }
     printf("\n\n");
     Sleep(sleep_time);
+
+    return 0;
+}
+
+int HandlePush(Proc_t* proc_data, int value)
+{
+    assert(proc_data != NULL);
+
+    DPRINTF("\tPUSH: %d\n", value);
+    if (StackPush(&proc_data->stack, value) != STACK_SUCCESS)
+    {
+        return 1;
+    }
 
     return 0;
 }
