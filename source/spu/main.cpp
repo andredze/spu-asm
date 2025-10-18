@@ -1,3 +1,4 @@
+#include <TXLib.h>
 #include "stack.h"
 #include "input.h"
 #include "operations.h"

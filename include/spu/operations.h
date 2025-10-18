@@ -77,9 +77,6 @@ int HandlePopm(Proc_t* proc_data);
 
 int HandleDraw(Proc_t* proc_data);
 
-// int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
-//                  size_t new_cmd_count, Command_t command);
-
-// int CompareForJump(int number1, int number2, Command_t command);
+int DrawInWindow(Proc_t* proc_data);
 
 #endif /* OPERATIONS_H */

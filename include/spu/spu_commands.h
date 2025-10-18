@@ -2,7 +2,6 @@
 #define SPU_COMMANDS_H
 
 #include "operations.h"
-#include "commands.h"
 
 int (* const SPU_HANDLE_OP_TABLE[]) (Proc_t*) = {
     NULL,
@@ -28,9 +27,10 @@ int (* const SPU_HANDLE_OP_TABLE[]) (Proc_t*) = {
     HandlePopr,
     HandlePushm,
     HandlePopm,
-    HandleDraw
+    DrawInWindow
 };
 
-const size_t SPU_HANDLE_OP_TABLE_SIZE = sizeof(SPU_HANDLE_OP_TABLE) / sizeof(SPU_HANDLE_OP_TABLE[0]);
+const size_t SPU_HANDLE_OP_TABLE_SIZE = sizeof(SPU_HANDLE_OP_TABLE) /
+                                        sizeof(SPU_HANDLE_OP_TABLE[0]);
 
 #endif /* SPU_COMMANDS_H */

@@ -1,3 +1,4 @@
+#include <TXLib.h>
 #include "operations.h"
 
 // TODO: add square
@@ -420,51 +421,59 @@ int HandlePush(Proc_t* proc_data)
     return 0;
 }
 
-// realisation without macro
+int DrawInWindow(Proc_t* proc_data)
+{
+    txCreateWindow(100, 100);
+    HDC dc = txDC();
+    txSetDefaults();
+    txSetColor(TX_WHITE, 0, dc);
 
-// int HandleJumpIf(Stack_t* stack, Proc_t* proc_data,
-//                  size_t new_cmd_count, Command_t command)
+    COLORREF color = TX_WHITE;
+    for (int x_ram = 0; x_ram < RAM_SIDE_SIZE; x_ram++)
+    {
+        for (int y_ram = 0; y_ram < RAM_SIDE_SIZE; y_ram++)
+        {
+            color = TX_WHITE;
+            if (proc_data->ram[y_ram * RAM_SIDE_SIZE + x_ram] != 0)
+                color = TX_GREEN;
+            txSetPixel(x_ram, y_ram, color, dc);
+        }
+    }
+
+    txSaveImage("draw.bmp", dc);
+
+    return 0;
+}
+
+// color = TX_WHITE;
+// if (proc_data->ram[y_ram * RAM_SIDE_SIZE + x_ram] != 0)
+//     color = TX_GREEN;
+// txSetPixel(x_ram, y_ram, color, dc);
+
+// int DrawInWindow(Proc_t* proc_data)
 // {
-//     assert(proc_data != NULL);
-//     assert(stack != NULL);
+//     txCreateWindow(100, 100);
+//     HDC dc = txDC();
+//     txSetDefaults();
+//     txSetColor(TX_WHITE, 0, dc);
 //
-//     int number1 = 0;
-//     int number2 = 0;
-//     if (StackPop(stack, &number2))
+//     COLORREF color = TX_WHITE;
+//     for (int x_ram = 0; x_ram < RAM_SIDE_SIZE; x_ram++)
 //     {
-//         return 1;
+//         for (int y_ram = 0; y_ram < RAM_SIDE_SIZE; y_ram++)
+//         {
+//             color = TX_WHITE;
+//             if (proc_data->ram[y_ram * RAM_SIDE_SIZE + x_ram] != 0)
+//             {
+//                 color = TX_GREEN;
+//             }
+//             txSetFillColor(color, dc);
+//             txRectangle(x_ram * 10, y_ram * 10,
+//                         x_ram * 10 + 10, y_ram * 10 + 10, dc);
+//         }
 //     }
-//     if (StackPop(stack, &number1))
-//     {
-//         return 1;
-//     }
-//     // if compare returns 0 than don't jump
-//     if (!(CompareForJump(number1, number2, command)))
-//     {
-//         DPRINTF("-Jump rejected\n");
-//         return 0;
-//     }
-//     // else jump
-//     if (Jump(proc_data, new_cmd_count))
-//     {
-//         return 1;
-//     }
+//
+//     txSaveImage("draw.bmp", dc);
 //
 //     return 0;
-// }
-
-// int CompareForJump(int number1, int number2, Command_t command)
-// {
-//     switch (command)
-//     {
-//         case CMD_JB:  return number1 <  number2;
-//         case CMD_JBE: return number1 <= number2;
-//         case CMD_JA:  return number1 >  number2;
-//         case CMD_JAE: return number1 >= number2;
-//         case CMD_JE:  return number1 == number2;
-//         case CMD_JNE: return number1 != number2;
-//         default:      return EOF;
-//     }
-//
-//     return EOF;
 // }
