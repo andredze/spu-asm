@@ -77,9 +77,8 @@ AsmErr_t AddNormalArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     assert(asm_ctx);
 
     int symbols_count = 0;
-    char operation[CMD_MAX_LEN] = {};
 
-    if (sscanf(cmd_ctx->line, "%s %d%n", operation, &cmd_ctx->value, &symbols_count) != 2)
+    if (sscanf(cmd_ctx->line, " %d%n", &cmd_ctx->value, &symbols_count) != 1)
     {
         printf("Syntax error: wrong number of args for cmd: %s\n",
                COMM_CASES[cmd_ctx->command].str_command);
@@ -103,11 +102,10 @@ AsmErr_t AddLabelArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     assert(cmd_ctx);
     assert(asm_ctx);
 
-    char operation[CMD_MAX_LEN] = {};
     int label = 0;
     int symbols_count = 0;
 
-    if (sscanf(cmd_ctx->line, "%s :%d%n", operation, &label, &symbols_count) != 2)
+    if (sscanf(cmd_ctx->line, " :%d%n", &label, &symbols_count) != 1)
     {
         printf("Syntax error: wrong arguments for label arg cmd: %s\n",
                COMM_CASES[cmd_ctx->command].str_command);
@@ -162,11 +160,10 @@ AsmErr_t AddRegArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     assert(cmd_ctx);
     assert(asm_ctx);
 
-    char operation[CMD_MAX_LEN] = {};
     char reg[CMD_MAX_LEN] = {};
     int symbols_count = 0;
 
-    if (sscanf(cmd_ctx->line, "%s %s%n", operation, reg, &symbols_count) != 2)
+    if (sscanf(cmd_ctx->line, " %s%n", reg, &symbols_count) != 1)
     {
         printf("Syntax error: wrong arguments for reg args cmd: %s\n",
                COMM_CASES[cmd_ctx->command].str_command);
@@ -213,11 +210,10 @@ AsmErr_t AddRamArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     assert(cmd_ctx);
     assert(asm_ctx);
 
-    char operation[CMD_MAX_LEN] = {};
     char reg[CMD_MAX_LEN] = {};
     int symbols_count = 0;
 
-    if (sscanf(cmd_ctx->line, "%s [%[^]]]%n", operation, reg, &symbols_count) != 2)
+    if (sscanf(cmd_ctx->line, " [%[^]]]%n", reg, &symbols_count) != 1)
     {
         printf("Syntax error: wrong arguments for ram args cmd: %s\n",
                COMM_CASES[cmd_ctx->command].str_command);

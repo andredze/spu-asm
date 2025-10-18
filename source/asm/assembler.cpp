@@ -185,12 +185,15 @@ AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
     assert(cmd_ctx != NULL);
 
     char operation[CMD_MAX_LEN] = {};
+    int op_len = 0;
 
-    if (sscanf(cmd_ctx->line, "%s", operation) != 1)
+    if (sscanf(cmd_ctx->line, "%s%n", operation, &op_len) != 1)
     {
         DPRINTF("sscanf for GetCmd() failed\n");
         return ASM_SYNTAX_ERROR;
     }
+    cmd_ctx->line = cmd_ctx->line + op_len;
+
     for (size_t i = 0; i < ASM_CMD_CASES_SIZE; i++)
     {
         if (strcmp(operation, ASM_CMD_CASES[i].str_command) == 0)
