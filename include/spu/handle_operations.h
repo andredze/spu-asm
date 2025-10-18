@@ -46,6 +46,6 @@ HandleOpErr_t HandlePOPR  (Proc_t* proc_data);
 HandleOpErr_t HandlePUSHM (Proc_t* proc_data);
 HandleOpErr_t HandlePOPM  (Proc_t* proc_data);
 HandleOpErr_t HandleDRAW  (Proc_t* proc_data);
-HandleOpErr_t DrawInWindow(Proc_t* proc_data);
+HandleOpErr_t HandleWDRAW (Proc_t* proc_data);
 
 #endif /* HANDLE_OPERATIONS_H */

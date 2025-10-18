@@ -37,6 +37,7 @@ AsmErr_t AddOpPOPR  (CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx);
 AsmErr_t AddOpPUSHM (CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx);
 AsmErr_t AddOpPOPM  (CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx);
 AsmErr_t AddOpDRAW  (CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx);
+AsmErr_t AddOpWDRAW (CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx);
 
 AsmErr_t ProcessLabelCase(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx);
 

@@ -31,6 +31,7 @@ DECLARE_ADD_OP(POPR,  Reg);
 DECLARE_ADD_OP(PUSHM, Ram);
 DECLARE_ADD_OP(POPM,  Ram);
 DECLARE_ADD_OP(DRAW,  Normal);
+DECLARE_ADD_OP(WDRAW, Normal);
 
 AsmErr_t ProcessLabelCase(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
 {

@@ -29,7 +29,8 @@ typedef enum Command {
     CMD_PUSHM = 22,
     CMD_POPM  = 23,
     CMD_DRAW  = 24,
-    CMD_LABEL = 25,
+    CMD_WDRAW = 25,
+    CMD_LABEL = 26,
     CMD_END
 } Command_t;
 

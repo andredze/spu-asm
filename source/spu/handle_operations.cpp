@@ -378,7 +378,7 @@ HandleOpErr_t HandleDRAW(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
-HandleOpErr_t DrawInWindow(Proc_t* proc_data)
+HandleOpErr_t HandleWDRAW(Proc_t* proc_data)
 {
     txCreateWindow(100, 100);
     HDC dc = txDC();
