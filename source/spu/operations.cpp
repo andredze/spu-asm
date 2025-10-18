@@ -38,6 +38,40 @@ DECLARE_HANDLE_JUMP_IF(>=, JAE);
 DECLARE_HANDLE_JUMP_IF(==, JE);
 DECLARE_HANDLE_JUMP_IF(!=, JNE);
 
+#define DECLARE_HANDLE_MATH_OP(cmd_name, calculate) \
+    int Handle##cmd_name(Proc_t* proc_data) \
+    { \
+        assert(proc_data->stack.size >= 2); \
+        \
+        CalcData_t calc_data = {}; \
+        \
+        if (StackPop(&proc_data->stack, &calc_data.number1) != STACK_SUCCESS) \
+        { \
+            return 1; \
+        } \
+        if (StackPop(&proc_data->stack, &calc_data.number2) != STACK_SUCCESS) \
+        { \
+            return 1; \
+        } \
+        \
+        if (calculate(&calc_data) != MATH_SUCCESS) \
+        { \
+            return 2; \
+        } \
+        if (StackPush(&proc_data->stack, calc_data.result) != STACK_SUCCESS) \
+        { \
+            return 1; \
+        } \
+        \
+        return 0; \
+    }
+
+DECLARE_HANDLE_MATH_OP(ADD, Add);
+DECLARE_HANDLE_MATH_OP(SUB, Sub);
+DECLARE_HANDLE_MATH_OP(MUL, Mul);
+DECLARE_HANDLE_MATH_OP(DIV, Div);
+DECLARE_HANDLE_MATH_OP(MOD, Mod);
+
 MathErr_t ExecuteBinaryOperation(Stack_t* stack,
                                  MathErr_t (* calculate) (CalcData_t* calc_data))
 {
@@ -70,25 +104,25 @@ MathErr_t ExecuteBinaryOperation(Stack_t* stack,
     return MATH_SUCCESS;
 }
 
-MathErr_t HandleSqrt(Stack_t* stack)
+int HandleSqrt(Proc_t* proc_data)
 {
-    assert(stack != NULL);
+    assert(proc_data != NULL);
 
     int number = 0;
-    if (StackPop(stack, &number) != STACK_SUCCESS)
+    if (StackPop(&proc_data->stack, &number) != STACK_SUCCESS)
     {
-        return MATH_STACK_ERROR;
+        return 1;
     }
 
     int value = (int) sqrt((double) number);
-    if (StackPush(stack, value) != STACK_SUCCESS)
+    if (StackPush(&proc_data->stack, value) != STACK_SUCCESS)
     {
-        return MATH_STACK_ERROR;
+        return 1;
     }
 
     DPRINTF("\tSQRT: sqrt(%d) = %d\n", number, value);
 
-    return MATH_SUCCESS;
+    return 0;
 }
 
 MathErr_t Add(CalcData_t* calc_data)
@@ -156,12 +190,12 @@ MathErr_t Mod(CalcData_t* calc_data)
     return MATH_SUCCESS;
 }
 
-int HandleOut(Stack_t* stack)
+int HandleOut(Proc_t* proc_data)
 {
-    assert(stack != NULL);
+    assert(proc_data != NULL);
 
     int result = 0;
-    StackErr_t pop_return = StackPop(stack, &result);
+    StackErr_t pop_return = StackPop(&proc_data->stack, &result);
 
     if (pop_return == STACK_SIZE_IS_ZERO)
     {
@@ -231,9 +265,9 @@ int HandlePushr(Proc_t* proc_data, int index)
     return 0;
 }
 
-int HandleIn(Stack_t* stack)
+int HandleIn(Proc_t* proc_data)
 {
-    assert(stack != NULL);
+    assert(proc_data != NULL);
 
     int value = 0;
     printf("Enter int value: ");
@@ -247,7 +281,7 @@ int HandleIn(Stack_t* stack)
     getchar();
 #endif /* PROC_DEBUG */
 
-    if (StackPush(stack, value) != STACK_SUCCESS)
+    if (StackPush(&proc_data->stack, value) != STACK_SUCCESS)
     {
         return 1;
     }

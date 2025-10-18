@@ -383,22 +383,21 @@ ProcErr_t ProcGetCommand(Proc_t* proc_data,
 int ProcRunCommand(Proc_t* proc_data, Command_t command, int value)
 {
     PROC_OK_DEBUG(proc_data);
-    Stack_t* stk_ptr = &proc_data->stack;
 
     switch (command)
     {
         case CMD_PUSH:  DPRINTF("\tPUSH: %d\n", value);
-                        return StackPush(stk_ptr, value) == STACK_SUCCESS ? 0 : 1;
-        case CMD_ADD:   return ExecuteBinaryOperation(stk_ptr, Add) == MATH_SUCCESS ? 0 : 1;
-        case CMD_SUB:   return ExecuteBinaryOperation(stk_ptr, Sub) == MATH_SUCCESS ? 0 : 1;
-        case CMD_MUL:   return ExecuteBinaryOperation(stk_ptr, Mul) == MATH_SUCCESS ? 0 : 1;
-        case CMD_DIV:   return ExecuteBinaryOperation(stk_ptr, Div) == MATH_SUCCESS ? 0 : 1;
-        case CMD_MOD:   return ExecuteBinaryOperation(stk_ptr, Mod) == MATH_SUCCESS ? 0 : 1;
-        case CMD_SQRT:  return HandleSqrt(stk_ptr) == MATH_SUCCESS ? 0 : 1;
-        case CMD_OUT:   return HandleOut(stk_ptr);
+                        return StackPush(&proc_data->stack, value) == STACK_SUCCESS ? 0 : 1;
+        case CMD_ADD:   return HandleADD(proc_data);
+        case CMD_SUB:   return HandleSUB(proc_data);
+        case CMD_MUL:   return HandleMUL(proc_data);
+        case CMD_DIV:   return HandleDIV(proc_data);
+        case CMD_MOD:   return HandleMOD(proc_data);
+        case CMD_SQRT:  return HandleSqrt(proc_data);
+        case CMD_OUT:   return HandleOut(proc_data);
         case CMD_POPR:  return HandlePopr(proc_data, value);
         case CMD_PUSHR: return HandlePushr(proc_data, value);
-        case CMD_IN:    return HandleIn(stk_ptr);
+        case CMD_IN:    return HandleIn(proc_data);
         case CMD_JMP:   return HandleJmp(proc_data, value);
         case CMD_JB:    return HandleJB (proc_data, value);
         case CMD_JBE:   return HandleJBE(proc_data, value);

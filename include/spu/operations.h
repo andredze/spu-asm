@@ -19,6 +19,12 @@ typedef struct CalcData {
     int result;
 } CalcData_t;
 
+int HandleADD(Proc_t* proc_data);
+int HandleSUB(Proc_t* proc_data);
+int HandleMUL(Proc_t* proc_data);
+int HandleDIV(Proc_t* proc_data);
+int HandleMOD(Proc_t* proc_data);
+
 int HandleJB(Proc_t* proc_data, int new_cmd_count);
 
 int HandleJBE(Proc_t* proc_data, int new_cmd_count);
@@ -44,15 +50,15 @@ MathErr_t Div(CalcData_t* calc_data);
 
 MathErr_t Mod(CalcData_t* calc_data);
 
-MathErr_t HandleSqrt(Stack_t* stack);
+int HandleSqrt(Proc_t* proc_data);
 
-int HandleOut(Stack_t* stack);
+int HandleOut(Proc_t* proc_data);
 
 int HandlePopr(Proc_t* proc_data, int index);
 
 int HandlePushr(Proc_t* proc_data, int index);
 
-int HandleIn(Stack_t* stack);
+int HandleIn(Proc_t* proc_data);
 
 int HandleJmp(Proc_t* proc_data, size_t new_cmd_count);
 
