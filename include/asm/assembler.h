@@ -15,6 +15,12 @@ const int MAX_FILENAME_LEN = 100;
 const int ASM_MAX_ARGS_COUNT = 2;
 const char COMMENT_SYMBOL = '#';
 
+int AsmGetHash(const char* str);
+
+AsmErr_t SetHashInCmdCases();
+
+int AsmCmdCasesCompare(const void* par1, const void* par2);
+
 int SetFilenames(const char** commands_filename,
                  const char** bytecode_filename,
                  int argc, char* argv[], int* listing_flag);

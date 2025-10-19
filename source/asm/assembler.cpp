@@ -1,6 +1,36 @@
 #include "assembler.h"
 #include "config.h"
 
+int AsmGetHash(const char* str)
+{
+    char c = '\0';
+    int hash = 5381;
+    while ((c = *str++) != '\0')
+    {
+        hash += (hash << 5) + hash + c;
+    }
+
+    return hash;
+}
+
+AsmErr_t SetHashInCmdCases()
+{
+    for (size_t i = 0; i < CMD_CASES_SIZE; i++)
+    {
+        CMD_CASES[i].hash = AsmGetHash(CMD_CASES[i].str_command);
+    }
+
+    return ASM_SUCCESS;
+}
+
+int AsmCmdCasesCompare(const void* par1, const void* par2)
+{
+    int hash1 = ((const CmdCase_t*) par1)->hash;
+    int hash2 = ((const CmdCase_t*) par2)->hash;
+
+    return hash1 - hash2;
+}
+
 int SetFilenames(const char** commands_filename,
                  const char** bytecode_filename,
                  int argc, char* argv[], int* listing_flag)

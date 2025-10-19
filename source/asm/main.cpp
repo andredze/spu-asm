@@ -3,6 +3,16 @@
 
 int main(int argc, char* argv[])
 {
+    if (SetHashInCmdCases())
+    {
+        return EXIT_FAILURE;
+    }
+    if (qsort(CMD_CASES, CMD_CASES_SIZE, sizeof(CMD_CASES[0]), AsmCmdCasesCompare))
+    {
+        printf("qsort() for cmd_cases failed\n");
+        return EXIT_FAILURE;
+    }
+
     const char* commands_filename = NULL;
     const char* bytecode_filename = NULL;
     int listing_flag = 0;
