@@ -113,14 +113,14 @@ AsmErr_t AddNormalArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 
     if (sscanf(cmd_ctx->line + cmd_ctx->op_len, " %d%n", &cmd_ctx->value, &args_len) != 1)
     {
-        // printf("Syntax error: wrong number of args for cmd: %s\n",
-        //        COMM_CASES[cmd_ctx->command].str_command);
+        printf("Syntax error: wrong number of args for cmd: %s\n",
+               cmd_ctx->line);
         return ASM_GET_OP_ARG_ERR;
     }
     if (!(EndIsSpaces(cmd_ctx->line + cmd_ctx->op_len + args_len)))
     {
-        // printf("Syntax error: symbols after argument for cmd = %s\n",
-        //        COMM_CASES[cmd_ctx->command].str_command);
+        printf("Syntax error: symbols after argument for cmd = %s\n",
+               cmd_ctx->line);
         return ASM_SYNTAX_ERROR;
     }
 
@@ -140,14 +140,14 @@ AsmErr_t AddLabelArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 
     if (sscanf(cmd_ctx->line + cmd_ctx->op_len, " :%d%n", &label, &args_len) != 1)
     {
-        // printf("Syntax error: wrong arguments for label arg cmd: %s\n",
-        //        COMM_CASES[cmd_ctx->command].str_command);
+        printf("Syntax error: wrong arguments for label arg cmd: %s\n",
+               cmd_ctx->line);
         return ASM_SYNTAX_ERROR;
     }
     if (!(EndIsSpaces(cmd_ctx->line + cmd_ctx->op_len + args_len)))
     {
-        // printf("Syntax error: symbols after argument for cmd = %s\n",
-        //        COMM_CASES[cmd_ctx->command].str_command);
+        printf("Syntax error: symbols after argument for cmd = %s\n",
+               cmd_ctx->line);
         return ASM_SYNTAX_ERROR;
     }
     if (CheckLabel(asm_ctx, label) != ASM_SUCCESS)
@@ -198,8 +198,8 @@ AsmErr_t AddRegArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 
     if (sscanf(cmd_ctx->line + cmd_ctx->op_len, " %s%n", reg, &args_len) != 1)
     {
-        // printf("Syntax error: wrong arguments for reg args cmd: %s\n",
-        //        COMM_CASES[cmd_ctx->command].str_command);
+        printf("Syntax error: wrong arguments for reg args cmd: %s\n",
+               cmd_ctx->line);
         return ASM_SYNTAX_ERROR;
     }
     if (CheckReg(reg) != ASM_SUCCESS)
@@ -208,8 +208,8 @@ AsmErr_t AddRegArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     }
     if (!(EndIsSpaces(cmd_ctx->line + cmd_ctx->op_len + args_len)))
     {
-        // printf("Syntax error: symbols after argument for cmd = %s\n",
-        //        COMM_CASES[cmd_ctx->command].str_command);
+        printf("Syntax error: symbols after argument for cmd = %s\n",
+               cmd_ctx->line);
         return ASM_SYNTAX_ERROR;
     }
 
@@ -248,8 +248,8 @@ AsmErr_t AddRamArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 
     if (sscanf(cmd_ctx->line + cmd_ctx->op_len, " [%[^]]]%n", reg, &args_len) != 1)
     {
-        // printf("Syntax error: wrong arguments for ram args cmd: %s\n",
-        //        COMM_CASES[cmd_ctx->command].str_command);
+        printf("Syntax error: wrong arguments for ram args cmd: %s\n",
+               cmd_ctx->line);
         return ASM_SYNTAX_ERROR;
     }
     if (CheckReg(reg) != ASM_SUCCESS)
@@ -258,8 +258,8 @@ AsmErr_t AddRamArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     }
     if (!(EndIsSpaces(cmd_ctx->line+ cmd_ctx->op_len + args_len)))
     {
-        // printf("Syntax error: symbols after argument for cmd = %s\n",
-        //        COMM_CASES[cmd_ctx->command].str_command);
+        printf("Syntax error: symbols after argument for cmd = %s\n",
+               cmd_ctx->line);
         return ASM_SYNTAX_ERROR;
     }
 

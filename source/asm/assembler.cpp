@@ -233,7 +233,7 @@ AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
         cmd_ctx->index = index;
         cmd_ctx->command = CMD_CASES[index].command;
 
-        DPRINTF(LIGHT_YELLOW "index = %d\n",
+        DPRINTF(LIGHT_YELLOW "index = %d\n"
                              "cmd = %s (%d)\n" RESET_CLR,
                 index, CMD_CASES[index].str_command, cmd_ctx->command);
 
