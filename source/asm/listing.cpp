@@ -31,7 +31,7 @@ AsmErr_t AddStringToListing(CmdCtx_t* cmd_ctx,
     assert(cmd_ctx != NULL);
     assert(asm_ctx != NULL);
 
-    if (CMD_CASES[cmd_ctx->command].args_count == 2)
+    if (CMD_CASES[cmd_ctx->index].args_count == 2)
     {
         if (fprintf(listing_stream, "[%04zu]\t%-10s\t%-4d\t%-4d\n",
                     asm_ctx->cur_cmd,

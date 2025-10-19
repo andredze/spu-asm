@@ -189,7 +189,7 @@ AsmErr_t CompileCommands(InputCtx_t* input_ctx,
         {
             return ASM_GET_CMD_ERROR;
         }
-        if (CMD_CASES[cmd_ctx.command].add_op(&cmd_ctx, asm_ctx) != ASM_SUCCESS)
+        if (CMD_CASES[cmd_ctx.index].add_op(&cmd_ctx, asm_ctx) != ASM_SUCCESS)
         {
             return ASM_ADD_OP_ERROR;
         }
@@ -224,19 +224,47 @@ AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
     }
     cmd_ctx->op_len = op_len;
 
-    for (size_t i = 0; i < CMD_CASES_SIZE; i++)
+    int current_op_hash = AsmGetHash(operation);
+
+    int index = -1;
+
+    if ((index = CmdCasesBinarySearch(current_op_hash, CMD_CASES, CMD_CASES_SIZE)) != EOF)
     {
-        if (strcmp(operation, CMD_CASES[i].str_command) == 0)
-        {
-            cmd_ctx->command = CMD_CASES[i].command;
-            DPRINTF(LIGHT_YELLOW "cmd = %s (%d)\n" RESET_CLR,
-                    CMD_CASES[cmd_ctx->command].str_command, cmd_ctx->command);
-            return ASM_SUCCESS;
-        }
+        cmd_ctx->index = index;
+        cmd_ctx->command = CMD_CASES[index].command;
+
+        DPRINTF(LIGHT_YELLOW "index = %d\n",
+                             "cmd = %s (%d)\n" RESET_CLR,
+                index, CMD_CASES[index].str_command, cmd_ctx->command);
+
+        return ASM_SUCCESS;
     }
 
     printf("Syntax error: unknown command\n");
     return ASM_SYNTAX_ERROR;
+}
+
+int CmdCasesBinarySearch(int curr_hash, CmdCase_t cmd_case[], int size)
+{
+    int left = 0;
+    int middle = 0;
+    int right = size - 1;
+
+    while (left <= right)
+    {
+        middle = left + (right - left) / 2;
+
+        if (cmd_case[middle].hash == curr_hash)
+            return middle;
+
+        else if (cmd_case[middle].hash < curr_hash)
+            left = middle + 1;
+
+        else
+            right = middle - 1;
+    }
+
+    return -1;
 }
 
 int WriteByteCode(AsmCtx_t* asm_ctx, InputCtx_t* input_ctx)

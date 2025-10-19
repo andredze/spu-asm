@@ -38,6 +38,7 @@ typedef struct CmdCtx {
     Command_t command;
     int value;
     int op_len;
+    int index;
 } CmdCtx_t;
 
 #endif /* ASM_TYPES_H */

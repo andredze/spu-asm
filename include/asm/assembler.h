@@ -35,6 +35,8 @@ AsmErr_t CompileCommands(InputCtx_t* input_ctx,
 
 AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx);
 
+int CmdCasesBinarySearch(int curr_hash, CmdCase_t cmd_case[], int size);
+
 int WriteByteCode(AsmCtx_t* asm_ctx, InputCtx_t* input_ctx);
 
 int WriteByteCodePretty(AsmCtx_t* asm_ctx, const char* filepath);
