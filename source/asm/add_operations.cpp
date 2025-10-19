@@ -1,38 +1,5 @@
 #include "add_operations.h"
 
-#define DECLARE_ADD_OP(cmd_name, args_type)                             \
-    AsmErr_t AddOp ## cmd_name(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)    \
-    {                                                                   \
-        return Add ## args_type ## ArgOp(cmd_ctx, asm_ctx);             \
-    }
-
-DECLARE_ADD_OP(HLT,   No);
-DECLARE_ADD_OP(PUSH,  Normal);
-DECLARE_ADD_OP(OUT,   No);
-DECLARE_ADD_OP(IN,    No);
-DECLARE_ADD_OP(CALL,  Label);
-DECLARE_ADD_OP(RET,   No);
-DECLARE_ADD_OP(ADD,   No);
-DECLARE_ADD_OP(SUB,   No);
-DECLARE_ADD_OP(MUL,   No);
-DECLARE_ADD_OP(DIV,   No);
-DECLARE_ADD_OP(MOD,   No);
-DECLARE_ADD_OP(SQRT,  No);
-DECLARE_ADD_OP(SQR,   No);
-DECLARE_ADD_OP(JMP,   Label);
-DECLARE_ADD_OP(JB,    Label);
-DECLARE_ADD_OP(JBE,   Label);
-DECLARE_ADD_OP(JA,    Label);
-DECLARE_ADD_OP(JAE,   Label);
-DECLARE_ADD_OP(JE,    Label);
-DECLARE_ADD_OP(JNE,   Label);
-DECLARE_ADD_OP(PUSHR, Reg);
-DECLARE_ADD_OP(POPR,  Reg);
-DECLARE_ADD_OP(PUSHM, Ram);
-DECLARE_ADD_OP(POPM,  Ram);
-DECLARE_ADD_OP(DRAW,  Normal);
-DECLARE_ADD_OP(WDRAW, Normal);
-
 AsmErr_t ProcessLabelCase(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
 {
     assert(cmd_ctx);
