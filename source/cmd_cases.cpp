@@ -28,7 +28,9 @@ CmdCase_t CMD_CASES[] = {
     SET_CMD_CASE (PUSHM, 2, Ram),
     SET_CMD_CASE (POPM,  2, Ram),
     SET_CMD_CASE (DRAW,  2, Normal),
+#ifdef GRAPHICS
     SET_CMD_CASE (WDRAW, 2, Normal)
+#endif /* GRAPHICS */
 };
 
 const size_t CMD_CASES_SIZE = sizeof(CMD_CASES) / sizeof(CMD_CASES[0]);

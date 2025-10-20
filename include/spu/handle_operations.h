@@ -1,7 +1,9 @@
 #ifndef HANDLE_OPERATIONS_H
 #define HANDLE_OPERATIONS_H
 
-#include <TXLib.h>
+#ifdef GRAPHICS
+    #include <TXLib.h>
+#endif /* GRAPHICS */
 #include <math.h>
 #include <windows.h>
 #include "stack.h"
@@ -25,9 +27,11 @@ int Jump(Proc_t* proc_data, int new_cmd_count);
 
 int ConsoleDrawVram(Proc_t* proc_data, int sleep_time);
 
+#ifdef GRAPHICS
 int WindowOpen();
-
 int WindowDrawVram(Proc_t* proc_data, int sleep_time);
+HandleOpErr_t HandleWDRAW (Proc_t* proc_data);
+#endif /* GRAPHICS */
 
 HandleOpErr_t HandleHLT   (Proc_t* proc_data);
 HandleOpErr_t HandlePUSH  (Proc_t* proc_data);
@@ -54,6 +58,5 @@ HandleOpErr_t HandlePOPR  (Proc_t* proc_data);
 HandleOpErr_t HandlePUSHM (Proc_t* proc_data);
 HandleOpErr_t HandlePOPM  (Proc_t* proc_data);
 HandleOpErr_t HandleDRAW  (Proc_t* proc_data);
-HandleOpErr_t HandleWDRAW (Proc_t* proc_data);
 
 #endif /* HANDLE_OPERATIONS_H */

@@ -40,8 +40,12 @@ ASMOUTPUTS = bytecode.bin \
 			 pretty_bc.txt
 
 ifdef DEBUG
-ASMFLAGS += -DASM_DEBUG -DINPUT_DEBUG
+ASMFLAGS += -DASM_DEBUG -DINPUT_DEBUG -DDEBUG
 PROCFLAGS += -DPROC_DEBUG -DSTACK_DEBUG -DDEBUG -DINPUT_DEBUG
+endif
+
+ifdef GRAPHICS
+PROCFLAGS += -DGRAPHICS
 endif
 
 all:
@@ -52,6 +56,9 @@ asm:
 
 spu:
 	$(CXX) -DSPU $(PROCFLAGS) $(PROCSOURCES) -o $(PROCEXECUTABLE)
+
+bad_apple:
+	$(CXX) -Iinclude badapple/main.cpp source/input.cpp -o bad.exe
 
 clean:
 	rm $(PROCOUTPUTS) $(ASMOUTPUTS) $(PROCEXECUTABLE) $(ASMEXECUTABLE)

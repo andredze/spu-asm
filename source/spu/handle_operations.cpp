@@ -369,6 +369,7 @@ HandleOpErr_t HandleDRAW(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
+#ifdef GRAPHICS
 HandleOpErr_t HandleWDRAW(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
@@ -415,21 +416,22 @@ int WindowDrawVram(Proc_t* proc_data, int sleep_time)
 
     return 0;
 }
+#endif /* GRAPHICS */
 
 int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
 {
     assert(proc_data != NULL);
 
     system("cls");
-    printf(RED "Drawing...\n" RESET_CLR);
+    DPRINTF(RED "Drawing...\n" RESET_CLR);
 
     char buffer[RAM_SIZE * 3 + RAM_SIDE_SIZE] = {};
     int buf_ind = 0;
 
     for (size_t i = 0; i < RAM_SIZE; i++)
     {
-        buffer[buf_ind++] = ' ';
-        if (proc_data->ram[i] == 0)
+        // buffer[buf_ind++] = ' ';
+        if (proc_data->ram[i] == 0) // || proc_data->ram[i] == ' '
         {
             buffer[buf_ind++] = '.';
             // printf(GRAY " . " RESET_CLR);
@@ -439,7 +441,7 @@ int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
             buffer[buf_ind++] = proc_data->ram[i];
             // printf(LIGHT_YELLOW " %c " RESET_CLR, proc_data->ram[i]);
         }
-        buffer[buf_ind++] = ' ';
+        // buffer[buf_ind++] = ' ';
 
         if ((i + 1) % RAM_SIDE_SIZE == 0)
         {
@@ -457,7 +459,7 @@ int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
         return 1;
     }
 
-    Sleep(sleep_time);
+    // Sleep(sleep_time);
 
     return 0;
 }
