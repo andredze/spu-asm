@@ -352,11 +352,6 @@ HandleOpErr_t HandlePOPM(Proc_t* proc_data)
     proc_data->ram[mem_addr] = value;
     DPRINTF("\t\tpoped to ram[%zu] = %d\n", mem_addr, value);
 
-    // if (ConsoleDrawVram(proc_data, DEFAULT_SLEEP_TIME))
-    // {
-    //     return HANDLE_OP_DRAW_ERROR;
-    // }
-
     return HANDLE_OP_SUCCESS;
 }
 
@@ -456,13 +451,13 @@ int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
 
     size_t symbols_count = sizeof(buffer) / sizeof(buffer[0]);
 
-    if (fwrite(buffer, sizeof(buffer[0]), symbols_count, stdout) != symbols_count)
+    if (fwrite(buffer, sizeof(buffer), 1, stdout) != 1)
     {
         printf(RED "Draw in console failed\n" RESET_CLR);
         return 1;
     }
 
-    // Sleep(sleep_time);
+    Sleep(sleep_time);
 
     return 0;
 }
