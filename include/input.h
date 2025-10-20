@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <sys\stat.h>
 
-#ifdef DEBUG
+#ifdef INPUT_DEBUG
     #ifndef DPRINTF
         #define DPRINTF(...) fprintf(stderr, __VA_ARGS__);
     #endif

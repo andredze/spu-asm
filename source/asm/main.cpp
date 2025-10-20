@@ -1,8 +1,11 @@
+#include <TXLib.h>
 #include "assembler.h"
 #include "config.h"
 
 int main(int argc, char* argv[])
 {
+    printf(BLUE "Compiling programm...\n" RESET_CLR);
+
     SetHashInCmdCases();
 
     qsort(CMD_CASES, CMD_CASES_SIZE, sizeof(CMD_CASES[0]), AsmCmdCasesCompare);
@@ -23,8 +26,11 @@ int main(int argc, char* argv[])
 
     if (CompileProgramm(&asm_input_ctx, listing_flag) != ASM_SUCCESS)
     {
+        printf(RED "Compilation error\n" RESET_CLR);
         return EXIT_FAILURE;
     }
+
+    printf(GREEN "Compilation success" RESET_CLR);
 
     return EXIT_SUCCESS;
 }

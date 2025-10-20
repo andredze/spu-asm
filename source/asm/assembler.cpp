@@ -97,8 +97,6 @@ AsmErr_t CompileProgramm(InputCtx_t* input_ctx, int listing_flag)
     }
     DPrintAsmData(&asm_ctx);
 
-    free(asm_ctx.labels);
-
     if (WriteByteCode(&asm_ctx, input_ctx))
     {
         return ASM_PRINT_CODE_ERROR;
@@ -109,7 +107,7 @@ AsmErr_t CompileProgramm(InputCtx_t* input_ctx, int listing_flag)
     // }
 
     AsmDestroy(input_ctx, &asm_ctx);
-    DPRINTF("\n<End of the compilator>");
+    DPRINTF("\n<End of the compilator>\n");
 
     return ASM_SUCCESS;
 }
