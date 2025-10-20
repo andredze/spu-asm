@@ -199,6 +199,11 @@ AsmErr_t CompileCommands(InputCtx_t* input_ctx,
                 return ASM_LISTING_ERROR;
             }
         }
+
+        if (i % 10000000 == 0)
+        {
+            printf(LIGHT_YELLOW "Compiled %d lines..\n" RESET_CLR, i);
+        }
     }
     if (listing_flag == 1)
     {

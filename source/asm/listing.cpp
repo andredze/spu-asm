@@ -8,7 +8,16 @@ AsmErr_t CreateListingFile(InputCtx_t* input_ctx,
 
     char listing_filename[MAX_FILENAME_LEN] = {};
     strcpy(listing_filename, "logs/");
-    strcat(listing_filename, strchr(input_ctx->input_file_info.filepath, '/') + 1);
+
+    const char* filename_start = input_ctx->input_file_info.filepath;
+    if ((filename_start = strchr(input_ctx->input_file_info.filepath, '/')) != NULL)
+    {
+        strcat(listing_filename, filename_start + 1);
+    }
+    else
+    {
+        strcat(listing_filename, input_ctx->input_file_info.filepath);
+    }
     strcat(listing_filename, ".lst");
     DPRINTF("listing_filename = %s\n", listing_filename);
     listing_file_info->filepath = listing_filename;
