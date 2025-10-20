@@ -352,6 +352,11 @@ HandleOpErr_t HandlePOPM(Proc_t* proc_data)
     proc_data->ram[mem_addr] = value;
     DPRINTF("\t\tpoped to ram[%zu] = %d\n", mem_addr, value);
 
+    // if (ConsoleDrawVram(proc_data, DEFAULT_SLEEP_TIME))
+    // {
+    //     return HANDLE_OP_DRAW_ERROR;
+    // }
+
     return HANDLE_OP_SUCCESS;
 }
 
@@ -420,19 +425,44 @@ int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
 {
     assert(proc_data != NULL);
 
+    system("cls");
+    printf(RED "Drawing...\n" RESET_CLR);
+
+    char buffer[RAM_SIZE * 3 + RAM_SIDE_SIZE] = {};
+    int buf_ind = 0;
+
     for (size_t i = 0; i < RAM_SIZE; i++)
     {
-        if (proc_data->ram[i] == 0) {
-            printf(" - "); }
-        else {
-            printf(" %c ", proc_data->ram[i]); }
+        buffer[buf_ind++] = ' ';
+        if (proc_data->ram[i] == 0)
+        {
+            buffer[buf_ind++] = '.';
+            // printf(GRAY " . " RESET_CLR);
+        }
+        else
+        {
+            buffer[buf_ind++] = proc_data->ram[i];
+            // printf(LIGHT_YELLOW " %c " RESET_CLR, proc_data->ram[i]);
+        }
+        buffer[buf_ind++] = ' ';
+
         if ((i + 1) % RAM_SIDE_SIZE == 0)
         {
-            printf("\n");
+            buffer[buf_ind++] = '\n';
+            // printf("\n");
         }
     }
-    printf("\n\n");
-    Sleep(sleep_time);
+    // printf("\n\n");
+
+    size_t symbols_count = sizeof(buffer) / sizeof(buffer[0]);
+
+    if (fwrite(buffer, sizeof(buffer[0]), symbols_count, stdout) != symbols_count)
+    {
+        printf(RED "Draw in console failed\n" RESET_CLR);
+        return 1;
+    }
+
+    // Sleep(sleep_time);
 
     return 0;
 }

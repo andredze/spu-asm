@@ -7,6 +7,7 @@
 #include "stack.h"
 #include "input.h"
 #include "spu_types.h"
+#include "colors.h"
 
 typedef enum HandleOpErr {
     HANDLE_OP_SUCCESS,

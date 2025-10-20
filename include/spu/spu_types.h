@@ -22,7 +22,7 @@ typedef enum ProcErr {
     PROC_ERR_END
 } ProcErr_t;
 
-const int DEFAULT_SLEEP_TIME = 0;
+const int DEFAULT_SLEEP_TIME = 100;
 const int REGS_COUNT = 8;
 const size_t RAM_SIDE_SIZE = 100;
 const size_t RAM_SIZE = RAM_SIDE_SIZE * RAM_SIDE_SIZE;

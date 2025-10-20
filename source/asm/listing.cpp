@@ -20,6 +20,7 @@ AsmErr_t CreateListingFile(InputCtx_t* input_ctx,
 
     fprintf(listing_file_info->stream, "addr\tcmd\t\t\tcode\tvalue\n\n");
     DPRINTF("FILE = %p\n", listing_file_info->stream);
+    printf(LIGHT_YELLOW "Created listing file: %s\n" RESET_CLR, listing_filename);
 
     return ASM_SUCCESS;
 }
