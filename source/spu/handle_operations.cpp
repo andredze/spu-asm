@@ -400,12 +400,12 @@ int WindowDrawVram(Proc_t* proc_data, int sleep_time)
     HDC dc = txDC();
 
     COLORREF color = TX_WHITE;
-    for (int x_ram = 0; x_ram < RAM_SIDE_SIZE; x_ram++)
+    for (int y_ram = 0; y_ram < RAM_HEIGHT; y_ram++)
     {
-        for (int y_ram = 0; y_ram < RAM_SIDE_SIZE; y_ram++)
+        for (int x_ram = 0; x_ram < RAM_WIDTH; x_ram++)
         {
             color = TX_WHITE;
-            if (proc_data->ram[y_ram * RAM_SIDE_SIZE + x_ram] != 0)
+            if (proc_data->ram[y_ram * RAM_WIDTH + x_ram] != 0)
                 color = TX_GREEN;
             txSetPixel(x_ram, y_ram, color, dc);
         }
@@ -425,41 +425,29 @@ int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
     system("cls");
     DPRINTF(RED "Drawing...\n" RESET_CLR);
 
-    char buffer[RAM_SIZE * 3 + RAM_SIDE_SIZE] = {};
-    int buf_ind = 0;
+    // printf(LIGHT_YELLOW);
 
     for (size_t i = 0; i < RAM_SIZE; i++)
     {
-        // buffer[buf_ind++] = ' ';
-        if (proc_data->ram[i] == 0) // || proc_data->ram[i] == ' '
+        // if (proc_data->ram[i] == 0) // || proc_data->ram[i] == ' '
+        // {
+        //     printf("."); // GRAY
+        // }
+        // else
+        // {
+        //     printf("%c", proc_data->ram[i]); // LIGHT_YELLOW
+        // }
+        printf("%c", proc_data->ram[i]); // LIGHT_YELLOW
+        if ((i + 1) % RAM_WIDTH == 0)
         {
-            buffer[buf_ind++] = '.';
-            // printf(GRAY " . " RESET_CLR);
-        }
-        else
-        {
-            buffer[buf_ind++] = proc_data->ram[i];
-            // printf(LIGHT_YELLOW " %c " RESET_CLR, proc_data->ram[i]);
-        }
-        // buffer[buf_ind++] = ' ';
-
-        if ((i + 1) % RAM_SIDE_SIZE == 0)
-        {
-            buffer[buf_ind++] = '\n';
-            // printf("\n");
+            printf("\n");
         }
     }
+    // fflush(stdout);
+    // printf(RESET_CLR);
     // printf("\n\n");
 
-    size_t symbols_count = sizeof(buffer) / sizeof(buffer[0]);
-
-    if (fwrite(buffer, sizeof(buffer), 1, stdout) != 1)
-    {
-        printf(RED "Draw in console failed\n" RESET_CLR);
-        return 1;
-    }
-
-    // Sleep(sleep_time);
+    // Sleep(sleep_time / 6);
 
     return 0;
 }

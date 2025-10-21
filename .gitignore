@@ -3,6 +3,7 @@
 
 # Video
 *.mp4
+*.jpg
 
 # Outputs
 *.bin

@@ -29,7 +29,7 @@ ASMSOURCES = source/asm/main.cpp \
 			 source/asm/assembler.cpp \
 			 source/asm/listing.cpp \
 			 source/asm/add_operations.cpp \
-			 source/input.cpp \
+			 source/badinput.cpp \
 			 source/cmd_cases.cpp
 
 ASMEXECUTABLE = compile.exe
@@ -58,7 +58,7 @@ spu:
 	$(CXX) -DSPU $(PROCFLAGS) $(PROCSOURCES) -o $(PROCEXECUTABLE)
 
 bad_apple:
-	$(CXX) -Iinclude badapple/main.cpp source/input.cpp -o bad.exe
+	$(CXX) -Iinclude badapple/main.cpp source/badinput.cpp -o bad.exe
 
 clean:
 	rm $(PROCOUTPUTS) $(ASMOUTPUTS) $(PROCEXECUTABLE) $(ASMEXECUTABLE)

@@ -2,9 +2,10 @@
 #include "input.h"
 #include "colors.h"
 
-const int MAX_FILENAME_LEN = 30;
-const int FRAMES_COUNT = 6572; // 6572
-const int STRING_LEN = 96;
+// strings_count = 40;
+const int MAX_FILENAME_LEN = 50;
+const int FRAMES_COUNT = 6962; // 6572 // 6962
+const int STRING_LEN = 106;
 
 int ConvertFrame(int i, FILE* stream);
 
@@ -12,11 +13,11 @@ int main()
 {
     printf(BLUE "Converting started...\n" RESET_CLR);
 
-    FILE* stream = fopen("badapple/badapple.txt", "w");
+    FILE* stream = fopen("badapple/mybadapple.txt", "w");
 
     for (int i = 1; i <= FRAMES_COUNT; i++)
     {
-        if (ConvertFrame(i, stream))
+        if (ConvertFrame(i, stream) != 0)
         {
             fclose(stream);
             printf("Frame %d conversion failed\n", i);
@@ -37,7 +38,7 @@ int main()
 int ConvertFrame(int i, FILE* output_stream)
 {
     char input_filename[MAX_FILENAME_LEN] = "";
-    sprintf(input_filename, "badapple/frames/out%04d.jpg.txt", i);
+    sprintf(input_filename, "badapple/myasciiframes/out%04d-ascii-art.txt", i);
 
     InputCtx_t input_ctx = {.input_file_info =  {.filepath = input_filename}};
 
@@ -53,6 +54,7 @@ int ConvertFrame(int i, FILE* output_stream)
     fprintf(output_stream, "PUSH 0\nPOPR RAX\n");
 
     // int flag = 1;
+    // printf("lines_count = %d\n", input_ctx.ptrdata_params.lines_count);
 
     for (int i = 0; i < input_ctx.ptrdata_params.lines_count; i++)
     {
@@ -70,7 +72,7 @@ int ConvertFrame(int i, FILE* output_stream)
         }
     }
 
-    fprintf(output_stream, "DRAW 100\n");
+    fprintf(output_stream, "DRAW 33\n");
 
     return 0;
 }
