@@ -1,6 +1,14 @@
 #include "cmd_cases.h"
 
-// SET_CMD_CASE(CMD_NAME, args_count, args_type)
+#ifdef SPU
+    #define SET_CMD_CASE(name, args_count, args_type)   [CMD_  ## name] = {#name, CMD_ ## name, (args_count), Handle ## name}
+#endif /* SPU */
+#ifdef ASM
+    #define SET_CMD_CASE(name, args_count, args_type)   [CMD_  ## name] = {#name, CMD_ ## name, (args_count), Add ## args_type ## ArgOp, 0}
+#endif /* ASM */
+#ifndef SET_CMD_CASE
+    #define SET_CMD_CASE(name, args_count, args_type)   [CMD_  ## name] = {#name, CMD_ ## name, (args_count)}
+#endif /* SET_CMD_CASE */
 
 CmdCase_t CMD_CASES[] = {
     SET_CMD_CASE (HLT,   1, No),

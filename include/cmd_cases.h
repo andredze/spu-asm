@@ -23,16 +23,6 @@ typedef struct CmdCase {
 #endif /* ASM */
 } CmdCase_t;
 
-#ifdef SPU
-    #define SET_CMD_CASE(name, args_count, args_type)   {#name, CMD_ ## name, (args_count), Handle ## name}
-#endif /* SPU */
-#ifdef ASM
-    #define SET_CMD_CASE(name, args_count, args_type)   {#name, CMD_ ## name, (args_count), Add ## args_type ## ArgOp, 0}
-#endif /* ASM */
-#ifndef SET_CMD_CASE
-    #define SET_CMD_CASE(name, args_count, args_type)   {#name, CMD_ ## name, (args_count)}
-#endif /* SET_CMD_CASE */
-
 extern CmdCase_t CMD_CASES[];
 
 extern const size_t CMD_CASES_SIZE;
