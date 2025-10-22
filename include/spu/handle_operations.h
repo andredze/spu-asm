@@ -5,6 +5,7 @@
     #include <TXLib.h>
 #endif /* GRAPHICS */
 #include <math.h>
+#include <unistd.h>
 #include <windows.h>
 #include "stack.h"
 #include "input.h"

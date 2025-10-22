@@ -3,14 +3,6 @@
 
 int main(int argc, char* argv[])
 {
-    char buffer[RAM_SIZE + RAM_HEIGHT] = {};
-
-    if (setvbuf(stdout, buffer, _IOFBF, sizeof(buffer)) != 0)
-    {
-        DPRINTF("Setvbuffer size failed\n");
-        return 1;
-    }
-
     const char* code_filename = NULL;
 
     if (SpuSetFilenames(&code_filename, argc, argv))
