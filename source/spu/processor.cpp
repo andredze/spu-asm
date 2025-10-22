@@ -401,46 +401,71 @@ ProcErr_t ProcConsoleDump(Proc_t* proc_data)
 
     DPRINTF(RED "------------------------<PROC DUMP>------------------------\n"
             YELLOW "stack: [");
+
     for (size_t i = 0; i < proc_data->stack.size; i++)
     {
-        if (i == proc_data->stack.size - 1) {
-            DPRINTF("%d", proc_data->stack.data[i]); break; }
-        if ((i + 1) % 14 == 0 && i != 0) {
-            DPRINTF("\n\t"); }
-        DPRINTF("%d, ", proc_data->stack.data[i])
+        if (i == proc_data->stack.size - 1)
+        {
+            DPRINTF("%d", proc_data->stack.data[i]);
+            break;
+        }
+        if ((i + 1) % 14 == 0 && i != 0)
+        {
+            DPRINTF("\n\t");
+        }
+        DPRINTF("%d, ", proc_data->stack.data[i]);
     }
-    DPRINTF("]\n"
-            "call_stack: [");
+    DPRINTF("]\ncall_stack: [");
+
     for (size_t i = 0; i < proc_data->call_stack.size; i++)
     {
-        if (i == proc_data->call_stack.size - 1) {
-            DPRINTF("%d", proc_data->call_stack.data[i]); break; }
-        if ((i + 1) % 14 == 0 && i != 0) {
-            DPRINTF("\n\t"); }
+        if (i == proc_data->call_stack.size - 1)
+        {
+            DPRINTF("%d", proc_data->call_stack.data[i]);
+            break;
+        }
+        if ((i + 1) % 14 == 0 && i != 0)
+        {
+            DPRINTF("\n\t");
+        }
         DPRINTF("%d, ", proc_data->call_stack.data[i])
     }
-    DPRINTF("]\n" GREEN
-            "regs[%d] = [", REGS_COUNT);
+    DPRINTF("]\n" GREEN "regs[%d] = [", REGS_COUNT);
+
     for (int i = 0; i < REGS_COUNT; i++)
     {
-        if (i == REGS_COUNT - 1) {
-            DPRINTF("%d", proc_data->regs[i]); break; }
-        if ((i + 1) % 14 == 0 && i != 0) {
-            DPRINTF("\n\t"); }
+        if (i == REGS_COUNT - 1)
+        {
+            DPRINTF("%d", proc_data->regs[i]);
+            break;
+        }
+        if ((i + 1) % 14 == 0 && i != 0)
+        {
+            DPRINTF("\n\t");
+        }
         DPRINTF("%d, ", proc_data->regs[i]);
     }
-    DPRINTF("]\n" BLUE
-            "code[] = [");
+    DPRINTF("]\n" BLUE "code[] = [");
+
     for (size_t i = 0; i < proc_data->code_size; i++)
     {
-        if (i == proc_data->code_size - 1) {
-            DPRINTF("%d", proc_data->code[i]); break; }
-        if ((i + 1) % 14 == 0 && i != 0) {
-            DPRINTF("\n\t  "); }
-        if (i == proc_data->cmd_count) {
-            DPRINTF("{%d}, ", proc_data->code[i]); }
-        else {
-            DPRINTF("%d, ", proc_data->code[i]); }
+        if (i == proc_data->code_size - 1)
+        {
+            DPRINTF("%d", proc_data->code[i]);
+            break;
+        }
+        if ((i + 1) % 14 == 0 && i != 0)
+        {
+            DPRINTF("\n\t  ");
+        }
+        if (i == proc_data->cmd_count)
+        {
+            DPRINTF("{%d}, ", proc_data->code[i]);
+        }
+        else
+        {
+            DPRINTF("%d, ", proc_data->code[i]);
+        }
     }
 
     size_t ram_size = RAM_SIZE;
@@ -448,19 +473,25 @@ ProcErr_t ProcConsoleDump(Proc_t* proc_data)
     {
         ram_size = MAX_DUMP_RAM_SIZE;
     }
-    DPRINTF("]\n"
-            LIGHT_YELLOW "ram[] = [");
+
+    DPRINTF("]\n" LIGHT_YELLOW "ram[] = [");
+
     for (size_t i = 0; i < ram_size; i++)
     {
-        if (i == ram_size - 1) {
-            DPRINTF("%d", proc_data->ram[i]); }
-        else if (i % 17 == 0 && i != 0) {
-            DPRINTF("\n\t "); }
-        else {
-            DPRINTF("%d, ", proc_data->ram[i]); }
+        if (i == ram_size - 1)
+        {
+            DPRINTF("%d", proc_data->ram[i]);
+        }
+        else if (i % 17 == 0 && i != 0)
+        {
+            DPRINTF("\n\t ");
+        }
+        else
+        {
+            DPRINTF("%d, ", proc_data->ram[i]);
+        }
     }
-    DPRINTF("]\n"
-            RED "-----------------------------------------------------------\n" RESET_CLR);
+    DPRINTF("]\n" RED "-----------------------------------------------------------\n" RESET_CLR);
 
     return PROC_SUCCESS;
 }
