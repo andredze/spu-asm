@@ -1,13 +1,18 @@
 #ifndef ASM_TYPES_H
 #define ASM_TYPES_H
 
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 #include <stdio.h>
 #include "commands.h"
 
-typedef enum AsmErr {
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+typedef enum AsmErr
+{
     ASM_SUCCESS,
     ASM_ERROR_WITH_READING_FILE,
-    ASM_OUTPUT_FILE_OPENNING_ERROR,
+    ASM_OUTPUT_FILE_OPENING_ERROR,
     ASM_GET_COMMAND_ERROR,
     ASM_SET_COMMAND_ERROR,
     ASM_CALLOC_ERROR,
@@ -26,19 +31,27 @@ typedef enum AsmErr {
     ASM_LABEL_ERROR
 } AsmErr_t;
 
-typedef struct AsmCtx {
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+typedef struct AsmCtx
+{
     int* buffer;
     size_t cur_cmd;
     size_t* labels;
     int labels_size;
 } AsmCtx_t;
 
-typedef struct CmdCtx {
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+typedef struct CmdCtx
+{
     char* line;
     Command_t command;
     int value;
     int op_len;
     int index;
 } CmdCtx_t;
+
+//——————————————————————————————————————————————————————————————————————————————————————————
 
 #endif /* ASM_TYPES_H */

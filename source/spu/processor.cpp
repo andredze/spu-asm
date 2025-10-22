@@ -117,7 +117,7 @@ ProcErr_t ProcLoadCode(Proc_t* proc_data, const char* codepath)
     if (code_stream == NULL)
     {
         printf("Error with opening file\n");
-        return PROC_CODE_FILE_OPENNING_ERROR;
+        return PROC_CODE_FILE_OPENING_ERROR;
     }
 
     CodeParams_t code_params = {};
@@ -241,7 +241,7 @@ ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
     if (stream == NULL)
     {
         DPRINTF("Can not open stream: processor.log");
-        return PROC_OUTPUT_FILE_OPENNING_ERROR;
+        return PROC_OUTPUT_FILE_OPENING_ERROR;
     }
 
     const char* error_str = "";

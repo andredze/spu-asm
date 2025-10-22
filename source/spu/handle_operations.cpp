@@ -426,74 +426,30 @@ int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
 
     static HANDLE hConsole = NULL;
     static COORD home = {0, 0};
-    static DWORD dummy;
+    static DWORD written = 0;
 
-    if (hConsole == NULL) {
+    if (hConsole == NULL)
+    {
         hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         system("cls");
     }
 
-    char buffer[RAM_SIZE * 3 + RAM_HEIGHT] = {};
+    char buffer[RAM_SIZE * 3 + RAM_HEIGHT + 1] = {};
     int buf_ind = 0;
 
     for (size_t i = 0; i < RAM_SIZE; i++)
     {
-        // buffer[buf_ind++] = ' ';
-        // if (proc_data->ram[i] == 0) // || proc_data->ram[i] == ' '
-        // {
-        //     buffer[buf_ind++] = '.';
-        //     // printf(GRAY " . " RESET_CLR);
-        // }
-        // else
-        // {
         buffer[buf_ind++] = proc_data->ram[i];
-            // printf(LIGHT_YELLOW " %c " RESET_CLR, proc_data->ram[i]);
-        // }
-        // buffer[buf_ind++] = ' ';
 
         if ((i + 1) % RAM_WIDTH == 0)
         {
             buffer[buf_ind++] = '\n';
-            // printf("\n");
         }
     }
-    // printf("\n\n");
+    buffer[buf_ind++] = '\n';
 
     SetConsoleCursorPosition(hConsole, home);
-    WriteConsoleA(hConsole, buffer, buf_ind - 1, &dummy, NULL);
+    WriteConsoleA(hConsole, buffer, buf_ind - 1, &written, NULL);
 
     return 0;
 }
-
-// int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
-// {
-//     usleep(4160);
-//     static HANDLE hConsole = NULL;
-//     static COORD home = {0, 0};
-//     static DWORD dummy;
-//
-//     if (hConsole == NULL) {
-//         hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-//         system("cls");
-//     }
-//
-//     char buffer[RAM_SIZE * 5];
-//     int pos = 0;
-//
-//     for (int i = 1; i <= RAM_SIZE; i++) {
-//         char ch = (char) proc_data->ram[i - 1];
-//         pos += sprintf(buffer + pos, "%c");
-//
-//         if (i % RAM_WIDTH == 0) {
-//             pos += sprintf(buffer + pos, "\n");
-//         }
-//     }
-//     pos += sprintf(buffer + pos, "\n");
-//
-//     // Возвращаем курсор и перезаписываем
-//     SetConsoleCursorPosition(hConsole, home);
-//     WriteConsoleA(hConsole, buffer, pos, &dummy, NULL);
-//
-//     return 0;
-// }
-

@@ -273,7 +273,7 @@ int StackErrToStr(StackErr_t error, const char** line)
         case STACK_END_CANARY_RUINED:
             *line = "End boundary value was changed";
             return 0;
-        case STACK_FILE_OPENNING_ERROR:
+        case STACK_FILE_OPENING_ERROR:
             *line = "Opening the log file failed";
             return 0;
         case STACK_SIZE_IS_ZERO:
@@ -300,7 +300,7 @@ StackErr_t StackDump(Stack_t* stack, StackErr_t error,
     if (stream == NULL)
     {
         DPRINTF("Can not open stream: stack.log");
-        return STACK_FILE_OPENNING_ERROR;
+        return STACK_FILE_OPENING_ERROR;
     }
 
     const char* error_str = NULL;

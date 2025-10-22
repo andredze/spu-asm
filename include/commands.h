@@ -1,9 +1,14 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 #include <stdio.h>
 
-typedef enum Command {
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+typedef enum Command
+{
     CMD_HLT   = 0,
     CMD_PUSH  = 1,
     CMD_OUT   = 2,
@@ -29,18 +34,27 @@ typedef enum Command {
     CMD_PUSHM = 22,
     CMD_POPM  = 23,
     CMD_DRAW  = 24,
+
 #ifdef GRAPHICS
     CMD_WDRAW = 25,
 #endif /* GRAPHICS */
+
     CMD_LABEL,
     CMD_END
 } Command_t;
 
-typedef struct CodeParams {
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+typedef struct CodeParams
+{
     int version;
     size_t code_size;
 } CodeParams_t;
 
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 const int CMD_MAX_LEN = 50;
+
+//——————————————————————————————————————————————————————————————————————————————————————————
 
 #endif /* COMMANDS_H */

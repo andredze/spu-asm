@@ -1,14 +1,19 @@
 #ifndef SPU_TYPES_H
 #define SPU_TYPES_H
 
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 #include <stdio.h>
 
-typedef enum ProcErr {
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+typedef enum ProcErr
+{
     PROC_SUCCESS,
-    PROC_CODE_FILE_OPENNING_ERROR,
+    PROC_CODE_FILE_OPENING_ERROR,
     PROC_READING_FILE_ERROR,
     PROC_CALLOC_ERROR,
-    PROC_OUTPUT_FILE_OPENNING_ERROR,
+    PROC_OUTPUT_FILE_OPENING_ERROR,
     PROC_UNKNOWN_COMMAND,
     PROC_EXECUTE_OP_ERROR,
     PROC_MATH_ERROR,
@@ -22,29 +27,33 @@ typedef enum ProcErr {
     PROC_ERR_END
 } ProcErr_t;
 
-const int DEFAULT_SLEEP_TIME = 10;
-const int REGS_COUNT = 8;
-const size_t RAM_WIDTH = 106; // 96
-const size_t RAM_HEIGHT = 40; // 36
-const size_t RAM_SIZE = RAM_HEIGHT * RAM_WIDTH; // 96 * 36
+//——————————————————————————————————————————————————————————————————————————————————————————
 
-const int MAX_DUMP_RAM_SIZE = 64;
-const size_t MAX_RAM_ADDRESS = SIZE_MAX / 32 * 20;
-const size_t PROC_CODE_SIZE_LIMIT = SIZE_MAX / 32 * 30;
+const int    REGS_COUNT = 8;
+
+const int    DEFAULT_SLEEP_TIME = 10000;
+const int    MAX_DUMP_RAM_SIZE = 64;
+const size_t RAM_HEIGHT = 40;
+const size_t RAM_WIDTH  = 106;
+const size_t RAM_SIZE   = RAM_HEIGHT * RAM_WIDTH;
+const size_t MAX_RAM_ADDRESS   = SIZE_MAX / 32 * 20;
+
+const size_t PROC_CODE_SIZE_LIMIT    = SIZE_MAX / 32 * 30;
 const size_t PROC_MIN_STACK_CAPACITY = 32;
+
+//——————————————————————————————————————————————————————————————————————————————————————————
 
 typedef struct Proc {
     Stack_t stack;
+    Stack_t call_stack;
     int* code;
     size_t code_size;
     size_t cmd_count;
-    int regs[REGS_COUNT];
-    Stack_t call_stack;
     int* ram;
-#ifdef PROC_DEBUG
-    VarInfo_t var_info;
-#endif
+    int regs[REGS_COUNT];
 } Proc_t;
+
+//——————————————————————————————————————————————————————————————————————————————————————————
 
 const char* const PROC_ERR_STRS[] =
     {"Proc_data is OK",
@@ -60,5 +69,7 @@ const char* const PROC_ERR_STRS[] =
      "Proc_data.cmd_count is bigger than limit (probably was set to negative)",
      "Proc_data.code_size is bigger than limit (probably was set to negative)",
      "Proc_data.cmd_count is bigger than code_size"};
+
+//——————————————————————————————————————————————————————————————————————————————————————————
 
 #endif /* SPU_TYPES_H */

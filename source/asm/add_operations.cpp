@@ -1,6 +1,6 @@
 #include "add_operations.h"
 
-AsmErr_t ProcessLabelCase(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
+AsmErr_t ProcessLabelCase(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 {
     assert(cmd_ctx);
     assert(asm_ctx);
