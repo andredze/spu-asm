@@ -11,16 +11,12 @@ int main(int argc, char* argv[])
     }
     DPRINTF("filename = %s\n", code_filename);
 
-    PROC_INIT(proc_data);
+    Proc_t proc_data = {};
 
     if (ProcCtor(&proc_data) != PROC_SUCCESS)
     {
         return EXIT_FAILURE;
     }
-    // if (ProcLoadPrettyBC(&proc_data, READABLE_BYTECODE_FILENAME) != PROC_SUCCESS)
-    // {
-    //     return EXIT_FAILURE;
-    // }
     if (ProcLoadCode(&proc_data, code_filename) != PROC_SUCCESS)
     {
         return EXIT_FAILURE;
