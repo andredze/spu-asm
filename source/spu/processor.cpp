@@ -28,6 +28,7 @@ ProcErr_t ProcCtor(Proc_t* proc_data)
         printf("<Proc_data is null pointer>\n");
         return PROC_DATA_IS_NULL;
     }
+
     if (StackCtor(&proc_data->stack, PROC_MIN_STACK_CAPACITY) != STACK_SUCCESS)
     {
         return PROC_STACK_ERROR;
@@ -394,7 +395,7 @@ ProcErr_t ProcExecuteOperation(Proc_t* proc_data, Command_t command, int* break_
     return PROC_SUCCESS;
 }
 
-int ProcConsoleDump(Proc_t* proc_data)
+ProcErr_t ProcConsoleDump(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
@@ -443,9 +444,9 @@ int ProcConsoleDump(Proc_t* proc_data)
     }
 
     size_t ram_size = RAM_SIZE;
-    if (ram_size > 64)
+    if (ram_size > MAX_DUMP_RAM_SIZE)
     {
-        ram_size = 64;
+        ram_size = MAX_DUMP_RAM_SIZE;
     }
     DPRINTF("]\n"
             LIGHT_YELLOW "ram[] = [");
@@ -461,5 +462,5 @@ int ProcConsoleDump(Proc_t* proc_data)
     DPRINTF("]\n"
             RED "-----------------------------------------------------------\n" RESET_CLR);
 
-    return 0;
+    return PROC_SUCCESS;
 }

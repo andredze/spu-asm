@@ -28,6 +28,7 @@ const size_t RAM_WIDTH = 106; // 96
 const size_t RAM_HEIGHT = 40; // 36
 const size_t RAM_SIZE = RAM_HEIGHT * RAM_WIDTH; // 96 * 36
 
+const int MAX_DUMP_RAM_SIZE = 64;
 const size_t MAX_RAM_ADDRESS = SIZE_MAX / 32 * 20;
 const size_t PROC_CODE_SIZE_LIMIT = SIZE_MAX / 32 * 30;
 const size_t PROC_MIN_STACK_CAPACITY = 32;
