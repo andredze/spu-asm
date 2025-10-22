@@ -1,14 +1,29 @@
 #include "cmd_cases.h"
 
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 #ifdef SPU
-    #define SET_CMD_CASE(name, args_count, args_type)   [CMD_  ## name] = {#name, CMD_ ## name, (args_count), Handle ## name}
+
+    #define SET_CMD_CASE(name, args_count, args_type) \
+            [CMD_  ## name] = {#name, CMD_ ## name, (args_count), Handle ## name}
+
 #endif /* SPU */
+
 #ifdef ASM
-    #define SET_CMD_CASE(name, args_count, args_type)   [CMD_  ## name] = {#name, CMD_ ## name, (args_count), Add ## args_type ## ArgOp, 0}
+
+    #define SET_CMD_CASE(name, args_count, args_type) \
+            [CMD_  ## name] = {#name, CMD_ ## name, (args_count), Add ## args_type ## ArgOp, 0}
+
 #endif /* ASM */
+
 #ifndef SET_CMD_CASE
-    #define SET_CMD_CASE(name, args_count, args_type)   [CMD_  ## name] = {#name, CMD_ ## name, (args_count)}
+
+    #define SET_CMD_CASE(name, args_count, args_type) \
+            [CMD_  ## name] = {#name, CMD_ ## name, (args_count)}
+
 #endif /* SET_CMD_CASE */
+
+//——————————————————————————————————————————————————————————————————————————————————————————
 
 CmdCase_t CMD_CASES[] = {
     SET_CMD_CASE (HLT,   1, No),
@@ -40,5 +55,11 @@ CmdCase_t CMD_CASES[] = {
     SET_CMD_CASE (WDRAW, 2, Normal)
 #endif /* GRAPHICS */
 };
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
+#undef SET_CMD_CASE
+
+//——————————————————————————————————————————————————————————————————————————————————————————
 
 const size_t CMD_CASES_SIZE = sizeof(CMD_CASES) / sizeof(CMD_CASES[0]);
