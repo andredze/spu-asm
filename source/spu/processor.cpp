@@ -277,16 +277,12 @@ ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
         return PROC_SUCCESS;
     }
 
-    fprintf(stream, "from %s at %s:%d\n"
-                    "ERROR %d: %s\n"
-                    "proc_data: %s [%p]:\n{\n"
+    fprintf(stream, "ERROR %d: %s\n"
+                    "proc_data: [%p]:\n{\n"
                     "\tcmd_count = %zu;\n"
                     "\tcode_size = %zu;\n",
-                    proc_data->var_info.function,
-                    proc_data->var_info.file_name,
-                    proc_data->var_info.line,
                     error, error_str,
-                    proc_data->var_info.struct_name, proc_data,
+                    proc_data,
                     proc_data->cmd_count,
                     proc_data->code_size);
     // stack

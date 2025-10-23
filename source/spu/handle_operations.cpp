@@ -96,7 +96,7 @@ int Jump(Proc_t* proc_data, int new_cmd_count)
 
     if (new_cmd_count > proc_data->code_size || new_cmd_count < 0)
     {
-        DPRINTF("Invalid argument for jump\n");
+        DPRINTF("Invalid argument for jump (%d)\n", new_cmd_count);
         return 1;
     }
     proc_data->cmd_count = new_cmd_count;
@@ -482,7 +482,7 @@ int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
 {
     assert(proc_data != NULL);
 
-    usleep(sleep_time / 3 * 2.75);
+    usleep(sleep_time / 3 * 2.77);
 
     static HANDLE hConsole = NULL;
     static COORD home = {0, 0};

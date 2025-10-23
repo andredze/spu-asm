@@ -234,7 +234,11 @@ AsmErr_t CompileCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx, int* do_continue)
         *comment_start = '\0';
     }
 
+    // TODO: listing labels
+
     cmd_ctx->line = SkipSpaces(cmd_ctx->line);
+
+    DPRINTF(LIGHT_YELLOW "line = %s\n" RESET_CLR, cmd_ctx->line);
 
     if (cmd_ctx->line[0] == '\0')
     {
@@ -272,7 +276,7 @@ char* SkipSpaces(char* str)
 {
     assert(str);
 
-    while (!(isalpha(*str)) && *str != '\0')
+    while (isspace(*str) && *str != '\0')
     {
         str++;
     }
