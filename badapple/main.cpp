@@ -2,12 +2,18 @@
 #include "input.h"
 #include "colors.h"
 
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 // strings_count = 40;
 const int MAX_FILENAME_LEN = 50;
 const int FRAMES_COUNT = 6962; // 6572 // 6962
 const int STRING_LEN = 106;
 
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 int ConvertFrame(int i, FILE* stream);
+
+//——————————————————————————————————————————————————————————————————————————————————————————
 
 int main()
 {
@@ -35,6 +41,8 @@ int main()
     return 0;
 }
 
+//------------------------------------------------------------------------------------------
+
 int ConvertFrame(int i, FILE* output_stream)
 {
     char input_filename[MAX_FILENAME_LEN] = "";
@@ -49,32 +57,37 @@ int ConvertFrame(int i, FILE* output_stream)
     }
 
     char* line = NULL;
+
     int ram_index = 0;
 
-    fprintf(output_stream, "PUSH 0\nPOPR RAX\n");
-
-    // int flag = 1;
-    // printf("lines_count = %d\n", input_ctx.ptrdata_params.lines_count);
+    static int first_run = 1;
+    static int line_len = 0;
 
     for (int i = 0; i < input_ctx.ptrdata_params.lines_count; i++)
     {
-        // if (flag)
-        // {
-        //     int len = strlen(input_ctx.ptrdata_params.ptrdata[i]);
-        //     printf("len = %d\n", len);
-        //     flag = 0;
-        // }
-        line = input_ctx.ptrdata_params.ptrdata[i];
-        for (int j = 0; j < STRING_LEN; j++)
+        if (first_run)
         {
-            fprintf(output_stream, "PUSH %d\nPOPM [RAX]\nPUSHR RAX\nPUSH 1\nADD\nPOPR RAX\n", line[j], ram_index);
+            line_len = strlen(input_ctx.ptrdata_params.ptrdata[i]);
+            printf("lines_count = %d\n", input_ctx.ptrdata_params.lines_count);
+            printf("line_len = %d\n", line_len);
+            first_run = 0;
+        }
+
+        line = input_ctx.ptrdata_params.ptrdata[i];
+
+        for (int j = 0; j < line_len; j++)
+        {
+            fprintf(output_stream, "PUSH %d\nPOPR RAX\nPUSH %d\nPOPM [RAX]\n", ram_index, line[j]);
             ram_index++;
         }
     }
 
-    fprintf(output_stream, "DRAW 33\n");
+    fprintf(output_stream, "DRAW 33333\n");
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
+
 // TODO: POPM [] может принимать просто число - номер элемента в ram
 // RAM = (len = STRING_LEN) x (str_count = ...)

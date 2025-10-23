@@ -14,6 +14,7 @@
 #include "asm_types.h"
 #include "commands.h"
 #include "cmd_cases.h"
+#include "config.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
@@ -27,15 +28,18 @@ int SetFilenames(const char** commands_filename,
                  const char** bytecode_filename,
                  int argc, char* argv[], int* listing_flag);
 
+char* SkipSpaces(char* str);
+
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 AsmErr_t SetHashInCmdCases    ();
 int      AsmGetHash           (const char* str);
 int      AsmCmdCasesCompare   (const void* par1, const void* par2);
 int      AsmCtxCtor           (InputCtx_t* input_ctx, AsmCtx_t* asm_ctx);
-AsmErr_t CompileProgramm      (InputCtx_t* input_ctx, int listing_flag);
-AsmErr_t CompileCommands      (InputCtx_t* input_ctx, AsmCtx_t* asm_ctx, int listing_flag);
+AsmErr_t CompileProgram       (InputCtx_t* input_ctx, int listing_flag);
+AsmErr_t CompileCode          (InputCtx_t* input_ctx, AsmCtx_t* asm_ctx, int listing_flag);
 void     AsmDestroy           (InputCtx_t* input_ctx, AsmCtx_t* asm_ctx);
+AsmErr_t CompileCmd           (AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx, int* do_continue);
 AsmErr_t GetCmd               (AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx);
 int      WriteByteCode        (AsmCtx_t* asm_ctx, InputCtx_t* input_ctx);
 int      WriteByteCodePretty  (AsmCtx_t* asm_ctx, const char* filepath);

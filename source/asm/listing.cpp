@@ -1,5 +1,7 @@
 #include "listing.h"
 
+//------------------------------------------------------------------------------------------
+
 AsmErr_t CreateListingFile(InputCtx_t* input_ctx,
                            FileInfo_t* listing_file_info)
 {
@@ -33,6 +35,8 @@ AsmErr_t CreateListingFile(InputCtx_t* input_ctx,
 
     return ASM_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 AsmErr_t AddStringToListing(CmdCtx_t* cmd_ctx,
                             AsmCtx_t* asm_ctx,
@@ -71,6 +75,8 @@ AsmErr_t AddStringToListing(CmdCtx_t* cmd_ctx,
     return ASM_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 void DPrintLabels(AsmCtx_t* asm_ctx)
 {
     DPRINTF("labels_size = %d;\n", asm_ctx->labels_size);
@@ -81,6 +87,8 @@ void DPrintLabels(AsmCtx_t* asm_ctx)
     }
     DPRINTF("\n")
 }
+
+//------------------------------------------------------------------------------------------
 
 void DPrintAsmData(AsmCtx_t* asm_ctx)
 {
@@ -96,6 +104,7 @@ void DPrintAsmData(AsmCtx_t* asm_ctx)
     {
         DPRINTF("%zu, ", asm_ctx->labels[i]);
     }
-    DPRINTF("\n"
-            "-----------------------------------------------------------------\n");
+    DPRINTF("\n-----------------------------------------------------------------\n");
 }
+
+//------------------------------------------------------------------------------------------

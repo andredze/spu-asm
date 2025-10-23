@@ -7,7 +7,7 @@ Soft processor unit and assembler
   make asm
 ```
 
-## Build programm
+## Build program
 
 ```powershell
   make spu
@@ -20,7 +20,7 @@ Build compiler
   make asm DEBUG=1
 ```
 
-Build programm
+Build program
 ```powershell
   make spu DEBUG=1
 ```
@@ -53,7 +53,7 @@ Input file example
   HLT
 ```
 
-Execute programm
+Execute program
 ```powershell
   run.exe <bytecode_name.bin>
 ```
@@ -71,7 +71,7 @@ Comment
 ```
 # <your_commentary>
 ```
-End programm
+End program
 ```
   HLT
 ```

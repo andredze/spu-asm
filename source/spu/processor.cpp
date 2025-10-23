@@ -1,6 +1,6 @@
 #include "processor.h"
 
-// TODO: rename struct names (spu ...)
+//------------------------------------------------------------------------------------------
 
 int SpuSetFilenames(const char** code_filename,
                     int argc, char* argv[])
@@ -20,6 +20,8 @@ int SpuSetFilenames(const char** code_filename,
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
 
 ProcErr_t ProcCtor(Proc_t* proc_data)
 {
@@ -48,6 +50,8 @@ ProcErr_t ProcCtor(Proc_t* proc_data)
     DPRINTF("Proc constructed\n");
     return PROC_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 ProcErr_t ProcLoadPrettyBC(Proc_t* proc_data, const char* codepath)
 {
@@ -108,6 +112,8 @@ ProcErr_t ProcLoadPrettyBC(Proc_t* proc_data, const char* codepath)
     return PROC_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 ProcErr_t ProcLoadCode(Proc_t* proc_data, const char* codepath)
 {
     assert(proc_data != NULL);
@@ -157,6 +163,8 @@ ProcErr_t ProcLoadCode(Proc_t* proc_data, const char* codepath)
     return PROC_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 ProcErr_t ProcDtor(Proc_t* proc_data)
 {
     DPRINTF("Destroying proc_data...\n");
@@ -185,7 +193,12 @@ ProcErr_t ProcDtor(Proc_t* proc_data)
     return PROC_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 #ifdef PROC_DEBUG
+
+//------------------------------------------------------------------------------------------
+
 ProcErr_t ProcVerify(Proc_t* proc_data)
 {
     // DPRINTF("Verifying proc...\n");
@@ -219,6 +232,8 @@ ProcErr_t ProcVerify(Proc_t* proc_data)
     return PROC_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 ProcErr_t ProcErrToStr(ProcErr_t error, const char** error_str)
 {
     DPRINTF("Converting error to string...\n");
@@ -232,6 +247,8 @@ ProcErr_t ProcErrToStr(ProcErr_t error, const char** error_str)
 
     return PROC_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
 {
@@ -317,7 +334,12 @@ ProcErr_t ProcDump(Proc_t* proc_data, ProcErr_t error)
 
     return PROC_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
+
 #endif /* PROC_DEBUG */
+
+//------------------------------------------------------------------------------------------
 
 ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
 {
@@ -329,9 +351,11 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
 
     while (proc_data->cmd_count < proc_data->code_size)
     {
+
 #ifdef PROC_DEBUG
         getchar();
 #endif /* PROC_DEBUG */
+
         if (ProcGetCommand(proc_data, &command))
         {
             return PROC_UNKNOWN_COMMAND;
@@ -345,7 +369,7 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
         }
         if (break_loop == 1)
         {
-            DPRINTF(RED "\nProgramm ran successfully\n" RESET_CLR);
+            DPRINTF(RED "\nProgram ran successfully\n" RESET_CLR);
             break;
         }
 
@@ -362,6 +386,8 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
     return PROC_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 ProcErr_t ProcGetCommand(Proc_t* proc_data, Command_t* command)
 {
     PROC_OK_DEBUG(proc_data);
@@ -370,6 +396,8 @@ ProcErr_t ProcGetCommand(Proc_t* proc_data, Command_t* command)
 
     return PROC_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 ProcErr_t ProcExecuteOperation(Proc_t* proc_data, Command_t command, int* break_loop)
 {
@@ -394,6 +422,8 @@ ProcErr_t ProcExecuteOperation(Proc_t* proc_data, Command_t command, int* break_
 
     return PROC_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 ProcErr_t ProcConsoleDump(Proc_t* proc_data)
 {
@@ -495,3 +525,5 @@ ProcErr_t ProcConsoleDump(Proc_t* proc_data)
 
     return PROC_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------

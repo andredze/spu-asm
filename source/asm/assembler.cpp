@@ -1,5 +1,6 @@
 #include "assembler.h"
-#include "config.h"
+
+//------------------------------------------------------------------------------------------
 
 int AsmGetHash(const char* str)
 {
@@ -13,6 +14,8 @@ int AsmGetHash(const char* str)
     return hash;
 }
 
+//------------------------------------------------------------------------------------------
+
 AsmErr_t SetHashInCmdCases()
 {
     for (size_t i = 0; i < CMD_CASES_SIZE; i++)
@@ -23,6 +26,8 @@ AsmErr_t SetHashInCmdCases()
     return ASM_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 int AsmCmdCasesCompare(const void* par1, const void* par2)
 {
     int hash1 = ((const CmdCase_t*) par1)->hash;
@@ -30,6 +35,8 @@ int AsmCmdCasesCompare(const void* par1, const void* par2)
 
     return hash1 - hash2;
 }
+
+//------------------------------------------------------------------------------------------
 
 int SetFilenames(const char** commands_filename,
                  const char** bytecode_filename,
@@ -65,7 +72,9 @@ int SetFilenames(const char** commands_filename,
     return 0;
 }
 
-AsmErr_t CompileProgramm(InputCtx_t* input_ctx, int listing_flag)
+//------------------------------------------------------------------------------------------
+
+AsmErr_t CompileProgram(InputCtx_t* input_ctx, int listing_flag)
 {
     assert(input_ctx != NULL);
 
@@ -83,15 +92,17 @@ AsmErr_t CompileProgramm(InputCtx_t* input_ctx, int listing_flag)
     }
 
     AsmErr_t error = ASM_SUCCESS;
-    if ((error = CompileCommands(input_ctx, &asm_ctx, 0)) != ASM_SUCCESS)
+    if ((error = CompileCode(input_ctx, &asm_ctx, 0)) != ASM_SUCCESS)
     {
         return error;
     }
     DPrintAsmData(&asm_ctx);
 
-    // two-pass compilation for labels that are declared after usage
+    /* two-pass compilation for labels that are declared after usage */
+
     asm_ctx.cur_cmd = 0; // reset current compile command to start
-    if ((error = CompileCommands(input_ctx, &asm_ctx, listing_flag)) != ASM_SUCCESS)
+
+    if ((error = CompileCode(input_ctx, &asm_ctx, listing_flag)) != ASM_SUCCESS)
     {
         return error;
     }
@@ -101,16 +112,15 @@ AsmErr_t CompileProgramm(InputCtx_t* input_ctx, int listing_flag)
     {
         return ASM_PRINT_CODE_ERROR;
     }
-    // if (WriteByteCodePretty(&asm_ctx, READABLE_BYTECODE_FILENAME))
-    // {
-    //     return ASM_PRINT_CODE_ERROR;
-    // }
 
     AsmDestroy(input_ctx, &asm_ctx);
-    DPRINTF("\n<End of the compilator>\n");
+
+    DPRINTF("\n<End of the compiler>\n");
 
     return ASM_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 int AsmCtxCtor(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx)
 {
@@ -143,14 +153,17 @@ int AsmCtxCtor(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx)
     return 0;
 }
 
-AsmErr_t CompileCommands(InputCtx_t* input_ctx,
-                         AsmCtx_t* asm_ctx,
-                         int listing_flag)
+//------------------------------------------------------------------------------------------
+
+AsmErr_t CompileCode(InputCtx_t* input_ctx,
+                     AsmCtx_t* asm_ctx,
+                     int listing_flag)
 {
-    assert(input_ctx != NULL);
-    assert(asm_ctx != NULL);
+    assert(input_ctx);
+    assert(asm_ctx);
 
     FileInfo_t listing_file_info = {};
+
     if (listing_flag == 1)
     {
         if (CreateListingFile(input_ctx, &listing_file_info))
@@ -159,38 +172,29 @@ AsmErr_t CompileCommands(InputCtx_t* input_ctx,
         }
     }
 
-    CmdCtx_t cmd_ctx = {};
-    char* comment_start = NULL;
-
     for (int i = 0; i < input_ctx->ptrdata_params.lines_count; i++)
     {
-        DPRINTF("\nEntering ptrdata[%d]:\n", i);
+        DPRINTF("\nEntering code line %d:\n", i);
+
 #ifdef ASM_DEBUG
         getchar();
 #endif /* ASM_DEBUG */
-        cmd_ctx = {.line = input_ctx->ptrdata_params.ptrdata[i]};
 
-        if ((comment_start = strchr(cmd_ctx.line, COMMENT_SYMBOL)) != NULL)
+        CmdCtx_t cmd_ctx = {.line = input_ctx->ptrdata_params.ptrdata[i]};
+
+        AsmErr_t error = ASM_SUCCESS;
+
+        int do_continue = 0;
+
+        if ((error = CompileCmd(asm_ctx, &cmd_ctx, &do_continue)) != ASM_SUCCESS)
         {
-            *comment_start = '\0';
+            return error;
         }
-        if (cmd_ctx.line[0] == '\0')
+        if (do_continue)
+        {
             continue;
+        }
 
-        if (ProcessLabelCase(asm_ctx, &cmd_ctx) != ASM_SUCCESS)
-        {
-            return ASM_LABEL_CASE_ERROR;
-        }
-        if (cmd_ctx.command == CMD_LABEL) continue;
-
-        if (GetCmd(asm_ctx, &cmd_ctx) != ASM_SUCCESS)
-        {
-            return ASM_GET_CMD_ERROR;
-        }
-        if (CMD_CASES[cmd_ctx.index].add_op(&cmd_ctx, asm_ctx) != ASM_SUCCESS)
-        {
-            return ASM_ADD_OP_ERROR;
-        }
         if (listing_flag == 1)
         {
             if (AddStringToListing(&cmd_ctx, asm_ctx, listing_file_info.stream) != ASM_SUCCESS)
@@ -200,17 +204,83 @@ AsmErr_t CompileCommands(InputCtx_t* input_ctx,
             }
         }
 
-        if (i % 10000000 == 0)
+        if ((i + 1) % 10000000 == 0)
         {
-            printf(LIGHT_YELLOW "Compiled %d lines..\n" RESET_CLR, i);
+            printf(LIGHT_YELLOW "Compiled %d million lines..\n" RESET_CLR, (i + 1) / 1000000);
         }
     }
+
+    printf(PURPLE "TOTAL: Compiled %d lines\n" RESET_CLR, input_ctx->ptrdata_params.lines_count);
+
     if (listing_flag == 1)
     {
         fclose(listing_file_info.stream);
     }
+
     return ASM_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
+
+AsmErr_t CompileCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx, int* do_continue)
+{
+    assert(asm_ctx);
+    assert(cmd_ctx);
+
+    char* comment_start = NULL;
+
+    if ((comment_start = strchr(cmd_ctx->line, COMMENT_SYMBOL)) != NULL)
+    {
+        *comment_start = '\0';
+    }
+
+    cmd_ctx->line = SkipSpaces(cmd_ctx->line);
+
+    if (cmd_ctx->line[0] == '\0')
+    {
+        *do_continue = 1;
+        return ASM_SUCCESS;
+    }
+
+    if (ProcessLabelCase(cmd_ctx, asm_ctx) != ASM_SUCCESS)
+    {
+        return ASM_LABEL_CASE_ERROR;
+    }
+
+    if (cmd_ctx->command == CMD_LABEL)
+    {
+        *do_continue = 1;
+        return ASM_SUCCESS;
+    }
+
+    if (GetCmd(asm_ctx, cmd_ctx) != ASM_SUCCESS)
+    {
+        return ASM_GET_CMD_ERROR;
+    }
+
+    if (CMD_CASES[cmd_ctx->index].add_op(cmd_ctx, asm_ctx) != ASM_SUCCESS)
+    {
+        return ASM_ADD_OP_ERROR;
+    }
+
+    return ASM_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------
+
+char* SkipSpaces(char* str)
+{
+    assert(str);
+
+    while (!(isalpha(*str)) && *str != '\0')
+    {
+        str++;
+    }
+
+    return str;
+}
+
+//------------------------------------------------------------------------------------------
 
 AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
 {
@@ -247,6 +317,8 @@ AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
     return ASM_SYNTAX_ERROR;
 }
 
+//------------------------------------------------------------------------------------------
+
 int CmdCasesBinarySearch(int curr_hash, CmdCase_t cmd_case[], int size)
 {
     int left = 0;
@@ -269,6 +341,8 @@ int CmdCasesBinarySearch(int curr_hash, CmdCase_t cmd_case[], int size)
 
     return -1;
 }
+
+//------------------------------------------------------------------------------------------
 
 int WriteByteCode(AsmCtx_t* asm_ctx, InputCtx_t* input_ctx)
 {
@@ -300,6 +374,8 @@ int WriteByteCode(AsmCtx_t* asm_ctx, InputCtx_t* input_ctx)
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
 
 int WriteByteCodePretty(AsmCtx_t* asm_ctx, const char* filepath)
 {
@@ -335,6 +411,8 @@ int WriteByteCodePretty(AsmCtx_t* asm_ctx, const char* filepath)
     return 0;
 }
 
+//------------------------------------------------------------------------------------------
+
 void AsmDestroy(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx)
 {
     free(asm_ctx->buffer);
@@ -342,3 +420,5 @@ void AsmDestroy(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx)
     free(input_ctx->buffer_data.buffer);
     free(input_ctx->ptrdata_params.ptrdata);
 }
+
+//------------------------------------------------------------------------------------------

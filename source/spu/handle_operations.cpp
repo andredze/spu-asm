@@ -1,5 +1,7 @@
 #include "handle_operations.h"
 
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 #define DECLARE_HANDLE_JUMP_IF(comp_oper, cmd_name)                     \
     HandleOpErr_t Handle##cmd_name(Proc_t* proc_data)                   \
     {                                                                   \
@@ -30,12 +32,20 @@
         return HANDLE_OP_SUCCESS;                                       \
     }
 
+//------------------------------------------------------------------------------------------
+
 DECLARE_HANDLE_JUMP_IF(<,  JB);
 DECLARE_HANDLE_JUMP_IF(<=, JBE);
 DECLARE_HANDLE_JUMP_IF(>,  JA);
 DECLARE_HANDLE_JUMP_IF(>=, JAE);
 DECLARE_HANDLE_JUMP_IF(==, JE);
 DECLARE_HANDLE_JUMP_IF(!=, JNE);
+
+//------------------------------------------------------------------------------------------
+
+#undef DECLARE_HANDLE_JUMP_IF
+
+//——————————————————————————————————————————————————————————————————————————————————————————
 
 #define DECLARE_HANDLE_BINARY_MATH_OP(cmd_name, math_oper, check_errors)        \
     HandleOpErr_t Handle##cmd_name(Proc_t* proc_data)                           \
@@ -66,11 +76,19 @@ DECLARE_HANDLE_JUMP_IF(!=, JNE);
         return HANDLE_OP_SUCCESS;                                               \
     }
 
+//------------------------------------------------------------------------------------------
+
 DECLARE_HANDLE_BINARY_MATH_OP(ADD, +, {};);
 DECLARE_HANDLE_BINARY_MATH_OP(SUB, -, {};);
 DECLARE_HANDLE_BINARY_MATH_OP(MUL, *, {};);
 DECLARE_HANDLE_BINARY_MATH_OP(DIV, /, {if (number2 == 0) {printf("Error: division by zero\n"); return HANDLE_OP_DIVISION_BY_ZERO;}});
 DECLARE_HANDLE_BINARY_MATH_OP(MOD, /, {if (number2 == 0) {printf("Error: division by zero\n"); return HANDLE_OP_DIVISION_BY_ZERO;}});
+
+//------------------------------------------------------------------------------------------
+
+#undef DECLARE_HANDLE_BINARY_MATH_OP
+
+//——————————————————————————————————————————————————————————————————————————————————————————
 
 int Jump(Proc_t* proc_data, int new_cmd_count)
 {
@@ -87,10 +105,14 @@ int Jump(Proc_t* proc_data, int new_cmd_count)
     return 0;
 }
 
+//------------------------------------------------------------------------------------------
+
 HandleOpErr_t HandleHLT(Proc_t* proc_data)
 {
     return HANDLE_OP_BREAK_LOOP;
 }
+
+//------------------------------------------------------------------------------------------
 
 HandleOpErr_t HandlePUSH(Proc_t* proc_data)
 {
@@ -106,6 +128,8 @@ HandleOpErr_t HandlePUSH(Proc_t* proc_data)
 
     return HANDLE_OP_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 HandleOpErr_t HandleOUT(Proc_t* proc_data)
 {
@@ -129,6 +153,8 @@ HandleOpErr_t HandleOUT(Proc_t* proc_data)
 
     return HANDLE_OP_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 HandleOpErr_t HandleIN(Proc_t* proc_data)
 {
@@ -155,6 +181,8 @@ HandleOpErr_t HandleIN(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 HandleOpErr_t HandleCALL(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
@@ -175,6 +203,8 @@ HandleOpErr_t HandleCALL(Proc_t* proc_data)
 
     return HANDLE_OP_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 HandleOpErr_t HandleRET(Proc_t* proc_data)
 {
@@ -197,6 +227,8 @@ HandleOpErr_t HandleRET(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 HandleOpErr_t HandleSQRT(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
@@ -215,6 +247,8 @@ HandleOpErr_t HandleSQRT(Proc_t* proc_data)
 
     return HANDLE_OP_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 HandleOpErr_t HandleSQR(Proc_t* proc_data)
 {
@@ -235,6 +269,8 @@ HandleOpErr_t HandleSQR(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 HandleOpErr_t HandleJMP(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
@@ -249,6 +285,8 @@ HandleOpErr_t HandleJMP(Proc_t* proc_data)
 
     return HANDLE_OP_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 HandleOpErr_t HandlePUSHR(Proc_t* proc_data)
 {
@@ -273,6 +311,8 @@ HandleOpErr_t HandlePUSHR(Proc_t* proc_data)
 
     return HANDLE_OP_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 HandleOpErr_t HandlePOPR(Proc_t* proc_data)
 {
@@ -305,6 +345,8 @@ HandleOpErr_t HandlePOPR(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 HandleOpErr_t HandlePUSHM(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
@@ -328,6 +370,8 @@ HandleOpErr_t HandlePUSHM(Proc_t* proc_data)
 
     return HANDLE_OP_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 HandleOpErr_t HandlePOPM(Proc_t* proc_data)
 {
@@ -355,6 +399,8 @@ HandleOpErr_t HandlePOPM(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 HandleOpErr_t HandleDRAW(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
@@ -369,7 +415,12 @@ HandleOpErr_t HandleDRAW(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 #ifdef GRAPHICS
+
+//------------------------------------------------------------------------------------------
+
 HandleOpErr_t HandleWDRAW(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
@@ -386,6 +437,8 @@ HandleOpErr_t HandleWDRAW(Proc_t* proc_data)
     return HANDLE_OP_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 int WindowOpen()
 {
     txCreateWindow(100, 100);
@@ -394,6 +447,8 @@ int WindowOpen()
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
 
 int WindowDrawVram(Proc_t* proc_data, int sleep_time)
 {
@@ -416,13 +471,18 @@ int WindowDrawVram(Proc_t* proc_data, int sleep_time)
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
+
 #endif /* GRAPHICS */
+
+//------------------------------------------------------------------------------------------
 
 int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
 {
     assert(proc_data != NULL);
 
-    usleep(17000);
+    usleep(sleep_time / 3 * 2.75);
 
     static HANDLE hConsole = NULL;
     static COORD home = {0, 0};
@@ -453,3 +513,5 @@ int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------

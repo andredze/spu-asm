@@ -1,5 +1,7 @@
 #include "input.h"
 
+//------------------------------------------------------------------------------------------
+
 int ReadAndParseFile(InputCtx_t* InputCtx)
 {
     if (OpenFile(&InputCtx->input_file_info, "rb"))
@@ -22,6 +24,8 @@ int ReadAndParseFile(InputCtx_t* InputCtx)
     return 0;
 }
 
+//------------------------------------------------------------------------------------------
+
 int OpenFile(FileInfo_t* file_info, const char* mode)
 {
     assert(file_info != NULL);
@@ -36,6 +40,8 @@ int OpenFile(FileInfo_t* file_info, const char* mode)
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
 
 int CountSize(InputCtx_t* InputCtx)
 {
@@ -54,6 +60,8 @@ int CountSize(InputCtx_t* InputCtx)
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
 
 int ReadText(InputCtx_t* InputCtx)
 {
@@ -75,6 +83,8 @@ int ReadText(InputCtx_t* InputCtx)
     return 0;
 }
 
+//------------------------------------------------------------------------------------------
+
 int AllocateBuffer(InputCtx_t* InputCtx)
 {
     assert(InputCtx != NULL);
@@ -90,6 +100,8 @@ int AllocateBuffer(InputCtx_t* InputCtx)
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
 
 int FillBuffer(InputCtx_t* InputCtx)
 {
@@ -118,6 +130,7 @@ int FillBuffer(InputCtx_t* InputCtx)
     }
 
     DPRINTF("BUFFER:\n");
+
 #ifdef DEBUG
     puts(InputCtx->buffer_data.buffer);
 #endif
@@ -127,6 +140,8 @@ int FillBuffer(InputCtx_t* InputCtx)
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
 
 int ParseText(InputCtx_t* InputCtx)
 {
@@ -148,6 +163,8 @@ int ParseText(InputCtx_t* InputCtx)
     return 0;
 }
 
+//------------------------------------------------------------------------------------------
+
 int CountLines(InputCtx_t* InputCtx)
 {
     assert(InputCtx != NULL);
@@ -161,11 +178,14 @@ int CountLines(InputCtx_t* InputCtx)
         assert(ptr != NULL);
 
         ptr = strchr(ptr, '\n');
+        lines_count += 1;
 
-        assert(ptr != NULL);
+        if (ptr == NULL)
+        {
+            break;
+        }
 
         ptr++; // skip '\n'
-        lines_count += 1;
     }
 
     InputCtx->buffer_data.lines_count = lines_count;
@@ -173,6 +193,8 @@ int CountLines(InputCtx_t* InputCtx)
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
 
 int AllocatePtrdata(InputCtx_t* InputCtx)
 {
@@ -189,6 +211,8 @@ int AllocatePtrdata(InputCtx_t* InputCtx)
     return 0;
 }
 
+//------------------------------------------------------------------------------------------
+
 int FillPtrdata(InputCtx_t* InputCtx)
 {
     assert(InputCtx != NULL);
@@ -202,17 +226,21 @@ int FillPtrdata(InputCtx_t* InputCtx)
 
         assert(ptr != NULL);
 
-        ptr = strchr(ptr, '\n') + 1;
+        ptr = strchr(ptr, '\n');
         if (ptr == NULL)
         {
-            DPRINTF("\n<Can not find \\n in buffer>\n");
-            return 1;
+            break;
         }
+
+        ptr++;
+
         AddNullTerminators(ptr);
     }
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
 
 void AddNullTerminators(char* ptr)
 {
@@ -224,3 +252,5 @@ void AddNullTerminators(char* ptr)
         *(ptr - 2) = '\0'; // switch \r to \0
     }
 }
+
+//------------------------------------------------------------------------------------------

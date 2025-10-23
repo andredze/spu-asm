@@ -4,7 +4,7 @@
 
 int main(int argc, char* argv[])
 {
-    printf(BLUE "Compiling programm: " RESET_CLR);
+    printf(BLUE "Compiling program: " RESET_CLR);
 
     SetHashInCmdCases();
 
@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
         {.input_file_info =  {.filepath = commands_filename},
          .output_file_info = {.filepath = bytecode_filename}};
 
-    if (CompileProgramm(&asm_input_ctx, listing_flag) != ASM_SUCCESS)
+    if (CompileProgram(&asm_input_ctx, listing_flag) != ASM_SUCCESS)
     {
         printf(RED "ERROR: Compilation failed\n" RESET_CLR);
         return EXIT_FAILURE;

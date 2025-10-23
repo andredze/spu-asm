@@ -1,5 +1,7 @@
 #include "add_operations.h"
 
+//------------------------------------------------------------------------------------------
+
 AsmErr_t ProcessLabelCase(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 {
     assert(cmd_ctx);
@@ -9,6 +11,7 @@ AsmErr_t ProcessLabelCase(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     {
         return ASM_SUCCESS;
     }
+
     cmd_ctx->command = CMD_LABEL;
     DPRINTF(LIGHT_YELLOW "cmd = LABEL (%s)" RESET_CLR, cmd_ctx->line);
 
@@ -18,11 +21,13 @@ AsmErr_t ProcessLabelCase(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
         printf("Syntax error: wrong label name, should be a number\n");
         return ASM_SYNTAX_ERROR;
     }
+
     if (!(EndIsSpaces(cmd_ctx->line + args_len)))
     {
         printf("Syntax error: symbols after label name\n");
         return ASM_SYNTAX_ERROR;
     }
+
     if (AddLabelCode(cmd_ctx, asm_ctx) != ASM_SUCCESS)
     {
         return ASM_ADD_OP_ERROR;
@@ -30,6 +35,8 @@ AsmErr_t ProcessLabelCase(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 
     return ASM_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 int EndIsSpaces(char* str)
 {
@@ -47,6 +54,8 @@ int EndIsSpaces(char* str)
     return 1;
 }
 
+//------------------------------------------------------------------------------------------
+
 AsmErr_t AddLabelCode(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 {
     assert(cmd_ctx);
@@ -61,6 +70,8 @@ AsmErr_t AddLabelCode(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     return ASM_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 AsmErr_t AddNoArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 {
     assert(cmd_ctx);
@@ -70,6 +81,8 @@ AsmErr_t AddNoArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 
     return ASM_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 AsmErr_t AddNormalArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 {
@@ -96,6 +109,8 @@ AsmErr_t AddNormalArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 
     return ASM_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 AsmErr_t AddLabelArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 {
@@ -128,18 +143,20 @@ AsmErr_t AddLabelArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     return ASM_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 AsmErr_t CheckLabel(AsmCtx_t* asm_ctx, int label)
 {
     assert(asm_ctx != NULL);
 
     if (!(label >= 0))
     {
-        printf("Syntax error: Given lable for operation is negative\n");
+        printf("Syntax error: Given label for operation is negative\n");
         return ASM_SYNTAX_ERROR;
     }
     if (label >= MAX_LABELS_SIZE)
     {
-        printf("Syntax error: Given lable for operation is too big\n");
+        printf("Syntax error: Given label for operation is too big\n");
         return ASM_SYNTAX_ERROR;
     }
     if (label < asm_ctx->labels_size)
@@ -154,6 +171,8 @@ AsmErr_t CheckLabel(AsmCtx_t* asm_ctx, int label)
 
     return ASM_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 AsmErr_t AddRegArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 {
@@ -186,6 +205,8 @@ AsmErr_t AddRegArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     return ASM_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 AsmErr_t CheckReg(char reg[])
 {
     assert(reg);
@@ -204,6 +225,8 @@ AsmErr_t CheckReg(char reg[])
 
     return ASM_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
 
 AsmErr_t AddRamArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 {
@@ -236,6 +259,8 @@ AsmErr_t AddRamArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     return ASM_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------
+
 int LabelsRecalloc(AsmCtx_t* asm_ctx, int new_size)
 {
     int old_size = asm_ctx->labels_size;
@@ -261,3 +286,5 @@ int LabelsRecalloc(AsmCtx_t* asm_ctx, int new_size)
 
     return 0;
 }
+
+//------------------------------------------------------------------------------------------
