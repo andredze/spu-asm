@@ -35,14 +35,15 @@
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 int SpuSetFilenames(const char** code_filename,
-                    int argc, char* argv[]);
+                    int argc, char* argv[], int* play_music,
+                    char* music_filepath);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 ProcErr_t ProcCtor             (Proc_t* proc_data);
+ProcErr_t ProcExecuteCommands  (Proc_t* proc_data);
 ProcErr_t ProcLoadCode         (Proc_t* proc_data, const char* codepath);
 ProcErr_t ProcLoadPrettyBC     (Proc_t* proc_data, const char* codepath);
-ProcErr_t ProcExecuteCommands  (Proc_t* proc_data);
 ProcErr_t ProcGetCommand       (Proc_t* proc_data, Command_t* command);
 ProcErr_t ProcExecuteOperation (Proc_t* proc_data, Command_t  command, int* break_loop);
 ProcErr_t ProcDtor             (Proc_t* proc_data);

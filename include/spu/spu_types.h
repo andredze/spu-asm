@@ -41,6 +41,8 @@ const size_t MAX_RAM_ADDRESS   = SIZE_MAX / 32 * 20;
 const size_t PROC_CODE_SIZE_LIMIT    = SIZE_MAX / 32 * 30;
 const size_t PROC_MIN_STACK_CAPACITY = 32;
 
+const int    MAX_MUSIC_PATH_LEN = 100;
+
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 typedef struct Proc {

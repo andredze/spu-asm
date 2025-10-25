@@ -3,10 +3,16 @@
 //------------------------------------------------------------------------------------------
 
 int SpuSetFilenames(const char** code_filename,
-                    int argc, char* argv[])
+                    int argc, char* argv[], int* play_music,
+                    char* music_filepath)
 {
     switch (argc)
     {
+        case 3:
+            *code_filename = argv[1];
+            *play_music = 1;
+            strcat(music_filepath, argv[2]);
+            break;
         case 2:
             *code_filename = argv[1];
             break;
