@@ -33,7 +33,24 @@ int AsmCmdCasesCompare(const void* par1, const void* par2)
     int hash1 = ((const CmdCase_t*) par1)->hash;
     int hash2 = ((const CmdCase_t*) par2)->hash;
 
-    return hash1 - hash2;
+// TODO: может быть переполнение если вычесть из огр. отр числа такое же => compareints() - Боря
+    return CompareInts(hash1, hash2);
+}
+
+//------------------------------------------------------------------------------------------
+
+int CompareInts(int value1, int value2)
+{
+    if (value1 < value2)
+    {
+        return -1;
+    }
+    if (value1 == value2)
+    {
+        return 0;
+    }
+
+    return 1;
 }
 
 //------------------------------------------------------------------------------------------

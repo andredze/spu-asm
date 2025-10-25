@@ -37,6 +37,7 @@ char* SkipSpaces(char* str);
 AsmErr_t SetHashInCmdCases    ();
 int      AsmGetHash           (const char* str);
 int      AsmCmdCasesCompare   (const void* par1, const void* par2);
+int      CompareInts          (int value1, int value2);
 int      AsmCtxCtor           (InputCtx_t* input_ctx, AsmCtx_t* asm_ctx);
 AsmErr_t CompileProgram       (InputCtx_t* input_ctx, int listing_flag);
 AsmErr_t CompileCode          (InputCtx_t* input_ctx, AsmCtx_t* asm_ctx, int listing_flag);
