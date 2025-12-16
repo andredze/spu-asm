@@ -2,10 +2,12 @@
 
 //------------------------------------------------------------------------------------------
 
-int AsmGetHash(const char* str)
+size_t AsmGetHash(const char* str)
 {
     char c = '\0';
-    int hash = 5381;
+
+    size_t hash = 5381;
+
     while ((c = *str++) != '\0')
     {
         hash += (hash << 5) + hash + c;
@@ -30,16 +32,15 @@ AsmErr_t SetHashInCmdCases()
 
 int AsmCmdCasesCompare(const void* par1, const void* par2)
 {
-    int hash1 = ((const CmdCase_t*) par1)->hash;
-    int hash2 = ((const CmdCase_t*) par2)->hash;
+    size_t hash1 = ((const CmdCase_t*) par1)->hash;
+    size_t hash2 = ((const CmdCase_t*) par2)->hash;
 
-// TODO: может быть переполнение если вычесть из огр. отр числа такое же => compareints() - Боря
-    return CompareInts(hash1, hash2);
+    return CompareSizet(hash1, hash2);
 }
 
 //------------------------------------------------------------------------------------------
 
-int CompareInts(int value1, int value2)
+int CompareSizet(size_t value1, size_t value2)
 {
     if (value1 < value2)
     {
@@ -113,6 +114,7 @@ AsmErr_t CompileProgram(InputCtx_t* input_ctx, int listing_flag)
     {
         return error;
     }
+
     DPrintAsmData(&asm_ctx);
 
     /* two-pass compilation for labels that are declared after usage */
@@ -144,27 +146,33 @@ int AsmCtxCtor(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx)
     int lines_count = input_ctx->buffer_data.lines_count;
 
     int* buffer = (int*) calloc(lines_count * ASM_MAX_ARGS_COUNT, sizeof(int));
+
     if (buffer == NULL)
     {
         DPRINTF("Buffer calloc failed\n");
         return 1;
     }
+
     asm_ctx->buffer = buffer;
     asm_ctx->cur_cmd = 0;
 
-    size_t* labels = (size_t*) calloc(MIN_LABELS_SIZE, sizeof(size_t));
+    Label_t* labels = (Label_t*) calloc(MIN_LABELS_CAPACITY, sizeof(Label_t));
+
     if (labels == NULL)
     {
         DPRINTF("Labels calloc failed\n");
         return 1;
     }
-    asm_ctx->labels = labels;
-    asm_ctx->labels_size = MIN_LABELS_SIZE;
 
-    for (int i = 0; i < MIN_LABELS_SIZE; i++)
+    asm_ctx->labels          = labels;
+    asm_ctx->labels_size     = 0;
+    asm_ctx->labels_capacity = MIN_LABELS_CAPACITY;
+
+    for (size_t i = 0; i < MIN_LABELS_CAPACITY; i++)
     {
-        asm_ctx->labels[i] = 777;
+        asm_ctx->labels[i] = LABEL_POISON;
     }
+
     DPrintAsmData(asm_ctx);
 
     return 0;
@@ -173,8 +181,8 @@ int AsmCtxCtor(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx)
 //------------------------------------------------------------------------------------------
 
 AsmErr_t CompileCode(InputCtx_t* input_ctx,
-                     AsmCtx_t* asm_ctx,
-                     int listing_flag)
+                     AsmCtx_t*   asm_ctx,
+                     int         listing_flag)
 {
     assert(input_ctx);
     assert(asm_ctx);
@@ -318,7 +326,7 @@ AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
     }
     cmd_ctx->op_len = op_len;
 
-    int current_op_hash = AsmGetHash(operation);
+    size_t current_op_hash = AsmGetHash(operation);
 
     int index = -1;
 
@@ -340,7 +348,7 @@ AsmErr_t GetCmd(AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx)
 
 //------------------------------------------------------------------------------------------
 
-int CmdCasesBinarySearch(int curr_hash, CmdCase_t cmd_case[], int size)
+int CmdCasesBinarySearch(size_t curr_hash, CmdCase_t cmd_case[], int size)
 {
     int left = 0;
     int middle = 0;
@@ -436,6 +444,11 @@ int WriteByteCodePretty(AsmCtx_t* asm_ctx, const char* filepath)
 
 void AsmDestroy(InputCtx_t* input_ctx, AsmCtx_t* asm_ctx)
 {
+    for (size_t i = 0; i < asm_ctx->labels_size; i++)
+    {
+        free(asm_ctx->labels[i].name);
+    }
+
     free(asm_ctx->buffer);
     free(asm_ctx->labels);
     free(input_ctx->buffer_data.buffer);

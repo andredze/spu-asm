@@ -24,6 +24,9 @@ const int  MAX_FILENAME_LEN   = 100;
 const int  ASM_MAX_ARGS_COUNT = 2;
 const char COMMENT_SYMBOL     = '#';
 
+const size_t  MIN_LABELS_CAPACITY = 128;
+const Label_t LABEL_POISON = {};
+
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 int SetFilenames(const char** commands_filename,
@@ -35,9 +38,9 @@ char* SkipSpaces(char* str);
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 AsmErr_t SetHashInCmdCases    ();
-int      AsmGetHash           (const char* str);
+size_t   AsmGetHash           (const char* str);
 int      AsmCmdCasesCompare   (const void* par1, const void* par2);
-int      CompareInts          (int value1, int value2);
+int      CompareSizet         (size_t value1, size_t value2);
 int      AsmCtxCtor           (InputCtx_t* input_ctx, AsmCtx_t* asm_ctx);
 AsmErr_t CompileProgram       (InputCtx_t* input_ctx, int listing_flag);
 AsmErr_t CompileCode          (InputCtx_t* input_ctx, AsmCtx_t* asm_ctx, int listing_flag);
@@ -46,7 +49,7 @@ AsmErr_t CompileCmd           (AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx, int* do_con
 AsmErr_t GetCmd               (AsmCtx_t* asm_ctx, CmdCtx_t* cmd_ctx);
 int      WriteByteCode        (AsmCtx_t* asm_ctx, InputCtx_t* input_ctx);
 int      WriteByteCodePretty  (AsmCtx_t* asm_ctx, const char* filepath);
-int      CmdCasesBinarySearch (int curr_hash, CmdCase_t cmd_case[], int size);
+int      CmdCasesBinarySearch (size_t curr_hash, CmdCase_t cmd_case[], int size);
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 

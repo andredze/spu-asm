@@ -33,12 +33,24 @@ typedef enum AsmErr
 
 //——————————————————————————————————————————————————————————————————————————————————————————
 
+typedef struct Label
+{
+    char*  name;
+    size_t code_ind;
+} Label_t;
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 typedef struct AsmCtx
 {
-    int* buffer;
-    size_t cur_cmd;
-    size_t* labels;
-    int labels_size;
+    int*     buffer;
+    size_t   cur_cmd;
+
+    Label_t* labels;
+
+    size_t   labels_size;
+    size_t   labels_capacity;
+
 } AsmCtx_t;
 
 //——————————————————————————————————————————————————————————————————————————————————————————

@@ -27,7 +27,7 @@ typedef struct CmdCase
 
 #ifdef ASM
     AsmErr_t (*add_op) (CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx);
-    int hash;
+    size_t hash;
 #endif /* ASM */
 
 } CmdCase_t;

@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "config.h"
+#include <limits.h>
+#include <cstdint>
 
 #ifndef STACK_DEBUG
     #define NDEBUG

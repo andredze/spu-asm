@@ -72,6 +72,7 @@ AsmErr_t AddStringToListing(CmdCtx_t* cmd_ctx,
 #ifdef ASM_DEBUG
     fflush(listing_stream);
 #endif /* ASM_DEBUG */
+
     return ASM_SUCCESS;
 }
 
@@ -79,13 +80,18 @@ AsmErr_t AddStringToListing(CmdCtx_t* cmd_ctx,
 
 void DPrintLabels(AsmCtx_t* asm_ctx)
 {
-    DPRINTF("labels_size = %d;\n", asm_ctx->labels_size);
-    DPRINTF("labels = ");
-    for (int i = 0; i < asm_ctx->labels_size; i++)
+    DPRINTF(ORANGE "\nlabels dump:\n");
+    DPRINTF("labels_size = %zu;\n", asm_ctx->labels_size);
+    DPRINTF("labels:\n\n");
+
+    for (size_t i = 0; i < asm_ctx->labels_size; i++)
     {
-        DPRINTF("%zu, ", asm_ctx->labels[i]);
+        DPRINTF("[%s] = %zu\n",
+                asm_ctx->labels[i].name,
+                asm_ctx->labels[i].code_ind);
     }
-    DPRINTF("\n")
+
+    DPRINTF("\n"  RESET_CLR);
 }
 
 //------------------------------------------------------------------------------------------
@@ -94,16 +100,15 @@ void DPrintAsmData(AsmCtx_t* asm_ctx)
 {
     DPRINTF("\n-----------------------------------------------------------------\n"
             "code = ");
+
     for (size_t i = 0; i < asm_ctx->cur_cmd; i++)
     {
         DPRINTF("%d, ", asm_ctx->buffer[i]);
     }
-    DPRINTF("\n"
-            "labels = ");
-    for (int i = 0; i < asm_ctx->labels_size; i++)
-    {
-        DPRINTF("%zu, ", asm_ctx->labels[i]);
-    }
+    DPRINTF("\n");
+
+    DPrintLabels(asm_ctx);
+
     DPRINTF("\n-----------------------------------------------------------------\n");
 }
 

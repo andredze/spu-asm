@@ -200,8 +200,8 @@ int AllocatePtrdata(InputCtx_t* InputCtx)
 {
     assert(InputCtx != NULL);
 
-    InputCtx->ptrdata_params.ptrdata = (char**) calloc(InputCtx->buffer_data.lines_count,
-                                                     sizeof(char*));
+    InputCtx->ptrdata_params.ptrdata = (char**) calloc(InputCtx->buffer_data.lines_count, sizeof(char*));
+
     if (InputCtx->ptrdata_params.ptrdata == NULL)
     {
         DPRINTF("\n<Memory allocation for ptrdata failed>\n");

@@ -9,7 +9,7 @@
 
 #include <math.h>
 #include <unistd.h>
-#include <windows.h>
+// #include <windows.h>
 #include "stack.h"
 #include "input.h"
 #include "spu_types.h"

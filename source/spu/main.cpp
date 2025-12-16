@@ -1,8 +1,8 @@
 #include "processor.h"
 #include "config.h"
 
-#include <windows.h>
-#include <mmsystem.h>
+// #include <windows.h>
+// #include <mmsystem.h>
 #include <stdio.h>
 
 #pragma comment(lib, "winmm.lib")
@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
     if (play_music)
     {
         strcat(music_filepath, "\" type mpegvideo alias mymusic");
-        mciSendString(music_filepath, NULL, 0, NULL); // D:\\Coding\\spu-asm\\badapple\\music.wav
-        mciSendString("play mymusic", NULL, 0, NULL);
+        // mciSendString(music_filepath, NULL, 0, NULL); // D:\\Coding\\spu-asm\\badapple\\music.wav
+        // mciSendString("play mymusic", NULL, 0, NULL);
     }
 
     Proc_t proc_data = {};
@@ -68,8 +68,8 @@ int main(int argc, char* argv[])
 
     if (play_music)
     {
-        mciSendString("stop mymusic",  NULL, 0, NULL);
-        mciSendString("close mymusic", NULL, 0, NULL);
+        // mciSendString("stop mymusic",  NULL, 0, NULL);
+        // mciSendString("close mymusic", NULL, 0, NULL);
     }
 
     return EXIT_SUCCESS;

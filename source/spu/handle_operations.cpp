@@ -407,10 +407,10 @@ HandleOpErr_t HandleDRAW(Proc_t* proc_data)
 
     int sleep_time = proc_data->code[proc_data->cmd_count++];
 
-    if (ConsoleDrawVram(proc_data, sleep_time))
-    {
-        return HANDLE_OP_DRAW_ERROR;
-    }
+    // if (ConsoleDrawVram(proc_data, sleep_time))
+    // {
+    //     return HANDLE_OP_DRAW_ERROR;
+    // }
 
     return HANDLE_OP_SUCCESS;
 }
@@ -478,40 +478,40 @@ int WindowDrawVram(Proc_t* proc_data, int sleep_time)
 
 //------------------------------------------------------------------------------------------
 
-int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
-{
-    assert(proc_data != NULL);
-
-    usleep(sleep_time / 3 * 2.77);
-
-    static HANDLE hConsole = NULL;
-    static COORD home = {0, 0};
-    static DWORD written = 0;
-
-    if (hConsole == NULL)
-    {
-        hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-        system("cls");
-    }
-
-    char buffer[RAM_SIZE * 3 + RAM_HEIGHT + 1] = {};
-    int buf_ind = 0;
-
-    for (size_t i = 0; i < RAM_SIZE; i++)
-    {
-        buffer[buf_ind++] = proc_data->ram[i];
-
-        if ((i + 1) % RAM_WIDTH == 0)
-        {
-            buffer[buf_ind++] = '\n';
-        }
-    }
-    buffer[buf_ind++] = '\n';
-
-    SetConsoleCursorPosition(hConsole, home);
-    WriteConsoleA(hConsole, buffer, buf_ind - 1, &written, NULL);
-
-    return 0;
-}
+// int ConsoleDrawVram(Proc_t* proc_data, int sleep_time)
+// {
+//     assert(proc_data != NULL);
+//
+//     usleep(sleep_time / 3 * 2.77);
+//
+//     static HANDLE hConsole = NULL;
+//     static COORD home = {0, 0};
+//     static DWORD written = 0;
+//
+//     if (hConsole == NULL)
+//     {
+//         hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+//         system("cls");
+//     }
+//
+//     char buffer[RAM_SIZE * 3 + RAM_HEIGHT + 1] = {};
+//     int buf_ind = 0;
+//
+//     for (size_t i = 0; i < RAM_SIZE; i++)
+//     {
+//         buffer[buf_ind++] = proc_data->ram[i];
+//
+//         if ((i + 1) % RAM_WIDTH == 0)
+//         {
+//             buffer[buf_ind++] = '\n';
+//         }
+//     }
+//     buffer[buf_ind++] = '\n';
+//
+//     SetConsoleCursorPosition(hConsole, home);
+//     WriteConsoleA(hConsole, buffer, buf_ind - 1, &written, NULL);
+//
+//     return 0;
+// }
 
 //------------------------------------------------------------------------------------------

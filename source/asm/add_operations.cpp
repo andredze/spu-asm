@@ -1,4 +1,5 @@
 #include "add_operations.h"
+#include "listing.h"
 
 //------------------------------------------------------------------------------------------
 
@@ -16,7 +17,10 @@ AsmErr_t ProcessLabelCase(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     DPRINTF(LIGHT_YELLOW "cmd = LABEL (%s)" RESET_CLR, cmd_ctx->line);
 
     int args_len = 0;
-    if (sscanf(cmd_ctx->line, ":%d%n", &cmd_ctx->value, &args_len) != 1)
+
+    char label[MAX_LABEL_LEN] = {};
+
+    if (sscanf(cmd_ctx->line, ":%s%n", label, &args_len) != 1)
     {
         printf("Syntax error: wrong label name, should be a number\n");
         return ASM_SYNTAX_ERROR;
@@ -28,10 +32,19 @@ AsmErr_t ProcessLabelCase(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
         return ASM_SYNTAX_ERROR;
     }
 
-    if (AddLabelCode(cmd_ctx, asm_ctx) != ASM_SUCCESS)
+    size_t label_ind = 0;
+
+    if ((label_ind = FindLabelInTable(asm_ctx, label)) == (size_t)-1)
     {
-        return ASM_ADD_OP_ERROR;
+        if (LabelPutInTable(asm_ctx, label, &label_ind))
+            return ASM_LABEL_ERROR;
     }
+
+    DPRINTF("\nasm_ctx->cur_cmd = %zu\n" RESET_CLR, asm_ctx->cur_cmd);
+
+    asm_ctx->labels[label_ind].code_ind = asm_ctx->cur_cmd;
+
+    DPrintLabels(asm_ctx);
 
     return ASM_SUCCESS;
 }
@@ -43,6 +56,7 @@ int EndIsSpaces(char* str)
     assert(str != NULL);
 
     int i = 0;
+
     while (str[i] != '\0')
     {
         if (!(isspace(str[i])))
@@ -52,22 +66,6 @@ int EndIsSpaces(char* str)
         i++;
     }
     return 1;
-}
-
-//------------------------------------------------------------------------------------------
-
-AsmErr_t AddLabelCode(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
-{
-    assert(cmd_ctx);
-    assert(asm_ctx);
-
-    if (CheckLabel(asm_ctx, cmd_ctx->value) != ASM_SUCCESS)
-    {
-        return ASM_LABEL_ERROR;
-    }
-    asm_ctx->labels[cmd_ctx->value] = asm_ctx->cur_cmd;
-
-    return ASM_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------
@@ -117,10 +115,11 @@ AsmErr_t AddLabelArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
     assert(cmd_ctx);
     assert(asm_ctx);
 
-    int label = 0;
+    char label[MAX_LABEL_LEN] = {};
+
     int args_len = 0;
 
-    if (sscanf(cmd_ctx->line + cmd_ctx->op_len, " :%d%n", &label, &args_len) != 1)
+    if (sscanf(cmd_ctx->line + cmd_ctx->op_len, " :%s%n", label, &args_len) != 1)
     {
         printf("Syntax error: wrong arguments for label arg cmd: %s\n",
                cmd_ctx->line);
@@ -132,42 +131,65 @@ AsmErr_t AddLabelArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
                cmd_ctx->line);
         return ASM_SYNTAX_ERROR;
     }
-    if (CheckLabel(asm_ctx, label) != ASM_SUCCESS)
+
+    size_t label_ind = 0;
+
+    if ((label_ind = FindLabelInTable(asm_ctx, label)) == (size_t)-1)
     {
-        return ASM_LABEL_ERROR;
+        DPRINTF("Delayu put in tablo\n");
+
+        if (LabelPutInTable(asm_ctx, label, &label_ind))
+            return ASM_LABEL_ERROR;
     }
 
     asm_ctx->buffer[asm_ctx->cur_cmd++] = cmd_ctx->command;
-    asm_ctx->buffer[asm_ctx->cur_cmd++] = asm_ctx->labels[label];
+    asm_ctx->buffer[asm_ctx->cur_cmd++] = asm_ctx->labels[label_ind].code_ind;
+
+    DPrintLabels(asm_ctx);
 
     return ASM_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------
 
-AsmErr_t CheckLabel(AsmCtx_t* asm_ctx, int label)
+size_t FindLabelInTable(AsmCtx_t* asm_ctx, char* label_name)
 {
-    assert(asm_ctx != NULL);
+    assert(asm_ctx    != NULL);
+    assert(label_name != NULL);
 
-    if (!(label >= 0))
+    for (size_t ind = 0; ind < asm_ctx->labels_size; ind++)
     {
-        printf("Syntax error: Given label for operation is negative\n");
-        return ASM_SYNTAX_ERROR;
+        if (strcmp(label_name, asm_ctx->labels[ind].name) == 0)
+            return ind;
     }
-    if (label >= MAX_LABELS_SIZE)
+
+    return (size_t)-1;
+}
+
+//------------------------------------------------------------------------------------------
+
+AsmErr_t LabelPutInTable(AsmCtx_t* asm_ctx, char* label_name, size_t* label_ind)
+{
+    assert(label_name != NULL);
+    assert(asm_ctx    != NULL);
+
+    if (asm_ctx->labels_size >= asm_ctx->labels_capacity)
     {
-        printf("Syntax error: Given label for operation is too big\n");
-        return ASM_SYNTAX_ERROR;
+        if (LabelsRecalloc(asm_ctx, asm_ctx->labels_capacity * 2 + 1))
+            return ASM_LABELS_RECALLOC_ERROR;
     }
-    if (label < asm_ctx->labels_size)
+
+    char* copy = strdup(label_name);
+
+    if (copy == NULL)
     {
-        return ASM_SUCCESS;
+        DPRINTF("Memory allocation failed");
+        return ASM_CALLOC_ERROR;
     }
-    DPRINTF("Memory realloc...\n");
-    if (LabelsRecalloc(asm_ctx, 2 * label))
-    {
-        return ASM_LABELS_RECALLOC_ERROR;
-    }
+
+    asm_ctx->labels[asm_ctx->labels_size++].name = copy;
+
+    *label_ind = asm_ctx->labels_size - 1;
 
     return ASM_SUCCESS;
 }
@@ -261,28 +283,31 @@ AsmErr_t AddRamArgOp(CmdCtx_t* cmd_ctx, AsmCtx_t* asm_ctx)
 
 //------------------------------------------------------------------------------------------
 
-int LabelsRecalloc(AsmCtx_t* asm_ctx, int new_size)
+int LabelsRecalloc(AsmCtx_t* asm_ctx, size_t new_capacity)
 {
-    int old_size = asm_ctx->labels_size;
-    size_t* labels = (size_t*) realloc(asm_ctx->labels, new_size * sizeof(size_t));
+    assert(asm_ctx);
+
+    int old_capacity = asm_ctx->labels_capacity;
+
+    Label_t* labels = (Label_t*) realloc(asm_ctx->labels, new_capacity * sizeof(Label_t));
+
     if (labels == NULL)
     {
         printf("Labels recalloc failed\n");
         return 1;
     }
-    asm_ctx->labels_size = new_size;
-    asm_ctx->labels = labels;
 
-    DPRINTF("old_size = %d\n", old_size);
-    DPRINTF("labels[old_size] = %zu\n", asm_ctx->labels[old_size]);
+    asm_ctx->labels_capacity = new_capacity;
+    asm_ctx->labels          = labels;
 
-    for (int i = old_size; i < new_size; i++)
+    for (size_t i = old_capacity; i < new_capacity; i++)
     {
-        DPRINTF("%d, ", i);
-        asm_ctx->labels[i] = -1;
+        DPRINTF("%zu, ", i);
+        asm_ctx->labels[i] = {};
     }
+
     DPRINTF("\n");
-    DPRINTF("labels[old_size] = %zu\n", asm_ctx->labels[old_size]);
+    DPRINTF("labels[old_size] = %zu\n", asm_ctx->labels[old_capacity]);
 
     return 0;
 }

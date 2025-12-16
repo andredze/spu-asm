@@ -1,6 +1,7 @@
-// #include <TXLib.h>
 #include "assembler.h"
 #include "config.h"
+
+//------------------------------------------------------------------------------------------
 
 int main(int argc, char* argv[])
 {
@@ -22,7 +23,7 @@ int main(int argc, char* argv[])
     printf(BLUE "%s\n" RESET_CLR, commands_filename);
 
     InputCtx_t asm_input_ctx =
-        {.input_file_info =  {.filepath = commands_filename},
+        {.input_file_info  = {.filepath = commands_filename},
          .output_file_info = {.filepath = bytecode_filename}};
 
     if (CompileProgram(&asm_input_ctx, listing_flag) != ASM_SUCCESS)
@@ -35,3 +36,5 @@ int main(int argc, char* argv[])
 
     return EXIT_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------
