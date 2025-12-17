@@ -1,6 +1,12 @@
 # Directories
 .vscode/
 
+run
+compile
+
+./run
+./compile
+
 # Video
 *.mp4
 *.jpg
