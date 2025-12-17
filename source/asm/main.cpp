@@ -20,7 +20,8 @@ int main(int argc, char* argv[])
     {
         return EXIT_FAILURE;
     }
-    printf(BLUE "%s\n" RESET_CLR, commands_filename);
+    printf(BLUE "%s\n"    RESET_CLR, commands_filename);
+    printf(BLUE "to %s\n" RESET_CLR, bytecode_filename);
 
     InputCtx_t asm_input_ctx =
         {.input_file_info  = {.filepath = commands_filename},
@@ -32,7 +33,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    printf(GREEN "Compilation success! code file: %s" RESET_CLR, bytecode_filename);
+    printf(GREEN "Compilation success! code file: %s\n" RESET_CLR, bytecode_filename);
 
     return EXIT_SUCCESS;
 }

@@ -22,7 +22,7 @@
 
 const int  MAX_FILENAME_LEN   = 100;
 const int  ASM_MAX_ARGS_COUNT = 2;
-const char COMMENT_SYMBOL     = '#';
+const char COMMENT_SYMBOL     = ';';
 
 const size_t  MIN_LABELS_CAPACITY = 128;
 const Label_t LABEL_POISON = {};

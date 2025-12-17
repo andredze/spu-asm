@@ -65,23 +65,29 @@ int SetFilenames(const char** commands_filename,
         case 4:
             *commands_filename = argv[1];
             *bytecode_filename = argv[2];
+
             if (strcmp(argv[3], "LIST=1") == 0)
             {
                 *listing_flag = 1;
             }
+
             break;
+
         case 3:
             *commands_filename = argv[1];
             *bytecode_filename = argv[2];
             break;
+
         case 2:
             *commands_filename = argv[1];
             *bytecode_filename = BINARY_BYTECODE_FILENAME;
             break;
+
         case 1:
             *commands_filename = COMMANDS_FILENAME;
             *bytecode_filename = BINARY_BYTECODE_FILENAME;
             break;
+
         default:
             printf("Too much arguments given, maximum 2 (current arguments = %d)\n", argc);
             return 1;
