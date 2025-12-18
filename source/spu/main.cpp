@@ -35,36 +35,32 @@ int main(int argc, char* argv[])
 
     Proc_t proc_data = {};
 
-    if (ProcCtor(&proc_data) != PROC_SUCCESS)
+    do
     {
-        return EXIT_FAILURE;
-    }
-    if (ProcLoadCode(&proc_data, code_filename) != PROC_SUCCESS)
-    {
-        return EXIT_FAILURE;
-    }
+        if (ProcCtor(&proc_data) != PROC_SUCCESS)
+            break;
 
-#ifdef PROC_DEBUG
-    if (ProcConsoleDump(&proc_data) != PROC_SUCCESS)
-    {
-        return EXIT_FAILURE;
-    }
-    if (ProcVerify(&proc_data) != PROC_SUCCESS)
-    {
-        DPRINTF("Proc verify failed\n");
-        return EXIT_FAILURE;
-    }
-    ProcDump(&proc_data, PROC_SUCCESS);
-#endif /* PROC_DEBUG */
+        if (ProcLoadCode(&proc_data, code_filename) != PROC_SUCCESS)
+            break;
 
-    if (ProcExecuteCommands(&proc_data) != PROC_SUCCESS)
-    {
-        return EXIT_FAILURE;
-    }
-    if (ProcDtor(&proc_data) != PROC_SUCCESS)
-    {
-        return EXIT_FAILURE;
-    }
+    #ifdef PROC_DEBUG
+        if (ProcConsoleDump(&proc_data) != PROC_SUCCESS)
+            break;
+
+        if (ProcVerify(&proc_data) != PROC_SUCCESS)
+        {
+            DPRINTF("Proc verify failed\n");
+            break;
+        }
+        ProcDump(&proc_data, PROC_SUCCESS);
+    #endif /* PROC_DEBUG */
+
+        if (ProcExecuteCommands(&proc_data) != PROC_SUCCESS)
+            break;
+
+    } while (0);
+
+    ProcDtor(&proc_data);
 
     if (play_music)
     {
