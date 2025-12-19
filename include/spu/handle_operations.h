@@ -32,7 +32,7 @@ typedef enum HandleOpErr {
 //——————————————————————————————————————————————————————————————————————————————————————————
 
 int Jump            (Proc_t* proc_data, int new_cmd_count);
-int ConsoleDrawVram (Proc_t* proc_data, int sleep_time);
+int ConsoleDrawVram (Proc_t* proc_data, int sleep_time, int value);
 
 #ifdef GRAPHICS
 int WindowOpen      ();
@@ -66,6 +66,7 @@ HandleOpErr_t HandlePOPR  (Proc_t* proc_data);
 HandleOpErr_t HandlePUSHM (Proc_t* proc_data);
 HandleOpErr_t HandlePOPM  (Proc_t* proc_data);
 HandleOpErr_t HandleDRAW  (Proc_t* proc_data);
+HandleOpErr_t HandlePOINT (Proc_t* proc_data);
 
 #ifdef GRAPHICS
 HandleOpErr_t HandleWDRAW (Proc_t* proc_data);
