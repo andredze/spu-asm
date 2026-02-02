@@ -381,6 +381,7 @@ ProcErr_t ProcExecuteCommands(Proc_t* proc_data)
             return PROC_DUMP_ERR;
         }
 #endif /* PROC_DEBUG */
+
     }
 
     printf("---Executed commands---\n");
@@ -427,103 +428,149 @@ ProcErr_t ProcExecuteOperation(Proc_t* proc_data, Command_t command, int* break_
 
 //==========================================================================================
 
+static void ColorPrintArray(char* name, int* array, size_t size, char* color_code)
+{
+    DPRINTF("%s%s\t= [", color_code, name, size);
+
+    for (size_t i = 0; i < size; i++)
+    {
+        if (i == size - 1)
+        {
+            DPRINTF("%d", array[i]);
+            break;
+        }
+        if ((i + 1) % 24 == 0)
+        {
+            DPRINTF("\n\t  ");
+        }
+        DPRINTF("%d, ", array[i]);
+    }
+
+    DPRINTF("]\n" RESET_CLR);
+}
+
+//------------------------------------------------------------------------------------------
+
+static void DprintCommand(Proc_t* proc_data, size_t* i, size_t* cmds_in_line, int jump_id)
+{
+    CmdCase_t cmd_case = CMD_CASES[proc_data->code[*i]];
+
+    (*cmds_in_line)++;
+
+    bool opened_brace = false;
+
+    if (*i == proc_data->cmd_count)
+    {
+        DPRINTF(RED "{");
+        opened_brace = true;
+    }
+    else if (*i == jump_id)
+    {
+        DPRINTF(YELLOW "{");
+        opened_brace = true;
+    }
+
+    if (cmd_case.args_count == 2)
+    {
+        DPRINTF("%-5s", cmd_case.str_command);
+
+        if (20 <= proc_data->code[*i] && proc_data->code[*i] <= 23)
+        {
+            DPRINTF(" R%cX", (proc_data->code[*i + 1] + 'A'));
+        }
+        else
+        {
+            DPRINTF(" %-3d", proc_data->code[*i + 1]);
+        }
+        (*i)++;
+    }
+    else
+    {
+        DPRINTF("%-9s", cmd_case.str_command);
+    }
+
+    if (opened_brace)
+    {
+        DPRINTF("}" BLUE);
+    }
+    else
+    {
+        DPRINTF("  ");
+    }
+
+    if (*i != proc_data->code_size)
+    {
+        DPRINTF(", ");
+    }
+
+    if (*cmds_in_line % 7 == 0 && *cmds_in_line != 0)
+    {
+        DPRINTF("\n\t  ");
+        *cmds_in_line = 0;
+    }
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————
+
 ProcErr_t ProcConsoleDump(Proc_t* proc_data)
 {
     assert(proc_data != NULL);
 
-    DPRINTF(RED "------------------------<PROC DUMP>------------------------\n"
-            YELLOW "stack: [");
+    size_t cmds_in_line = 0;
+    size_t ram_size = (RAM_SIZE > MAX_DUMP_RAM_SIZE) ? MAX_DUMP_RAM_SIZE : RAM_SIZE;
 
-    for (size_t i = 0; i < proc_data->stack.size; i++)
+    DPRINTF(RED "-----------------------------------<PROC DUMP>"
+                "-----------------------------------\n");
+
+    ColorPrintArray("stack", proc_data->stack.data,      proc_data->stack.size,      YELLOW);
+
+    DPRINTF("           ");
+
+    char reg_names[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+    size_t reg_names_size = sizeof(reg_names);
+
+    DPRINTF(GREEN);
+    for (size_t i = 0; i < reg_names_size; i++)
     {
-        if (i == proc_data->stack.size - 1)
+        if (i == reg_names_size - 1)
         {
-            DPRINTF("%d", proc_data->stack.data[i]);
+            DPRINTF("%c", reg_names[i]);
             break;
         }
-        if ((i + 1) % 14 == 0 && i != 0)
+        if ((i + 1) % 24 == 0)
         {
             DPRINTF("\n\t");
         }
-        DPRINTF("%d, ", proc_data->stack.data[i]);
+        DPRINTF("%c  ", reg_names[i]);
     }
-    DPRINTF("]\ncall_stack: [");
+    DPRINTF("\n" RESET_CLR);
 
-    for (size_t i = 0; i < proc_data->call_stack.size; i++)
-    {
-        if (i == proc_data->call_stack.size - 1)
-        {
-            DPRINTF("%d", proc_data->call_stack.data[i]);
-            break;
-        }
-        if ((i + 1) % 14 == 0 && i != 0)
-        {
-            DPRINTF("\n\t");
-        }
-        DPRINTF("%d, ", proc_data->call_stack.data[i])
-    }
-    DPRINTF("]\n" GREEN "regs[%d] = [", REGS_COUNT);
+    ColorPrintArray("regs",  proc_data->regs,            REGS_COUNT,                 GREEN);
+    ColorPrintArray("calls", proc_data->call_stack.data, proc_data->call_stack.size, YELLOW);
+    ColorPrintArray("ram",   proc_data->ram,             ram_size,                   LIGHT_YELLOW);
 
-    for (int i = 0; i < REGS_COUNT; i++)
-    {
-        if (i == REGS_COUNT - 1)
-        {
-            DPRINTF("%d", proc_data->regs[i]);
-            break;
-        }
-        if ((i + 1) % 14 == 0 && i != 0)
-        {
-            DPRINTF("\n\t");
-        }
-        DPRINTF("%d, ", proc_data->regs[i]);
-    }
     DPRINTF("]\n" BLUE "code[] = [");
+
+    int cmd = proc_data->code[proc_data->cmd_count];
+
+    int jump_id = -1;
+
+    if ((CMD_JMP <= cmd && cmd <= CMD_JNE) || cmd == CMD_CALL)
+    {
+        jump_id = proc_data->code[proc_data->cmd_count + 1];
+    }
 
     for (size_t i = 0; i < proc_data->code_size; i++)
     {
-        if (i == proc_data->code_size - 1)
-        {
-            DPRINTF("%d", proc_data->code[i]);
-            break;
-        }
-        if ((i + 1) % 14 == 0 && i != 0)
-        {
-            DPRINTF("\n\t  ");
-        }
-        if (i == proc_data->cmd_count)
-        {
-            DPRINTF("{%d}, ", proc_data->code[i]);
-        }
-        else
-        {
-            DPRINTF("%d, ", proc_data->code[i]);
-        }
+        DprintCommand(proc_data, &i, &cmds_in_line, jump_id);
     }
 
-    size_t ram_size = RAM_SIZE;
-    if (ram_size > MAX_DUMP_RAM_SIZE)
-    {
-        ram_size = MAX_DUMP_RAM_SIZE;
-    }
+    DPRINTF("]\n");
 
-    DPRINTF("]\n" LIGHT_YELLOW "ram[] = [");
+    DPRINTF(RED "-----------------------------------------"
+                "----------------------------------------\n");
 
-    for (size_t i = 0; i < ram_size; i++)
-    {
-        if (i == ram_size - 1)
-        {
-            DPRINTF("%d", proc_data->ram[i]);
-        }
-        else if (i % 17 == 0 && i != 0)
-        {
-            DPRINTF("\n\t ");
-        }
-        else
-        {
-            DPRINTF("%d, ", proc_data->ram[i]);
-        }
-    }
-    DPRINTF("]\n" RED "-----------------------------------------------------------\n" RESET_CLR);
+    DPRINTF(RESET_CLR);
 
     return PROC_SUCCESS;
 }

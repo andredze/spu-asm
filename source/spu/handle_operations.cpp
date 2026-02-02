@@ -99,7 +99,9 @@ int Jump(Proc_t* proc_data, int new_cmd_count)
         DPRINTF("Invalid argument for jump (%d)\n", new_cmd_count);
         return 1;
     }
+
     proc_data->cmd_count = new_cmd_count;
+
     DPRINTF("\t   jumping to %d\n", new_cmd_count);
 
     return 0;

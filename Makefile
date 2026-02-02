@@ -65,6 +65,9 @@ asm:
 spu:
 	$(CXX) $(PROCSOURCES) -DSPU $(PROCFLAGS) -o $(PROCEXECUTABLE)
 
+spu_debug:
+	$(CXX) $(PROCSOURCES) -DSPU $(PROCFLAGS) -o run_debug
+
 bad_apple:
 	$(CXX) -I include badapple/main.cpp source/input.cpp -o bad
 
